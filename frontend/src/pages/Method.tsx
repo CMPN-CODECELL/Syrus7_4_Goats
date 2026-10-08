@@ -22,7 +22,7 @@ export const Method: React.FC = () => {
         <ul className="space-y-2 text-xs text-text/90">
           <li className="flex items-start gap-2">
             <span className="text-peach font-bold">•</span>
-            <span><strong>No Fake Quantum Advantage:</strong> We never claim quantum advantage, quantum speedup, or superiority over classical algorithms on current noisy hardware.</span>
+            <span><strong>Honest Quantum Evaluation:</strong> We never claim quantum superiority or classical displacement on current noisy hardware.</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-peach font-bold">•</span>

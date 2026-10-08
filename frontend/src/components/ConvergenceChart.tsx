@@ -44,7 +44,7 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
             <YAxis stroke="#A9B3C9" fontSize={10} tickLine={false} domain={['auto', 'auto']} />
             <Tooltip
               contentStyle={{ backgroundColor: '#242F49', borderColor: '#384358', borderRadius: '8px', fontSize: '11px', color: '#F4EFEA' }}
-              labelFormatter={(iter) => `Iteration ${iter}`}
+              labelFormatter={(iter: any) => `Iteration ${iter}`}
               formatter={(val: any) => [formatNumber(Number(val), 5), 'Energy ⟨H⟩']}
             />
             <Line

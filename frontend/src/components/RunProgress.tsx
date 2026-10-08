@@ -70,7 +70,7 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
                 <YAxis stroke="#A9B3C9" fontSize={10} tickLine={false} domain={['auto', 'auto']} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#242F49', borderColor: '#384358', borderRadius: '8px', fontSize: '11px', color: '#F4EFEA' }}
-                  labelFormatter={(label) => `Iteration ${label}`}
+                  labelFormatter={(label: any) => `Iteration ${label}`}
                   formatter={(val: any) => [Number(val).toFixed(5), 'Energy F(x)']}
                 />
                 <Line

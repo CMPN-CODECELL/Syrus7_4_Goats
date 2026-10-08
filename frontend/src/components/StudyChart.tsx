@@ -74,7 +74,7 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
             />
             <Tooltip
               contentStyle={{ backgroundColor: '#242F49', borderColor: '#384358', borderRadius: '8px', fontSize: '11px', color: '#F4EFEA' }}
-              labelFormatter={(val) => `${study.x_label}: ${val}`}
+              labelFormatter={(val: any) => `${study.x_label}: ${val}`}
             />
             <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '11px', color: '#F4EFEA' }} />
 
