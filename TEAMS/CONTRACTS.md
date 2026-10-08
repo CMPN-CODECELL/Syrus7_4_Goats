@@ -221,6 +221,7 @@ Base path is `/api`. Every response is JSON. An error body looks like `{"detail"
 }
 ```
 - **Solver ids:** `brute_force`, `relaxation`, `annealing`, `qaoa_standard`, `qaoa_xy`.
+- **Enums:** `kind` is `classical` or `quantum`; `verdict.level` is `matched`, `near`, `worse` or `no-feasible`. Frontier points are plain dicts (`risk`, `ret`, plus `selection` for discrete).
 - **No feasible sample:** a QAOA solver with no feasible sample has `selection: null`, `bitstring: null`, `feasible: false`, and null numbers, but **still has** `feasible_rate`.
 - **`volatility`:** equals `sqrt(variance)`.
 - **`qaoa.noise`:** when noise is on, `{"backend": "FakeGuadalupeV2", "ideal": {metrics}, "noisy": {metrics}, "transpiled": {"depth": int, "two_qubit_gates": int}}`.
