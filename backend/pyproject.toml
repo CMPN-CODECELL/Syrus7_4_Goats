@@ -1,0 +1,29 @@
+[project]
+name = "qportfolio"
+version = "0.1.0"
+description = "Quantum Portfolio Optimiser (QAOA vs classical baselines on NIFTY 50)"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "qiskit==2.5.2",
+    "qiskit-aer==0.17.2",
+    "qiskit-ibm-runtime==0.50.0",
+    "cvxpy==1.9.3",
+    "yfinance==1.7.0",
+    "pandas==3.0.6",
+    "numpy==2.5.3",
+    "scipy==1.18.1",
+    "pyarrow==25.0.1",
+    "fastapi==0.143.0",
+    "uvicorn[standard]==0.54.0",
+    "pydantic==2.14.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "httpx2==2.13.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
