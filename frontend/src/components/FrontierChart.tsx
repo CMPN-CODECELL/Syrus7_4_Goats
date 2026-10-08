@@ -79,7 +79,7 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
               domain={['auto', 'auto']}
               stroke="#A9B3C9"
               fontSize={11}
-              tickFormatter={(v) => formatPercent(v, 0)}
+              tickFormatter={(v: any) => formatPercent(v, 0)}
               name="Annualised Volatility"
               label={{ value: 'Annualised Volatility (Risk)', position: 'insideBottom', offset: -12, fill: '#A9B3C9', fontSize: 11 }}
             />
@@ -89,7 +89,7 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
               domain={['auto', 'auto']}
               stroke="#A9B3C9"
               fontSize={11}
-              tickFormatter={(v) => formatPercent(v, 0)}
+              tickFormatter={(v: any) => formatPercent(v, 0)}
               name="Annualised Return"
               label={{ value: 'Expected Return', angle: -90, position: 'insideLeft', offset: 10, fill: '#A9B3C9', fontSize: 11 }}
             />

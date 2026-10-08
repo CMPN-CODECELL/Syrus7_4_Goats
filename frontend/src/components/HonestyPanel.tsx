@@ -35,7 +35,7 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
             <span>🛡️ PS-03 Honesty &amp; Verdict Report</span>
           </h2>
           <p className="text-xs text-muted mt-0.5">
-            Automated verdict evaluation based on exact brute force comparison. No quantum advantage is claimed.
+            Automated verdict evaluation based on exact brute force comparison. No quantum superiority is claimed.
           </p>
         </div>
 

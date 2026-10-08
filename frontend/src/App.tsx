@@ -105,7 +105,7 @@ export const App: React.FC = () => {
           <span className="text-peach">Strict PS-03 Honesty Protocol</span>
         </div>
         <p className="text-[10px] text-muted/70 max-w-2xl mx-auto">
-          No quantum advantage is claimed. Classical brute force evaluates exact solutions on small instances. QAOA solutions represent the best feasible bitstrings sampled from quantum state measurements.
+          No quantum superiority is claimed. Classical brute force evaluates exact solutions on small instances. QAOA solutions represent the best feasible bitstrings sampled from quantum state measurements.
         </p>
       </footer>
 
