@@ -353,3 +353,236 @@ def test_discrete_pareto_frontier_non_dominated():
                     and (p_b["risk"] < p_a["risk"] or p_b["ret"] > p_a["ret"])
                 )
                 assert not b_dominates_a, f"Point {p_b} dominates {p_a}"
+
+
+def test_real_nifty50_market_pipeline_integration():
+    """U15 integration test on real NIFTY 50 snapshot market data."""
+    from qportfolio.classical.annealing import annealing
+    from qportfolio.classical.brute_force import brute_force
+    from qportfolio.classical.relaxation import relaxation
+    from qportfolio.data import build_market
+    from tests.test_classical import Problem, build_cardinality_qubo
+
+    # Real 10-asset universe from NIFTY 50 snapshot
+    test_tickers = [
+        "TCS.NS",
+        "INFY.NS",
+        "RELIANCE.NS",
+        "HDFCBANK.NS",
+        "ICICIBANK.NS",
+        "ITC.NS",
+        "SBIN.NS",
+        "LT.NS",
+        "BHARTIARTL.NS",
+        "HINDUNILVR.NS",
+    ]
+    market = build_market(test_tickers)
+    assert len(market.tickers) == 10
+
+    problem = Problem(
+        tickers=market.tickers,
+        sectors=market.sectors,
+        mu=market.mu,
+        sigma=market.sigma,
+        k=5,
+        q=0.5,
+        cost_lin=np.full(10, 0.001187),
+        cost_const=0.0005,
+        sector_cap=2,
+    )
+
+    # 1. Classical baselines
+    bf_res, landscape = brute_force(problem)
+    assert bf_res.feasible is True
+    assert bf_res.runtime_s > 0
+    assert len(bf_res.selection) == 5
+
+    rx_res = relaxation(problem)
+    assert rx_res.feasible is True
+    assert rx_res.runtime_s > 0
+
+    qubo = build_cardinality_qubo(problem, penalty_a=3.0)
+    sa_res = annealing(problem, qubo, seed=42, sweeps=1500)
+    assert sa_res.runtime_s > 0
+
+    # 2. Frontier
+    fr = frontier(market, landscape)
+    assert len(fr.continuous) == 25
+    assert len(fr.discrete) > 0
+    # Discrete frontier must include or match the exact optimum
+    discrete_selections = [set(p["selection"]) for p in fr.discrete]
+    assert set(bf_res.selection) in discrete_selections
+
+    # 3. QAOA simulated distributions across all 4 levels
+    # Case A: Matched
+    s_opt = Sample(
+        bitstring=bf_res.bitstring,
+        prob=0.8,
+        objective=bf_res.objective,
+        feasible=True,
+        optimal=True,
+    )
+    s_sub = Sample(
+        bitstring="0101010101",
+        prob=0.2,
+        objective=bf_res.objective + 0.01,
+        feasible=True,
+        optimal=False,
+    )
+    qaoa_sol_matched = SolverResultStub(
+        solver="qaoa_standard",
+        label="QAOA",
+        kind="quantum",
+        selection=bf_res.selection,
+        bitstring=bf_res.bitstring,
+        objective=bf_res.objective,
+        exp_return=bf_res.exp_return,
+        volatility=bf_res.volatility,
+        variance=bf_res.variance,
+        txn_cost=bf_res.txn_cost,
+        feasible=True,
+        violations=[],
+        runtime_s=12.5,
+    )
+    m_matched = qaoa_metrics([s_opt, s_sub], landscape)
+    assert pytest.approx(m_matched.p_random, abs=1e-9) == 1.0 / len(landscape.selections)
+    v_matched = verdict([bf_res, rx_res, sa_res, qaoa_sol_matched], landscape, m_matched)
+    assert v_matched.level == "matched"
+
+    # Case B: Near (within 1%)
+    near_obj = bf_res.objective + 0.005 * abs(bf_res.objective)
+    qaoa_sol_near = SolverResultStub(
+        solver="qaoa_standard",
+        label="QAOA",
+        kind="quantum",
+        selection=bf_res.selection,
+        bitstring=bf_res.bitstring,
+        objective=near_obj,
+        exp_return=bf_res.exp_return,
+        volatility=bf_res.volatility,
+        variance=bf_res.variance,
+        txn_cost=bf_res.txn_cost,
+        feasible=True,
+        violations=[],
+        runtime_s=12.5,
+    )
+    v_near = verdict([bf_res, rx_res, sa_res, qaoa_sol_near], landscape, m_matched)
+    assert v_near.level == "near"
+
+    # Case C: Worse (> 1%)
+    worse_obj = bf_res.objective + 0.10 * abs(bf_res.objective)
+    qaoa_sol_worse = SolverResultStub(
+        solver="qaoa_standard",
+        label="QAOA",
+        kind="quantum",
+        selection=bf_res.selection,
+        bitstring=bf_res.bitstring,
+        objective=worse_obj,
+        exp_return=bf_res.exp_return,
+        volatility=bf_res.volatility,
+        variance=bf_res.variance,
+        txn_cost=bf_res.txn_cost,
+        feasible=True,
+        violations=[],
+        runtime_s=12.5,
+    )
+    v_worse = verdict([bf_res, rx_res, sa_res, qaoa_sol_worse], landscape, m_matched)
+    assert v_worse.level == "worse"
+
+    # Case D: Infeasible
+    s_infeas = [Sample(bitstring="1111111111", prob=1.0, objective=None, feasible=False, optimal=False)]
+    m_infeas = qaoa_metrics(s_infeas, landscape)
+    qaoa_sol_infeas = SolverResultStub(
+        solver="qaoa_standard",
+        label="QAOA",
+        kind="quantum",
+        selection=None,
+        bitstring=None,
+        objective=None,
+        exp_return=None,
+        volatility=None,
+        variance=None,
+        txn_cost=None,
+        feasible=False,
+        violations=["no feasible sample"],
+        runtime_s=10.0,
+    )
+    v_infeas = verdict([bf_res, rx_res, sa_res, qaoa_sol_infeas], landscape, m_infeas)
+    assert v_infeas.level == "no-feasible"
+
+    # Banned phrase check across all generated verdicts
+    for v in [v_matched, v_near, v_worse, v_infeas]:
+        combined_text = f"{v.headline} " + " ".join(v.details)
+        for banned in BANNED_PHRASES:
+            assert banned not in combined_text.lower(), f"Banned phrase '{banned}' in verdict: {combined_text}"
+
+
+def test_constraints_variations_and_honesty():
+    """Verify solver and verdict honesty across constraint variations (K, caps, target return, holdings)."""
+    from qportfolio.classical.brute_force import brute_force
+    from qportfolio.classical.relaxation import relaxation
+    from qportfolio.data import build_market
+    from tests.test_classical import Problem
+
+    market = build_market(["TCS.NS", "INFY.NS", "RELIANCE.NS", "HDFCBANK.NS", "ICICIBANK.NS", "ITC.NS"])
+    n = 6
+
+    # Variation 1: K=3, sector cap=1
+    p1 = Problem(
+        tickers=market.tickers,
+        sectors=market.sectors,
+        mu=market.mu,
+        sigma=market.sigma,
+        k=3,
+        q=0.5,
+        cost_lin=np.zeros(n),
+        cost_const=0.0,
+        sector_cap=1,
+    )
+    bf1, land1 = brute_force(p1)
+    rx1 = relaxation(p1)
+
+    assert bf1.feasible is True
+    # Every selection in landscape must have at most 1 pick per sector
+    for sel in land1.selections:
+        ev = p1.evaluate(sel)
+        assert ev.feasible is True
+        assert len(ev.violations) == 0
+
+    # Variation 2: Target return set
+    target_ret = float(np.mean(market.mu))
+    p2 = Problem(
+        tickers=market.tickers,
+        sectors=market.sectors,
+        mu=market.mu,
+        sigma=market.sigma,
+        k=3,
+        q=0.5,
+        cost_lin=np.zeros(n),
+        cost_const=0.0,
+        target_return=target_ret,
+    )
+    bf2, land2 = brute_force(p2)
+    # If feasible selections exist, verify target return is satisfied
+    if bf2.feasible:
+        assert bf2.exp_return >= target_ret - 1e-9
+
+    # Variation 3: Holdings transaction costs
+    # Holding TCS.NS and INFY.NS
+    cost_lin = np.zeros(n)
+    cost_lin[0] = 0.001187  # TCS
+    cost_lin[1] = 0.001187  # INFY
+    cost_const = 0.0005
+    p3 = Problem(
+        tickers=market.tickers,
+        sectors=market.sectors,
+        mu=market.mu,
+        sigma=market.sigma,
+        k=2,
+        q=0.5,
+        cost_lin=cost_lin,
+        cost_const=cost_const,
+    )
+    bf3, land3 = brute_force(p3)
+    assert bf3.feasible is True
+    assert bf3.txn_cost > 0.0
