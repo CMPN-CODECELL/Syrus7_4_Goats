@@ -1,0 +1,39 @@
+{
+  "id": "depth",
+  "title": "Effect of circuit depth",
+  "description": "Mean over 10 fixed-seed 10-asset, K=5 instances, est window 2023-10-01..2025-09-30.",
+  "x_label": "QAOA depth p",
+  "y_label": "1 - approximation ratio",
+  "series": [
+    {
+      "label": "Standard mixer",
+      "points": [
+        {"x": 1, "y": 0.31, "yerr": 0.05},
+        {"x": 2, "y": 0.24, "yerr": 0.045},
+        {"x": 3, "y": 0.19, "yerr": 0.04},
+        {"x": 4, "y": 0.15, "yerr": 0.035},
+        {"x": 5, "y": 0.12, "yerr": 0.03}
+      ]
+    },
+    {
+      "label": "XY mixer + Dicke",
+      "points": [
+        {"x": 1, "y": 0.12, "yerr": 0.03},
+        {"x": 2, "y": 0.09, "yerr": 0.03},
+        {"x": 3, "y": 0.07, "yerr": 0.025},
+        {"x": 4, "y": 0.06, "yerr": 0.02},
+        {"x": 5, "y": 0.05, "yerr": 0.02}
+      ]
+    }
+  ],
+  "instance": {
+    "n_assets": 10,
+    "k": 5,
+    "q": 0.5,
+    "seeds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "shots": 4096
+  },
+  "notes": ["Noiseless statevector simulation.", "Example payload: illustrative numbers for UI development, not measured results."],
+  "generated_at": "2026-10-09",
+  "wall_time_s": 812.0
+}

@@ -1,0 +1,7 @@
+[
+  {"id": "depth", "title": "Effect of circuit depth", "summary": "How the approximation ratio changes with QAOA depth p, standard versus XY mixer."},
+  {"id": "optimizer", "title": "Choice of classical optimiser", "summary": "COBYLA, SPSA and Nelder-Mead compared at the same iteration budget."},
+  {"id": "init", "title": "Initial parameters", "summary": "Random, linear-ramp and depth-interpolated starting points compared."},
+  {"id": "mixer", "title": "Standard versus XY mixer", "summary": "Approximation ratio and probability of the optimum with each mixer."},
+  {"id": "noise", "title": "Effect of hardware noise", "summary": "The same optimised circuit sampled ideally and on a noisy FakeGuadalupeV2."}
+]
