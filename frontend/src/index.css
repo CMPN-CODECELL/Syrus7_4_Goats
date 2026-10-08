@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #161E2F;
+  --color-panel: #242F49;
+  --color-line: #384358;
+  --color-peach: #FFA586;
+  --color-red: #B51A2B;
+  --color-wine: #541A2E;
+  --color-text: #F4EFEA;
+  --color-muted: #A9B3C9;
+  --color-slate: #8FA3C8;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-text);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Soft Shadow from DESIGN.md */
+.shadow-panel {
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+}
+
+/* Hero Band Gradient from DESIGN.md: #541A2E -> #B51A2B -> #FFA586 -> #384358 -> #161E2F */
+.bg-hero-gradient {
+  background: linear-gradient(135deg, #541A2E 0%, #B51A2B 35%, #FFA586 70%, #384358 85%, #161E2F 100%);
+}
+
+.bg-hero-bar {
+  background: linear-gradient(90deg, #541A2E 0%, #B51A2B 25%, #FFA586 50%, #384358 75%, #161E2F 100%);
+}
+
+/* Glassmorphism panel styling */
+.glass-panel {
+  background: rgba(36, 47, 73, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 67, 88, 0.6);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #161E2F;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #384358;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8FA3C8;
+}
