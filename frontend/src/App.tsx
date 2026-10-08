@@ -43,7 +43,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('optimise')}
-                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                className={`px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
                   activeTab === 'optimise'
                     ? 'bg-peach text-ink shadow'
                     : 'text-muted hover:text-text'
@@ -54,7 +54,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('evidence')}
-                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                className={`px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
                   activeTab === 'evidence'
                     ? 'bg-peach text-ink shadow'
                     : 'text-muted hover:text-text'
@@ -65,7 +65,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('method')}
-                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                className={`px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
                   activeTab === 'method'
                     ? 'bg-peach text-ink shadow'
                     : 'text-muted hover:text-text'
@@ -78,7 +78,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setGlossaryOpen(true)}
-              className="p-2 bg-panel hover:bg-line text-peach border border-line rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow"
+              className="p-2 min-h-[44px] min-w-[44px] bg-panel hover:bg-line text-peach border border-line rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
               title="Quantum Glossary"
             >
               <span>📖</span>
