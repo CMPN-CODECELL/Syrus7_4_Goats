@@ -14,6 +14,14 @@ import { ConstraintsForm } from '../components/ConstraintsForm';
 import { AdvancedQaoa } from '../components/AdvancedQaoa';
 import { ScreenPreview } from '../components/ScreenPreview';
 import { RunProgress } from '../components/RunProgress';
+import { MetricCards } from '../components/MetricCards';
+import { PortfolioTable } from '../components/PortfolioTable';
+import { SolverTable } from '../components/SolverTable';
+import { FrontierChart } from '../components/FrontierChart';
+import { ConvergenceChart } from '../components/ConvergenceChart';
+import { BitstringHistogram } from '../components/BitstringHistogram';
+import { HonestyPanel } from '../components/HonestyPanel';
+import { OutOfSample } from '../components/OutOfSample';
 
 const DEFAULT_QAOA: QaoaSettings = {
   variant: 'standard',
@@ -49,6 +57,7 @@ export const Optimise: React.FC = () => {
   // Job & Execution State
   const [activeJobStatus, setActiveJobStatus] = useState<JobStatus | null>(null);
   const [runResult, setRunResult] = useState<RunResult | null>(null);
+  const [selectedSolverKey, setSelectedSolverKey] = useState<string>('brute_force');
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const pollTimerRef = useRef<number | null>(null);
@@ -106,6 +115,13 @@ export const Optimise: React.FC = () => {
     };
   }, []);
 
+  // Set default solver selection when result arrives
+  useEffect(() => {
+    if (runResult) {
+      setSelectedSolverKey(runResult.recommended || runResult.solvers[0]?.solver || 'brute_force');
+    }
+  }, [runResult]);
+
   // Handle Polling Loop
   const startPolling = (jobId: string) => {
     if (pollTimerRef.current !== null) {
@@ -135,7 +151,6 @@ export const Optimise: React.FC = () => {
     setValidationError(null);
     setRunResult(null);
 
-    // Validation limits from §2.2
     if (k < 2 || k > 15) {
       setValidationError('Cardinality (K) must be between 2 and 15 stocks.');
       return;
@@ -209,6 +224,8 @@ export const Optimise: React.FC = () => {
     );
   }
 
+  const selectedSolver = runResult?.solvers.find(s => s.solver === selectedSolverKey) || runResult?.solvers[0];
+
   return (
     <div className="space-y-6">
       {/* Top Market Data Banner */}
@@ -266,7 +283,7 @@ export const Optimise: React.FC = () => {
           </button>
         </div>
 
-        {/* Right Panel: Pre-screen, Active Execution & Results Slot */}
+        {/* Right Panel: Pre-screen, Execution State & U13 Full Results */}
         <div className="lg:col-span-6 space-y-6">
           {/* Live Qubit Pre-screen Preview */}
           <ScreenPreview
@@ -308,38 +325,68 @@ export const Optimise: React.FC = () => {
             </div>
           )}
 
-          {/* U13 Results Slot Container */}
-          <div id="u13-results-slot" className="min-h-[200px]">
-            {runResult ? (
-              <div className="p-6 bg-panel border border-peach/50 rounded-2xl shadow-panel space-y-3">
-                <div className="flex items-center justify-between border-b border-line pb-3">
-                  <h3 className="text-sm font-bold text-peach flex items-center gap-2">
-                    <span>✨</span> Optimization Complete (Run ID: {runResult.run_id})
-                  </h3>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-peach/10 text-peach border border-peach/30">
-                    QAOA + 3 Baselines Evaluated
-                  </span>
-                </div>
-                <div className="p-4 bg-ink/60 rounded-xl border border-line text-xs space-y-2">
-                  <div className="font-bold text-text">{runResult.verdict.headline}</div>
-                  <ul className="list-disc list-inside text-muted text-[11px] space-y-1">
-                    {runResult.verdict.details.map((d, i) => (
-                      <li key={i}>{d}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="text-[11px] text-muted italic text-center pt-2">
-                  [U13 Slot: Full Portfolio Breakdown, Efficient Frontier Chart, Bitstring Histogram &amp; Out-of-Sample metrics render here in U13]
-                </div>
-              </div>
-            ) : !activeJobStatus ? (
-              <div className="p-8 bg-panel/40 border border-dashed border-line rounded-2xl text-center text-xs text-muted space-y-2">
-                <div className="text-xl text-slate">📊</div>
-                <div className="font-bold text-text">No Active Optimization Run</div>
-                <p>Configure parameters on the left and click "Run Quantum Portfolio Optimization" to launch QAOA and classical benchmarks.</p>
-              </div>
-            ) : null}
-          </div>
+          {/* U13 Full Results Display */}
+          {runResult && selectedSolver && (
+            <div className="space-y-6">
+              {/* Metric Cards */}
+              <MetricCards solver={selectedSolver} />
+
+              {/* Portfolio Asset Allocation Table */}
+              <PortfolioTable
+                solvers={runResult.solvers}
+                recommendedSolverId={runResult.recommended}
+                selectedSolverKey={selectedSolverKey}
+                onSelectSolver={setSelectedSolverKey}
+              />
+
+              {/* Solver Comparison Matrix */}
+              <SolverTable
+                solvers={runResult.solvers}
+                recommendedId={runResult.recommended}
+                selectedSolverKey={selectedSolverKey}
+                onSelectSolver={setSelectedSolverKey}
+              />
+
+              {/* Efficient Frontier Chart */}
+              <FrontierChart
+                frontier={runResult.frontier}
+                solvers={runResult.solvers}
+                selectedSolverKey={selectedSolverKey}
+                onSelectSolver={setSelectedSolverKey}
+              />
+
+              {/* Convergence Chart */}
+              <ConvergenceChart
+                convergence={runResult.qaoa.convergence}
+              />
+
+              {/* Bitstring Sample Distribution Histogram */}
+              <BitstringHistogram
+                samples={runResult.qaoa.samples}
+              />
+
+              {/* Honesty Verdict Panel */}
+              <HonestyPanel
+                verdict={runResult.verdict}
+                qaoaResult={runResult.qaoa}
+              />
+
+              {/* Out of Sample Backtest Table */}
+              <OutOfSample
+                solvers={runResult.solvers}
+                nifty50Benchmark={runResult.benchmarks.nifty50}
+                testWindow={runResult.data.test_window}
+              />
+            </div>
+          )}
+
+          {!runResult && !activeJobStatus && (
+            <div className="p-8 bg-panel/40 border border-dashed border-line rounded-2xl text-center text-xs text-muted space-y-2">
+              <div className="text-xl text-slate">📊</div>
+              <div className="font-bold text-text">No Active Optimization Run</div>
+              <p>Configure parameters on the left and click "Run Quantum Portfolio Optimization" to launch QAOA and classical benchmarks.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
