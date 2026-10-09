@@ -1,0 +1,51 @@
+symbol,yf_ticker,name,sector
+ADANIENT,ADANIENT.NS,Adani Enterprises Ltd.,Metals & Mining
+ADANIPORTS,ADANIPORTS.NS,Adani Ports and Special Economic Zone Ltd.,Services
+APOLLOHOSP,APOLLOHOSP.NS,Apollo Hospitals Enterprise Ltd.,Healthcare
+ASIANPAINT,ASIANPAINT.NS,Asian Paints Ltd.,Consumer Durables
+AXISBANK,AXISBANK.NS,Axis Bank Ltd.,Financial Services
+BSE,BSE.NS,BSE Ltd.,Financial Services
+BAJAJ-AUTO,BAJAJ-AUTO.NS,Bajaj Auto Ltd.,Automobile and Auto Components
+BAJFINANCE,BAJFINANCE.NS,Bajaj Finance Ltd.,Financial Services
+BAJAJFINSV,BAJAJFINSV.NS,Bajaj Finserv Ltd.,Financial Services
+BEL,BEL.NS,Bharat Electronics Ltd.,Capital Goods
+BHARTIARTL,BHARTIARTL.NS,Bharti Airtel Ltd.,Telecommunication
+CIPLA,CIPLA.NS,Cipla Ltd.,Healthcare
+COALINDIA,COALINDIA.NS,Coal India Ltd.,Oil Gas & Consumable Fuels
+DRREDDY,DRREDDY.NS,Dr. Reddy's Laboratories Ltd.,Healthcare
+EICHERMOT,EICHERMOT.NS,Eicher Motors Ltd.,Automobile and Auto Components
+ETERNAL,ETERNAL.NS,Eternal Ltd.,Consumer Services
+GRASIM,GRASIM.NS,Grasim Industries Ltd.,Construction Materials
+HCLTECH,HCLTECH.NS,HCL Technologies Ltd.,Information Technology
+HDFCBANK,HDFCBANK.NS,HDFC Bank Ltd.,Financial Services
+HDFCLIFE,HDFCLIFE.NS,HDFC Life Insurance Company Ltd.,Financial Services
+HINDALCO,HINDALCO.NS,Hindalco Industries Ltd.,Metals & Mining
+HINDUNILVR,HINDUNILVR.NS,Hindustan Unilever Ltd.,Fast Moving Consumer Goods
+ICICIBANK,ICICIBANK.NS,ICICI Bank Ltd.,Financial Services
+ITC,ITC.NS,ITC Ltd.,Fast Moving Consumer Goods
+INFY,INFY.NS,Infosys Ltd.,Information Technology
+INDIGO,INDIGO.NS,InterGlobe Aviation Ltd.,Services
+JSWSTEEL,JSWSTEEL.NS,JSW Steel Ltd.,Metals & Mining
+JIOFIN,JIOFIN.NS,Jio Financial Services Ltd.,Financial Services
+KOTAKBANK,KOTAKBANK.NS,Kotak Mahindra Bank Ltd.,Financial Services
+LT,LT.NS,Larsen & Toubro Ltd.,Construction
+M&M,M&M.NS,Mahindra & Mahindra Ltd.,Automobile and Auto Components
+MARUTI,MARUTI.NS,Maruti Suzuki India Ltd.,Automobile and Auto Components
+MAXHEALTH,MAXHEALTH.NS,Max Healthcare Institute Ltd.,Healthcare
+NTPC,NTPC.NS,NTPC Ltd.,Power
+NESTLEIND,NESTLEIND.NS,Nestle India Ltd.,Fast Moving Consumer Goods
+ONGC,ONGC.NS,Oil & Natural Gas Corporation Ltd.,Oil Gas & Consumable Fuels
+POWERGRID,POWERGRID.NS,Power Grid Corporation of India Ltd.,Power
+RELIANCE,RELIANCE.NS,Reliance Industries Ltd.,Oil Gas & Consumable Fuels
+SBILIFE,SBILIFE.NS,SBI Life Insurance Company Ltd.,Financial Services
+SHRIRAMFIN,SHRIRAMFIN.NS,Shriram Finance Ltd.,Financial Services
+SBIN,SBIN.NS,State Bank of India,Financial Services
+SUNPHARMA,SUNPHARMA.NS,Sun Pharmaceutical Industries Ltd.,Healthcare
+TCS,TCS.NS,Tata Consultancy Services Ltd.,Information Technology
+TATACONSUM,TATACONSUM.NS,Tata Consumer Products Ltd.,Fast Moving Consumer Goods
+TMPV,TMPV.NS,Tata Motors Passenger Vehicles Ltd.,Automobile and Auto Components
+TATASTEEL,TATASTEEL.NS,Tata Steel Ltd.,Metals & Mining
+TECHM,TECHM.NS,Tech Mahindra Ltd.,Information Technology
+TITAN,TITAN.NS,Titan Company Ltd.,Consumer Durables
+TRENT,TRENT.NS,Trent Ltd.,Consumer Services
+ULTRACEMCO,ULTRACEMCO.NS,UltraTech Cement Ltd.,Construction Materials

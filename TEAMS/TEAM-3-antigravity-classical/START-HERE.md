@@ -13,8 +13,8 @@ Then download and install Antigravity from https://antigravity.google/download .
 
 ```powershell
 cd $HOME\Desktop
-git clone https://github.com/000wahab000/Quantum-Portfolio.git
-cd Quantum-Portfolio
+git clone https://github.com/CMPN-CODECELL/Syrus7_4_Goats.git
+cd Syrus7_4_Goats
 git checkout -b team-3/work
 git config user.name "TEAM-3"
 git config user.email "team-3@users.noreply.github.com"
@@ -24,7 +24,7 @@ If it asks you to log in to GitHub, log in. If it says "not found", send Wahab y
 
 ## Step 3: Open it in Antigravity (once).
 
-Antigravity > File > Open Folder > Desktop > Quantum-Portfolio.
+Antigravity > File > Open Folder > Desktop > Syrus7_4_Goats.
 
 Settings (gear icon): set "Artifact review" and "Terminal" to "Request review", turn ON "Sandbox Mode", NEVER pick "Turbo" or "Always proceed". Model: Gemini 3.1 Pro (or Claude Sonnet 5.5 if listed).
 

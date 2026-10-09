@@ -1,0 +1,8 @@
+.env
+.venv/
+node_modules/
+backend/data/cache/
+backend/*.parquet
+__pycache__/
+.pytest_cache/
+dist/
