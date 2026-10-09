@@ -35,6 +35,7 @@ Open http://localhost:5173 (the dev server proxies `/api` to port 8000). Health 
 - **Phone on the same Wi-Fi:** add `--host 0.0.0.0` to the uvicorn command and run `npm run dev -- --host`, then open `http://<laptop-ip>:5173` on the phone. Allow the Windows Firewall prompt for private networks.
 - **UI without a backend:** `$env:VITE_USE_MOCKS="1"; npm run dev` replays the example payloads in `contracts/api-examples/`. These are illustrative, not live results.
 - **Checks:** `cd backend; uv run pytest -q` and `cd frontend; npm run build`.
+- **Streamlit (1-Click Web Deployment):** Run `streamlit run streamlit_app.py` locally or deploy directly to [Streamlit Community Cloud](https://share.streamlit.io) using `streamlit_app.py` as the entrypoint. See [STREAMLIT.md](STREAMLIT.md) for full instructions.
 
 ## How it works
 

@@ -261,3 +261,7 @@ websockets==17.2
     #   yfinance
 yfinance==1.7.0
     # via qportfolio
+streamlit>=1.35.0
+    # via qportfolio
+plotly>=5.18.0
+    # via qportfolio
