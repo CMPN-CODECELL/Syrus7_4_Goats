@@ -1,4 +1,7 @@
 // Monochrome chart palette. Shape carries the series identity so colour is never the only signal.
+// Green and red never appear in a chart: they are reserved for gain and loss text elsewhere in the app.
+import { isNum } from './format';
+
 export const CHART_COLORS = {
   // Solver series
   qaoa_standard: '#FFFFFF',
@@ -14,9 +17,17 @@ export const CHART_COLORS = {
   infeasible: '#1A1A1A',
   infeasibleStroke: '#6B6B6B',
 
+  // Uniform-random baseline in the sampling-quality chart: mid grey beside QAOA's white (about 4.8:1 apart)
+  baseline: '#737373',
+
+  // Frontier cloud: the computed continuous points (solid) and discrete K-stock points (ring)
+  frontierContinuous: '#A3A3A3',
+  frontierDiscrete: '#737373',
+
   // Chart chrome
   grid: '#262626',
   tick: '#A3A3A3',
+  axis: '#6B6B6B',
 
   // UI palette
   bg: '#000000',
@@ -76,7 +87,7 @@ export function getSeriesStyle(index: number): SeriesStyle {
 }
 
 export function formatPercent(val: number | null | undefined, decimals = 1): string {
-  if (val === null || val === undefined || isNaN(val)) return '—';
+  if (!isNum(val)) return '—';
   return `${(val * 100).toFixed(decimals)}%`;
 }
 
@@ -111,6 +122,6 @@ export function formatINR(val: number | null | undefined): string {
 }
 
 export function formatNumber(val: number | null | undefined, decimals = 3): string {
-  if (val === null || val === undefined || isNaN(val)) return '—';
+  if (!isNum(val)) return '—';
   return val.toFixed(decimals);
 }

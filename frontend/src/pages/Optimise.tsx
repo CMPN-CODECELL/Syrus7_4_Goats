@@ -1,469 +1,144 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import {
-  Universe,
-  RunRequest,
-  ScreenInfo,
-  QaoaSettings,
-  JobStatus,
-  RunResult
-} from '../api/types';
-import { getUniverse, postScreen, startRun, getRun, cancelRun } from '../api/client';
+// Optimize: a four-step wizard (Build, Preferences, Review, Run). All state lives in useRun(), so Back keeps every choice.
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DataBanner } from '../components/DataBanner';
-import { UniversePicker } from '../components/UniversePicker';
-import { ConstraintsForm } from '../components/ConstraintsForm';
-import { AdvancedQaoa } from '../components/AdvancedQaoa';
-import { ScreenPreview } from '../components/ScreenPreview';
-import { RunProgress } from '../components/RunProgress';
-import { MetricCards } from '../components/MetricCards';
-import { PortfolioTable } from '../components/PortfolioTable';
-import { SolverTable } from '../components/SolverTable';
-import { FrontierChart } from '../components/FrontierChart';
-import { ConvergenceChart } from '../components/ConvergenceChart';
-import { BitstringHistogram } from '../components/BitstringHistogram';
-import { HonestyPanel } from '../components/HonestyPanel';
-import { OutOfSample } from '../components/OutOfSample';
+import { StepBuild } from '../components/wizard/StepBuild';
+import { StepPreferences } from '../components/wizard/StepPreferences';
+import { StepReview } from '../components/wizard/StepReview';
+import { StepRun } from '../components/wizard/StepRun';
+import { Stepper, SummaryBar, buildSummary } from '../components/wizard/Stepper';
+import { Btn } from '../components/wizard/fields';
+import { parseHoldings } from '../components/wizard/holdings';
+import { useScreen, useUniverse } from '../components/wizard/hooks';
+import { Status } from '../components/ui';
+import { useRun } from '../state/run';
+import { pickedTickers, validateConfig, type ConfigIssue, type WizardStep } from '../state/validate';
 
-const DEFAULT_QAOA: QaoaSettings = {
-  variant: 'xy',
-  reps: 2,
-  optimizer: 'COBYLA',
-  init: 'ramp',
-  shots: 2048,
-  maxiter: 80,
-  noise: false,
-  seed: 7
+const TITLES: Record<WizardStep, { title: string; lead: string }> = {
+  1: { title: 'Build your portfolio', lead: 'Choose how much to invest, which stocks to pick from, and how many companies to hold.' },
+  2: { title: 'Choose your preferences', lead: 'Tell the optimiser how to weigh estimated return against risk, and add any limits.' },
+  3: { title: 'Review your configuration', lead: 'Check everything before the run. You can jump back to any step.' },
+  4: { title: 'Run', lead: 'Start the optimiser. Progress is reported by the server as it happens.' },
 };
 
-export const Optimise: React.FC = () => {
-  // Universe & API Status
-  const [universe, setUniverse] = useState<Universe | null>(null);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [loadingUniverse, setLoadingUniverse] = useState(true);
+export const Optimise: React.FC<{ onOpenEvidence?: () => void }> = ({ onOpenEvidence }) => {
+  const { config, setConfig, mode, result, isStale } = useRun();
+  const { universe, error: loadError, loading, reload } = useUniverse();
+  const [step, setStep] = useState<WizardStep>(1);
+  const [maxStep, setMaxStep] = useState<WizardStep>(1);
+  const [capitalDraft, setCapitalDraft] = useState<string | null>(null);
+  const [holdingsText, setHoldingsTextState] = useState('');
+  const [blocked, setBlocked] = useState<ConfigIssue[]>([]);
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const moved = useRef(false);
 
-  // Form State
-  const [selectedTickers, setSelectedTickers] = useState<string[] | null>(null);
-  const [k, setK] = useState<number>(5);
-  const [riskAversion, setRiskAversion] = useState<number>(0.5);
-  const [sectorCap, setSectorCap] = useState<number | null>(2);
-  const [targetReturn, setTargetReturn] = useState<number | null>(null);
-  const [capital, setCapital] = useState<number>(1000000);
-  const [holdingsText, setHoldingsText] = useState('');
-  const [qaoaSettings, setQaoaSettings] = useState<QaoaSettings>(DEFAULT_QAOA);
-  const qubitCap = 12; // contract default: a live run stays under a minute (16 is allowed but takes ~3 min)
+  const assets = useMemo(() => universe?.assets ?? [], [universe]);
+  const picks = pickedTickers(config.tickers, assets);
+  const holdingsParse = useMemo(() => parseHoldings(holdingsText, assets, picks), [holdingsText, assets, picks.join('|')]);
 
-  // Pre-screen State
-  const [screenInfo, setScreenInfo] = useState<ScreenInfo | null>(null);
-  const [screenLoading, setScreenLoading] = useState<boolean>(false);
+  // The run carries the holdings that were read correctly; unreadable lines block the run instead.
+  const setHoldingsText = useCallback((text: string) => {
+    setHoldingsTextState(text);
+    const p = parseHoldings(text, assets, []);
+    setConfig({ holdings: p.errors.length ? {} : p.holdings });
+  }, [assets, setConfig]);
 
-  // Job & Execution State
-  const [activeJobStatus, setActiveJobStatus] = useState<JobStatus | null>(null);
-  const [runResult, setRunResult] = useState<RunResult | null>(null);
-  const [selectedSolverKey, setSelectedSolverKey] = useState<string>('brute_force');
-  const [validationError, setValidationError] = useState<string | null>(null);
-
-  // Pending poll timeout, and the one job we are polling. A reply for any other job (after cancel, a new run or unmount) is dropped.
-  const pollTimerRef = useRef<number | null>(null);
-  const activeJobRef = useRef<string | null>(null);
-  const rightPanelRef = useRef<HTMLDivElement | null>(null);
-
-  const fetchUniverseData = useCallback(async () => {
-    setLoadingUniverse(true);
-    setApiError(null);
-    try {
-      const data = await getUniverse();
-      setUniverse(data);
-    } catch (err: any) {
-      setApiError(err.message || 'Unable to connect to Quantum Backend API.');
-    } finally {
-      setLoadingUniverse(false);
+  const issues = useMemo<ConfigIssue[]>(() => {
+    const list = validateConfig(config, assets);
+    if (holdingsParse.errors.length > 0) {
+      list.push({ field: 'holdings', step: 2, message: `Existing holdings: ${holdingsParse.errors[0]}` });
     }
+    return list;
+  }, [config, assets, holdingsParse]);
+
+  const screen = useScreen(config, universe !== null);
+
+  const goTo = useCallback((s: WizardStep) => {
+    setBlocked([]);
+    setStep(s);
+    setMaxStep((m) => (s > m ? s : m));
   }, []);
 
+  // Move focus to the new step's heading, so keyboard and screen-reader users land on it.
   useEffect(() => {
-    fetchUniverseData();
-  }, [fetchUniverseData]);
+    if (!moved.current) { moved.current = true; return; }
+    headingRef.current?.focus({ preventScroll: true });
+    headingRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
+  }, [step]);
 
-  // Holdings textarea: one "SYMBOL shares" per line -> {"TCS.NS": 52}, or an error message
-  const holdings = useMemo((): Record<string, number> | string => {
-    const known = new Set(universe?.assets.map(a => a.ticker));
-    const out: Record<string, number> = {};
-    for (const line of holdingsText.split('\n').map(l => l.trim()).filter(Boolean)) {
-      const [sym, count, ...rest] = line.toUpperCase().split(/[\s,:=]+/);
-      const ticker = sym.includes('.') ? sym : `${sym}.NS`;
-      const shares = Number(count);
-      if (rest.length || !known.has(ticker) || !Number.isInteger(shares) || shares <= 0) {
-        return `Cannot read holdings line "${line}". Use one NIFTY 50 symbol and a whole number of shares per line, e.g. "TCS 52".`;
-      }
-      out[ticker] = shares;
+  const next = () => {
+    const here = step === 3 ? issues : issues.filter((i) => i.step === step);
+    if (here.length > 0) {
+      setBlocked(here);
+      return;
     }
-    return out;
-  }, [holdingsText, universe]);
-
-  // Construct current RunRequest payload
-  const buildRunRequest = useCallback((): RunRequest => {
-    return {
-      tickers: selectedTickers,
-      k,
-      risk_aversion: riskAversion,
-      sector_cap: sectorCap,
-      target_return: targetReturn,
-      capital,
-      holdings: typeof holdings === 'string' ? {} : holdings,
-      qubit_cap: qubitCap,
-      qaoa: qaoaSettings
-    };
-  }, [selectedTickers, k, riskAversion, sectorCap, targetReturn, capital, holdings, qubitCap, qaoaSettings]);
-
-  // Pre-screen preview: debounced, and a reply for an outdated form is ignored
-  useEffect(() => {
-    if (!universe) return;
-    let stale = false;
-    const timer = window.setTimeout(() => {
-      setScreenLoading(true);
-      postScreen(buildRunRequest())
-        .then(res => { if (!stale) setScreenInfo(res); })
-        .catch(() => { if (!stale) setScreenInfo(null); })
-        .finally(() => { if (!stale) setScreenLoading(false); });
-    }, 300);
-    return () => { stale = true; clearTimeout(timer); };
-  }, [universe, buildRunRequest]);
-
-  const stopPolling = () => {
-    if (pollTimerRef.current !== null) clearTimeout(pollTimerRef.current);
-    pollTimerRef.current = null;
-    activeJobRef.current = null;
+    goTo((step + 1) as WizardStep);
   };
 
-  // Clear polling timer on unmount
-  useEffect(() => stopPolling, []);
-
-  // Set default solver selection when result arrives
-  useEffect(() => {
-    if (runResult) {
-      setSelectedSolverKey(runResult.recommended || runResult.solvers[0]?.solver || 'brute_force');
-    }
-  }, [runResult]);
-
-  // Poll every 500 ms; the next request starts only after the previous reply, so replies never overlap
-  // A single failed poll is retried; three in a row end the run with the error message.
-  const startPolling = (jobId: string, failures = 0) => {
-    activeJobRef.current = jobId;
-    pollTimerRef.current = window.setTimeout(async () => {
-      try {
-        const status = await getRun(jobId);
-        if (activeJobRef.current !== jobId) return;
-        if (status.state === 'queued' || status.state === 'running') {
-          setActiveJobStatus(status);
-          startPolling(jobId);
-          return;
-        }
-        stopPolling();
-        if (status.state === 'done' && !status.result) {
-          setActiveJobStatus({ ...status, state: 'error', error: 'The run finished but the server sent no result.' });
-          return;
-        }
-        setActiveJobStatus(status);
-        if (status.state === 'done') setRunResult(status.result);
-      } catch (err: any) {
-        if (activeJobRef.current !== jobId) return;
-        if (failures < 2) {
-          startPolling(jobId, failures + 1);
-          return;
-        }
-        stopPolling();
-        setActiveJobStatus(prev => prev ? { ...prev, state: 'error', error: err.message } : null);
-      }
-    }, 500);
-  };
-
-  // Submit Run Handler
-  const handleStartRun = async () => {
-    setValidationError(null);
-    setRunResult(null);
-    setActiveJobStatus(null);
-
-    if (k < 2 || k > 15) {
-      setValidationError('Cardinality (K) must be between 2 and 15 stocks.');
-      return;
-    }
-    if (riskAversion < 0 || riskAversion > 1) {
-      setValidationError('Risk aversion (q) must be between 0.0 and 1.0.');
-      return;
-    }
-    if (qaoaSettings.shots < 256 || qaoaSettings.shots > 20000) {
-      setValidationError('Shots must be between 256 and 20,000.');
-      return;
-    }
-    const nStocks = selectedTickers?.length ?? universe?.assets.filter(a => !a.excluded_reason).length ?? 0;
-    if (k > nStocks) {
-      setValidationError(`You picked ${nStocks} stocks, so a portfolio of ${k} cannot be built. Add stocks or lower K.`);
-      return;
-    }
-    if (typeof holdings === 'string') {
-      setValidationError(holdings);
-      return;
-    }
-
-    stopPolling();
-    const req = buildRunRequest();
-    try {
-      const { job_id } = await startRun(req);
-      setActiveJobStatus({
-        job_id,
-        state: 'queued',
-        progress: 0,
-        stage: 'Initializing solver pipeline...',
-        convergence: [],
-        elapsed_s: 0,
-        result: null,
-        error: null
-      });
-      startPolling(job_id);
-      // On a phone the progress panel sits below the form: bring it into view
-      if (window.matchMedia('(max-width: 1023px)').matches) {
-        rightPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    } catch (err: any) {
-      setValidationError(`Could not start the run: ${err.message}`);
-    }
-  };
-
-  // Cancel Handler
-  const handleCancel = async () => {
-    if (!activeJobStatus) return;
-    stopPolling();
-
-    try {
-      const status = await cancelRun(activeJobStatus.job_id);
-      setActiveJobStatus(status);
-    } catch (err: any) {
-      setActiveJobStatus(prev => prev ? { ...prev, state: 'cancelled', stage: 'Cancelled' } : null);
-    }
-  };
-
-  if (loadingUniverse) {
+  if (loading) {
+    return <Status>Connecting to the Quantum Portfolio backend…</Status>;
+  }
+  if (loadError || !universe) {
     return (
-      <div className="p-12 text-center text-xs text-muted space-y-3">
-        <p>Connecting to Quantum Portfolio Backend...</p>
+      <div className="mx-auto max-w-2xl space-y-3">
+        <Status error>Could not load the stock list. {loadError}</Status>
+        <Btn variant="primary" onClick={() => { void reload(); }}>Retry</Btn>
       </div>
     );
   }
 
-  if (apiError) {
-    return (
-      <div className="max-w-2xl mx-auto p-6 bg-surface border border-line-strong text-center space-y-4">
-        <h2 className="text-base font-medium text-text">⚠ Could not load the stock list</h2>
-        <p className="text-xs text-text break-words">{apiError}</p>
-        <button
-          type="button"
-          onClick={fetchUniverseData}
-          className="px-5 py-2.5 min-h-[44px] bg-text text-bg font-medium text-xs hover:bg-muted transition-all"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  const selectedSolver = runResult?.solvers.find(s => s.solver === selectedSolverKey) || runResult?.solvers[0];
+  const research = mode === 'research';
+  const summary = buildSummary(config, assets, research);
+  const { title, lead } = TITLES[step];
 
   return (
     <div className="space-y-6">
-      {/* Top Market Data Banner */}
-      <DataBanner
-        source={universe?.source}
-        asOf={universe?.as_of}
-        estWindow={runResult?.data.est_window}
-        testWindow={runResult?.data.test_window}
-        notes={runResult?.data.notes}
-      />
+      <p className="font-mono text-xs uppercase tracking-[0.08em] text-muted">Optimize · Step {step} of 4</p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Panel: Inputs & Form */}
-        <div className="lg:col-span-6 space-y-6 min-w-0">
-          <UniversePicker
-            assets={universe?.assets || []}
-            selectedTickers={selectedTickers}
-            onChange={setSelectedTickers}
-          />
+      <Stepper step={step} maxStep={maxStep} onGo={goTo} />
+      <SummaryBar rows={summary} stale={!!result && isStale} />
 
-          <ConstraintsForm
-            k={k}
-            setK={setK}
-            riskAversion={riskAversion}
-            setRiskAversion={setRiskAversion}
-            sectorCap={sectorCap}
-            setSectorCap={setSectorCap}
-            targetReturn={targetReturn}
-            setTargetReturn={setTargetReturn}
-            capital={capital}
-            setCapital={setCapital}
-            holdingsText={holdingsText}
-            setHoldingsText={setHoldingsText}
-          />
+      <section aria-labelledby="step-title" className="border border-line bg-surface p-4 sm:p-6">
+        <h2 id="step-title" ref={headingRef} tabIndex={-1} className="text-2xl outline-offset-4">{title}</h2>
+        <p className="mt-1 max-w-prose text-base text-muted">{lead}</p>
 
-          <AdvancedQaoa
-            settings={qaoaSettings}
-            onChange={setQaoaSettings}
-          />
-
-          {/* Validation Error Banner */}
-          {validationError && (
-            <div className="p-4 bg-surface border border-line-strong text-xs text-text font-medium flex items-center gap-2">
-              <span>⚠</span> {validationError}
-            </div>
-          )}
-
-          {/* Action Button */}
-          <button
-            type="button"
-            onClick={handleStartRun}
-            disabled={activeJobStatus?.state === 'running' || activeJobStatus?.state === 'queued'}
-            className={`w-full py-4 px-6 min-h-[48px] text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
-              activeJobStatus?.state === 'running' || activeJobStatus?.state === 'queued'
-                ? 'bg-line text-faint cursor-not-allowed'
-                : 'bg-text text-bg hover:bg-muted font-medium border border-text cursor-pointer'
-            }`}
-          >
-            <span>Run Quantum Portfolio Optimization</span>
-          </button>
+        <div className="mt-6">
+          {step === 1 && <StepBuild assets={assets} issues={issues} capitalDraft={capitalDraft} setCapitalDraft={setCapitalDraft} />}
+          {step === 2 && <StepPreferences issues={issues} holdingsText={holdingsText} setHoldingsText={setHoldingsText} parsed={holdingsParse} />}
+          {step === 3 && <StepReview assets={assets} issues={issues} screen={screen} goTo={goTo} />}
+          {step === 4 && <StepRun issues={issues} goTo={goTo} onOpenEvidence={onOpenEvidence} />}
         </div>
 
-        {/* Right Panel: Pre-screen, Execution State & U13 Full Results */}
-        <div ref={rightPanelRef} className="lg:col-span-6 space-y-6 scroll-mt-4 min-w-0">
-          {/* Live Qubit Pre-screen Preview */}
-          <ScreenPreview
-            screenInfo={screenInfo}
-            loading={screenLoading && !screenInfo}
-            qubitCap={qubitCap}
-          />
-
-          {/* Active Job Progress Panel */}
-          {(activeJobStatus?.state === 'queued' || activeJobStatus?.state === 'running') && (
-            <RunProgress
-              jobStatus={activeJobStatus}
-              onCancel={handleCancel}
-            />
-          )}
-
-          {/* Job Error State */}
-          {activeJobStatus?.state === 'error' && (
-            <div className="p-5 bg-surface border border-line-strong text-xs space-y-2">
-              <h3 className="font-medium text-text flex items-center gap-2">
-                ⚠ The run failed
-              </h3>
-              <p className="text-text text-xs leading-relaxed break-words">
-                {activeJobStatus.error || 'The server reported an error.'}
-              </p>
-              {/feasible/i.test(activeJobStatus.error || '') && (
-                <p className="text-muted text-[11px]">
-                  Try more stocks, a lower number of picks (K) or a looser sector limit.
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={handleStartRun}
-                className="px-4 py-2 min-h-[44px] bg-text text-bg font-medium text-xs hover:bg-muted transition-all"
-              >
-                Retry
-              </button>
-            </div>
-          )}
-
-          {/* Job Cancelled State */}
-          {activeJobStatus?.state === 'cancelled' && (
-            <div className="p-4 bg-line/30 border border-line text-xs text-muted flex items-center justify-between">
-              <span>Run was cancelled. Input form is ready for a new optimization run.</span>
-              <button
-                onClick={() => setActiveJobStatus(null)}
-                className="text-text font-medium underline min-h-[44px] flex items-center px-2"
-              >
-                Reset
-              </button>
-            </div>
-          )}
-
-          {/* U13 Full Results Display */}
-          {runResult && selectedSolver && (
-            <div className="space-y-6">
-              {/* Metric Cards */}
-              <MetricCards solver={selectedSolver} />
-
-              {/* Portfolio Asset Allocation Table */}
-              <PortfolioTable
-                solvers={runResult.solvers}
-                recommendedSolverId={runResult.recommended}
-                selectedSolverKey={selectedSolverKey}
-                onSelectSolver={setSelectedSolverKey}
-              />
-
-              {/* Solver Comparison Matrix */}
-              <SolverTable
-                solvers={runResult.solvers}
-                recommendedId={runResult.recommended}
-                selectedSolverKey={selectedSolverKey}
-                onSelectSolver={setSelectedSolverKey}
-              />
-
-              {/* Efficient Frontier Chart */}
-              <FrontierChart
-                frontier={runResult.frontier}
-                solvers={runResult.solvers}
-                selectedSolverKey={selectedSolverKey}
-                onSelectSolver={setSelectedSolverKey}
-              />
-
-              {/* Convergence Chart */}
-              <ConvergenceChart
-                convergence={runResult.qaoa.convergence}
-              />
-
-              {/* Bitstring Sample Distribution Histogram */}
-              <BitstringHistogram
-                samples={runResult.qaoa.samples}
-              />
-
-              {/* Honesty Verdict Panel */}
-              <HonestyPanel
-                verdict={runResult.verdict}
-                qaoaResult={runResult.qaoa}
-              />
-
-              {/* Out of Sample Backtest Table */}
-              <OutOfSample
-                solvers={runResult.solvers}
-                nifty50Benchmark={runResult.benchmarks?.nifty50}
-                testWindow={runResult.data.test_window}
-              />
-            </div>
-          )}
-
-          {!runResult && !activeJobStatus && (
-            <div className="p-8 bg-surface border border-dashed border-line text-center text-xs text-muted space-y-2">
-              <div className="font-medium text-text">No Active Optimization Run</div>
-              <p>Pick your stocks and settings, then press "Run Quantum Portfolio Optimization" to run QAOA and the classical solvers side by side.</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Sticky Mobile Cancel Banner during active run (U15) */}
-      {activeJobStatus && (activeJobStatus.state === 'running' || activeJobStatus.state === 'queued') && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-line-strong p-3 px-4 flex items-center justify-between sm:hidden">
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 bg-text"></span>
-            <span className="text-xs font-medium text-text truncate max-w-[190px]">
-              {activeJobStatus.stage || 'Optimizing...'}
-            </span>
+        {blocked.length > 0 && (
+          <div className="mt-6" aria-live="assertive">
+            <Status error>
+              Fix this to continue:
+              <ul role="list" className="mt-1 list-disc pl-5">
+                {blocked.map((b) => <li key={b.message}>{b.message}</li>)}
+              </ul>
+            </Status>
           </div>
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="px-4 py-2 min-h-[44px] bg-surface text-text border border-line-strong hover:bg-line text-xs font-medium transition-all flex items-center justify-center"
-          >
-            Cancel Run
-          </button>
+        )}
+
+        <div className="mt-8 flex flex-col-reverse gap-3 border-t border-line pt-4 sm:flex-row sm:justify-between">
+          <Btn disabled={step === 1} onClick={() => goTo((step - 1) as WizardStep)}>
+            <span aria-hidden="true">← </span>Back
+          </Btn>
+          {step < 4 && (
+            <Btn variant="primary" onClick={next} className="sm:min-w-[200px]">
+              {step === 3 ? 'Continue to run' : 'Continue'}<span aria-hidden="true"> →</span>
+            </Btn>
+          )}
         </div>
+      </section>
+
+      {step >= 3 && (
+        <DataBanner
+          source={universe.source}
+          asOf={universe.as_of}
+          estWindow={result?.data.est_window}
+          testWindow={result?.data.test_window}
+          notes={result?.data.notes}
+        />
       )}
     </div>
   );

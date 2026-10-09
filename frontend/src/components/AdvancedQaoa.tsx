@@ -1,220 +1,188 @@
-import React, { useState } from 'react';
+import React, { type ReactNode } from 'react';
 import { QaoaSettings } from '../api/types';
-import { GlossaryTermTooltip } from './Glossary';
+import { LIMITS, issueFor, type ConfigIssue } from '../state/validate';
+import { GlossaryLink } from './Glossary';
+import { FieldError, NumField, ParamNote, Switch } from './wizard/fields';
 
 interface AdvancedQaoaProps {
   settings: QaoaSettings;
   onChange: (newSettings: QaoaSettings) => void;
+  qubitCap: number;
+  onQubitCapChange: (n: number) => void;
+  issues: ConfigIssue[];
 }
 
-export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const selectClass = 'mt-1 min-h-[44px] w-full max-w-sm border border-line-strong bg-bg px-3 text-base text-text';
 
-  const update = <K extends keyof QaoaSettings>(key: K, value: QaoaSettings[K]) => {
-    onChange({ ...settings, [key]: value });
-  };
+/** One advanced control: plain name, technical name, plain explanation, the control, then range, default and effect. */
+function Param({ id, label, tech, plain, children, error, range, def, effect }: {
+  id: string; label: ReactNode; tech: string; plain: ReactNode; children: ReactNode; error?: string;
+  range: ReactNode; def: ReactNode; effect: ReactNode;
+}) {
+  return (
+    <div className="border-t border-line py-4 first:border-t-0 first:pt-0">
+      <label htmlFor={id} className="block text-sm font-medium text-text">{label}</label>
+      <p className="mt-0.5 text-sm text-muted">{plain}</p>
+      {children}
+      <FieldError id={`${id}-error`}>{error}</FieldError>
+      <ParamNote name={tech} range={range} def={def} effect={effect} />
+    </div>
+  );
+}
+
+function Group({ title, lead, defaultOpen = true, children }: { title: string; lead: string; defaultOpen?: boolean; children: ReactNode }) {
+  return (
+    <details open={defaultOpen} className="border border-line bg-bg">
+      <summary className="flex min-h-[44px] cursor-pointer flex-col justify-center px-4 py-2">
+        <span className="text-base font-medium text-text">{title}</span>
+        <span className="text-sm text-muted">{lead}</span>
+      </summary>
+      <div className="border-t border-line px-4 py-4">{children}</div>
+    </details>
+  );
+}
+
+export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange, qubitCap, onQubitCapChange, issues }) => {
+  const update = <K extends keyof QaoaSettings>(key: K, value: QaoaSettings[K]) => onChange({ ...settings, [key]: value });
+  const bad = (field: Parameters<typeof issueFor>[1]) => issueFor(issues, field);
 
   return (
-    <div className="bg-surface border border-line mb-6 overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-line/20 transition-colors text-left"
-      >
-        <div className="flex items-center space-x-3">
-                    <div>
-            <h2 className="text-sm font-medium text-text flex items-center gap-2">
-              Advanced QAOA Hyperparameters
-              <span className="text-[10px] px-2 py-0.5 bg-surface text-text font-normal border border-line-strong">
-                {settings.variant.toUpperCase()} (p={settings.reps}, {settings.shots} shots)
-              </span>
-            </h2>
-            <p className="text-[11px] text-muted">
-              Configure quantum circuit depth p, mixer type, classical optimizer, and noise simulation.
-            </p>
-          </div>
+    <div className="space-y-3">
+      <Group title="Circuit" lead="The shape of the quantum circuit.">
+        <Param
+          id="qaoa-variant"
+          label={<>Mixer <GlossaryLink id="mixer">(what is a mixer?)</GlossaryLink></>}
+          tech="variant: 'standard' | 'xy'"
+          plain="The mixer decides how the circuit moves between candidate portfolios."
+          range="standard or xy."
+          def="xy."
+          effect="The XY ring mixer starts from states that already hold exactly K stocks and keeps it that way. The standard mixer can also sample states with the wrong number of stocks, which then count as infeasible."
+        >
+          <select id="qaoa-variant" value={settings.variant} onChange={(e) => update('variant', e.target.value as QaoaSettings['variant'])} className={selectClass}>
+            <option value="xy">XY ring mixer with Dicke-state start</option>
+            <option value="standard">Standard Pauli-X mixer</option>
+          </select>
+        </Param>
+
+        <Param
+          id="qaoa-reps"
+          label={<>Circuit depth p <GlossaryLink id="qaoa-depth">(what is depth?)</GlossaryLink></>}
+          tech="reps (p)"
+          plain="How many times the circuit repeats its cost-and-mixer layers."
+          error={bad('reps')}
+          range={`${LIMITS.reps.min} to ${LIMITS.reps.max}, whole number.`}
+          def={LIMITS.reps.def}
+          effect="More layers give the circuit more freedom and add two angles to tune per layer, but the circuit gets deeper and the run slower. It does not by itself guarantee a better result."
+        >
+          <NumField id="qaoa-reps" inputMode="numeric" value={settings.reps} onCommit={(n) => update('reps', n)} aria-invalid={!!bad('reps')} aria-describedby="qaoa-reps-error" className="mt-1 w-28" />
+        </Param>
+      </Group>
+
+      <Group title="Classical optimiser" lead="How the circuit's angles are tuned.">
+        <Param
+          id="qaoa-optimizer"
+          label="Optimiser"
+          tech="optimizer: 'COBYLA' | 'SPSA' | 'NELDER_MEAD'"
+          plain="The classical method that adjusts the circuit angles between runs of the circuit."
+          range="COBYLA, SPSA or NELDER_MEAD."
+          def="COBYLA."
+          effect="All three need no gradients. SPSA is designed for noisy evaluations; COBYLA and Nelder-Mead are common choices for noiseless ones. Each can end at a different result."
+        >
+          <select id="qaoa-optimizer" value={settings.optimizer} onChange={(e) => update('optimizer', e.target.value as QaoaSettings['optimizer'])} className={selectClass}>
+            <option value="COBYLA">COBYLA (default)</option>
+            <option value="SPSA">SPSA (built for noise)</option>
+            <option value="NELDER_MEAD">Nelder-Mead (simplex search)</option>
+          </select>
+        </Param>
+
+        <Param
+          id="qaoa-init"
+          label={<>Starting angles <GlossaryLink id="warm-start">(what is a warm start?)</GlossaryLink></>}
+          tech="init: 'ramp' | 'interp' | 'random'"
+          plain="Where the optimiser begins."
+          range="ramp, interp or random."
+          def="ramp."
+          effect="Ramp starts from a gradual schedule. Interp reuses the angles found at depth p−1 (a warm start). Random starts anywhere, so the result depends more on the seed."
+        >
+          <select id="qaoa-init" value={settings.init} onChange={(e) => update('init', e.target.value as QaoaSettings['init'])} className={selectClass}>
+            <option value="ramp">Linear ramp (default)</option>
+            <option value="interp">Interp (warm start from depth p−1)</option>
+            <option value="random">Random</option>
+          </select>
+        </Param>
+
+        <Param
+          id="qaoa-maxiter"
+          label="Maximum iterations"
+          tech="maxiter"
+          plain="The most tuning steps the optimiser may take."
+          error={bad('maxiter')}
+          range={`${LIMITS.maxiter.min} to ${LIMITS.maxiter.max}, whole number.`}
+          def={LIMITS.maxiter.def}
+          effect="A higher limit allows more tuning but a longer run, and the optimiser may stop sooner on its own. Stopping at the limit does not mean the best angles were found."
+        >
+          <NumField id="qaoa-maxiter" inputMode="numeric" value={settings.maxiter} onCommit={(n) => update('maxiter', n)} aria-invalid={!!bad('maxiter')} aria-describedby="qaoa-maxiter-error" className="mt-1 w-28" />
+        </Param>
+      </Group>
+
+      <Group title="Sampling and noise" lead="How the final circuit is measured.">
+        <Param
+          id="qaoa-shots"
+          label={<>Measurement shots <GlossaryLink id="shots">(what are shots?)</GlossaryLink></>}
+          tech="shots"
+          plain="How many times the finished circuit is measured to estimate which portfolios it favours."
+          error={bad('shots')}
+          range={`${LIMITS.shots.min} to ${LIMITS.shots.max.toLocaleString('en-IN')}, whole number.`}
+          def={LIMITS.shots.def.toLocaleString('en-IN')}
+          effect="More shots make the probability estimates steadier and the run longer. With noise simulation on, the noisy sample uses at most 1,024 shots."
+        >
+          <NumField id="qaoa-shots" inputMode="numeric" value={settings.shots} onCommit={(n) => update('shots', n)} aria-invalid={!!bad('shots')} aria-describedby="qaoa-shots-error" className="mt-1 w-32" />
+        </Param>
+
+        <div className="border-t border-line py-4">
+          <Switch
+            id="qaoa-noise"
+            checked={settings.noise}
+            onChange={(v) => update('noise', v)}
+            label={<>Simulate hardware noise <GlossaryLink id="noise-model">(what is a noise model?)</GlossaryLink></>}
+            description="Also samples the tuned circuit on Aer with the FakeGuadalupeV2 noise model, next to the noiseless run."
+          />
+          <ParamNote
+            name="noise: boolean"
+            range="on or off."
+            def="off."
+            effect="Adds a second, noisy sample so you can compare. The run takes longer, and the noisy sample is capped at 1,024 shots."
+          />
         </div>
 
-        <span className={`text-muted transition-transform text-xs font-medium ${isOpen ? 'rotate-180' : ''}`}>
-          ▼
-        </span>
-      </button>
+        <Param
+          id="qaoa-seed"
+          label="Random seed"
+          tech="seed"
+          plain="A number that fixes the random choices, so the same settings can be repeated."
+          error={bad('seed')}
+          range="any whole number."
+          def={LIMITS.seed.def}
+          effect="The same seed and settings repeat the same run. A different seed can change the starting angles and the sampled results."
+        >
+          <NumField id="qaoa-seed" inputMode="numeric" value={settings.seed} onCommit={(n) => update('seed', n)} aria-invalid={!!bad('seed')} aria-describedby="qaoa-seed-error" className="mt-1 w-32" />
+        </Param>
+      </Group>
 
-      {isOpen && (
-        <div className="p-5 border-t border-line bg-bg grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-          {/* QAOA Variant & Mixer */}
-          <div>
-            <label htmlFor="qaoa-variant" className="text-xs font-medium text-text mb-1.5 block flex items-center gap-1">
-              Mixer Variant
-              <GlossaryTermTooltip termKey="mixer">
-                <span>[?]</span>
-              </GlossaryTermTooltip>
-            </label>
-            <select
-              id="qaoa-variant"
-              value={settings.variant}
-              onChange={(e) => update('variant', e.target.value as 'standard' | 'xy')}
-              className="w-full bg-bg border border-line px-3 py-2 text-xs text-text focus:border-text"
-            >
-              <option value="standard">Standard Pauli-X Mixer</option>
-              <option value="xy">XY Ring Mixer + Dicke State Init</option>
-            </select>
-            <span className="text-[10px] text-muted mt-1 block">
-              {settings.variant === 'xy' ? 'Preserves stock count K automatically.' : 'Standard unconstrained mixer.'}
-            </span>
-          </div>
-
-          {/* Circuit Depth p */}
-          <div>
-            <div className="flex justify-between items-center mb-1.5">
-              <label htmlFor="qaoa-reps" className="text-xs font-medium text-text flex items-center gap-1">
-                Circuit Depth (p)
-                <GlossaryTermTooltip termKey="depth">
-                  <span>[?]</span>
-                </GlossaryTermTooltip>
-              </label>
-              <span className="text-xs font-medium text-text">p = {settings.reps}</span>
-            </div>
-            <input
-              id="qaoa-reps"
-              type="range"
-              min={1}
-              max={5}
-              value={settings.reps}
-              onChange={(e) => update('reps', Number(e.target.value))}
-              className="w-full accent-white bg-bg h-2 cursor-pointer"
-            />
-            <div className="flex justify-between text-[10px] text-muted mt-1">
-              <span>p=1 (Fast)</span>
-              <span>p=5 (High Expressiveness)</span>
-            </div>
-          </div>
-
-          {/* Optimizer */}
-          <div>
-            <label htmlFor="qaoa-optimizer" className="text-xs font-medium text-text mb-1.5 block">
-              Classical Optimizer
-            </label>
-            <select
-              id="qaoa-optimizer"
-              value={settings.optimizer}
-              onChange={(e) => update('optimizer', e.target.value as any)}
-              className="w-full bg-bg border border-line px-3 py-2 text-xs text-text focus:border-text"
-            >
-              <option value="COBYLA">COBYLA (Gradient-free, Default)</option>
-              <option value="SPSA">SPSA (Stochastic, Noise-resilient)</option>
-              <option value="NELDER_MEAD">Nelder-Mead (Simplex Search)</option>
-            </select>
-          </div>
-
-          {/* Initialization */}
-          <div>
-            <label htmlFor="qaoa-init" className="text-xs font-medium text-text mb-1.5 block flex items-center gap-1">
-              Parameter Initialization
-              <GlossaryTermTooltip termKey="warm_start">
-                <span>[?]</span>
-              </GlossaryTermTooltip>
-            </label>
-            <select
-              id="qaoa-init"
-              value={settings.init}
-              onChange={(e) => update('init', e.target.value as any)}
-              className="w-full bg-bg border border-line px-3 py-2 text-xs text-text focus:border-text"
-            >
-              <option value="ramp">Linear Ramp (Standard)</option>
-              <option value="interp">Interp (Warm Start from depth p-1)</option>
-              <option value="random">Random Initialization</option>
-            </select>
-            {settings.init === 'interp' && (
-              <span className="text-[10px] text-text font-medium mt-1 block">
-                Warm Start: Uses previous depth parameters. PS-03 compliant.
-              </span>
-            )}
-          </div>
-
-          {/* Measurement Shots */}
-          <div>
-            <div className="flex justify-between items-center mb-1.5">
-              <label htmlFor="qaoa-shots" className="text-xs font-medium text-text flex items-center gap-1">
-                Measurement Shots
-                <GlossaryTermTooltip termKey="shots">
-                  <span>[?]</span>
-                </GlossaryTermTooltip>
-              </label>
-              <span className="text-xs font-medium text-text">{settings.shots}</span>
-            </div>
-            <select
-              id="qaoa-shots"
-              value={settings.shots}
-              onChange={(e) => update('shots', Number(e.target.value))}
-              className="w-full bg-bg border border-line px-3 py-2 text-xs text-text focus:border-text"
-            >
-              <option value={1024}>1,024 shots</option>
-              <option value={2048}>2,048 shots (Default)</option>
-              <option value={4096}>4,096 shots</option>
-              <option value={8192}>8,192 shots</option>
-              <option value={16384}>16,384 shots (High Precision)</option>
-            </select>
-          </div>
-
-          {/* Random Seed & Max Iterations */}
-          <div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label htmlFor="qaoa-maxiter" className="text-xs font-medium text-text mb-1 block">Max Iterations</label>
-                <input
-                  id="qaoa-maxiter"
-                  type="number"
-                  min={20}
-                  max={500}
-                  value={settings.maxiter}
-                  onChange={(e) => update('maxiter', Number(e.target.value))}
-                  className="w-full bg-bg border border-line px-3 py-1.5 text-xs text-text focus:border-text"
-                />
-              </div>
-              <div>
-                <label htmlFor="qaoa-seed" className="text-xs font-medium text-text mb-1 block">RNG Seed</label>
-                <input
-                  id="qaoa-seed"
-                  type="number"
-                  value={settings.seed}
-                  onChange={(e) => update('seed', Number(e.target.value))}
-                  className="w-full bg-bg border border-line px-3 py-1.5 text-xs text-text focus:border-text"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Noise Simulation Toggle */}
-          <div className="sm:col-span-2 md:col-span-3 pt-3 border-t border-line/60 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  aria-label="Simulate hardware noise"
-                  checked={settings.noise}
-                  onChange={(e) => update('noise', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-bg border border-line-strong peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-faint peer-checked:after:bg-bg after:h-4 after:w-4 after:transition-all peer-checked:bg-text"></div>
-              </label>
-              <div>
-                <span className="text-xs font-medium text-text block">
-                  Simulate IBM Guadalupe Hardware Noise
-                </span>
-                <span className="text-[11px] text-muted">
-                  Samples the optimised circuit on Aer with the FakeGuadalupeV2 noise model, next to the noiseless run.
-                </span>
-              </div>
-            </div>
-            {settings.noise && (
-              <span className="text-xs font-medium text-text bg-surface px-2.5 py-1 border border-line-strong">
-                Noise Model Active
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+      <Group title="Execution" lead="Limits on the size of the quantum problem.">
+        <Param
+          id="qubit-cap"
+          label={<>Qubit cap <GlossaryLink id="qubit">(what is a qubit?)</GlossaryLink></>}
+          tech="qubit_cap"
+          plain="The most qubits the circuit may use: one per shortlisted stock plus slack qubits for the constraints."
+          error={bad('qubitCap')}
+          range={`${LIMITS.qubitCap.min} to ${LIMITS.qubitCap.max}, whole number.`}
+          def={LIMITS.qubitCap.def}
+          effect="A larger cap keeps more stocks on the shortlist, but the simulation time grows steeply: about 3 minutes at 16 against under a minute at 12."
+        >
+          <NumField id="qubit-cap" inputMode="numeric" value={qubitCap} onCommit={onQubitCapChange} aria-invalid={!!bad('qubitCap')} aria-describedby="qubit-cap-error" className="mt-1 w-28" />
+        </Param>
+      </Group>
     </div>
   );
 };

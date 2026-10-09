@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Asset } from '../api/types';
+import { Btn } from './wizard/fields';
 
 interface UniversePickerProps {
   assets: Asset[];
@@ -7,178 +8,125 @@ interface UniversePickerProps {
   onChange: (tickers: string[] | null) => void;
 }
 
-export const UniversePicker: React.FC<UniversePickerProps> = ({
-  assets,
-  selectedTickers,
-  onChange
-}) => {
+/** Search, industry filter and individual stock picks. The selection lives in the run configuration, so
+ *  "all stocks" (null) versus "my own list" is read from `selectedTickers` and cannot drift out of step. */
+export const UniversePicker: React.FC<UniversePickerProps> = ({ assets, selectedTickers, onChange }) => {
   const [search, setSearch] = useState('');
   const [selectedSector, setSelectedSector] = useState<string>('ALL');
-  const [mode, setMode] = useState<'all' | 'custom'>(selectedTickers === null ? 'all' : 'custom');
+  const mode: 'all' | 'custom' = selectedTickers === null ? 'all' : 'custom';
 
-  const availableTickers = useMemo(() => {
-    return assets.filter(a => !a.excluded_reason).map(a => a.ticker);
-  }, [assets]);
+  const availableTickers = useMemo(() => assets.filter((a) => !a.excluded_reason).map((a) => a.ticker), [assets]);
 
-  const sectors = useMemo(() => {
-    const list = Array.from(new Set(assets.map(a => a.sector))).sort();
-    return ['ALL', ...list];
-  }, [assets]);
+  const sectors = useMemo(() => ['ALL', ...Array.from(new Set(assets.map((a) => a.sector))).sort()], [assets]);
 
   const filteredAssets = useMemo(() => {
-    return assets.filter(a => {
-      const matchSearch = a.symbol.toLowerCase().includes(search.toLowerCase()) ||
-        a.name.toLowerCase().includes(search.toLowerCase()) ||
-        a.ticker.toLowerCase().includes(search.toLowerCase());
-      const matchSector = selectedSector === 'ALL' || a.sector === selectedSector;
-      return matchSearch && matchSector;
+    const needle = search.toLowerCase();
+    return assets.filter((a) => {
+      const matchSearch = a.symbol.toLowerCase().includes(needle) || a.name.toLowerCase().includes(needle) || a.ticker.toLowerCase().includes(needle);
+      return matchSearch && (selectedSector === 'ALL' || a.sector === selectedSector);
     });
   }, [assets, search, selectedSector]);
 
-  const handleModeChange = (newMode: 'all' | 'custom') => {
-    setMode(newMode);
-    if (newMode === 'all') {
-      onChange(null);
-    } else {
-      // Default custom selection to top available
-      onChange(availableTickers.slice(0, 10));
-    }
+  const handleModeChange = (next: 'all' | 'custom') => {
+    // Switching to a custom list starts from the first ten available stocks.
+    onChange(next === 'all' ? null : availableTickers.slice(0, 10));
   };
 
   const toggleTicker = (ticker: string) => {
     if (mode === 'all') return;
-    const current = selectedTickers || availableTickers;
+    const current = selectedTickers ?? availableTickers;
     if (current.includes(ticker)) {
-      if (current.length <= 2) return; // Maintain minimum 2 stocks
-      onChange(current.filter(t => t !== ticker));
+      if (current.length <= 2) return; // keep at least 2 stocks
+      onChange(current.filter((t) => t !== ticker));
     } else {
       onChange([...current, ticker]);
     }
   };
 
-  const isSelected = (ticker: string) => {
-    if (mode === 'all') {
-      const asset = assets.find(a => a.ticker === ticker);
-      return !asset?.excluded_reason;
-    }
-    return selectedTickers?.includes(ticker) ?? false;
-  };
-
-  const activeCount = mode === 'all'
-    ? availableTickers.length
-    : (selectedTickers ? selectedTickers.length : availableTickers.length);
+  const isSelected = (asset: Asset) => (mode === 'all' ? !asset.excluded_reason : selectedTickers?.includes(asset.ticker) ?? false);
+  const activeCount = mode === 'all' ? availableTickers.length : selectedTickers?.length ?? 0;
 
   return (
-    <div className="bg-surface border border-line p-5 mb-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-line mb-4">
+    <div className="border border-line bg-surface p-4">
+      <div className="flex flex-col justify-between gap-3 border-b border-line pb-4 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-base font-medium text-text flex items-center gap-2">
-            <span>Asset Universe</span>
-            <span className="text-xs px-2 py-0.5 bg-surface text-text border border-line-strong">
-              {activeCount} selected
-            </span>
-          </h2>
-          <p className="text-xs text-muted mt-0.5">
-            Select stocks from the NIFTY 50 universe for portfolio construction.
+          <h3 className="text-xl">Stock selection</h3>
+          <p className="mt-1 text-sm text-muted" role="status" aria-live="polite">
+            {activeCount} stock{activeCount === 1 ? '' : 's'} selected. {mode === 'custom' ? 'You need at least 2.' : 'All stocks with data are used.'}
           </p>
         </div>
-
-        {/* Mode Toggle */}
-        <div className="flex bg-bg p-1 border border-line self-start sm:self-auto">
-          <button
-            type="button"
-            onClick={() => handleModeChange('all')}
-            className={`px-3 py-2 min-h-[44px] text-xs font-medium transition-all flex items-center justify-center ${
-              mode === 'all'
-                ? 'bg-text text-bg font-medium'
-                : 'text-muted hover:text-text'
-            }`}
-          >
-            Full NIFTY 50 ({availableTickers.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => handleModeChange('custom')}
-            className={`px-3 py-2 min-h-[44px] text-xs font-medium transition-all flex items-center justify-center ${
-              mode === 'custom'
-                ? 'bg-text text-bg font-medium'
-                : 'text-muted hover:text-text'
-            }`}
-          >
-            Custom Sub-Universe
-          </button>
+        <div role="group" aria-label="Which stocks to use" className="flex gap-2">
+          <Btn aria-pressed={mode === 'all'} onClick={() => handleModeChange('all')} className={mode === 'all' ? '!border-text !bg-text !text-bg' : ''}>
+            {mode === 'all' && <span aria-hidden="true">✓</span>} All NIFTY 50 ({availableTickers.length})
+          </Btn>
+          <Btn aria-pressed={mode === 'custom'} onClick={() => mode !== 'custom' && handleModeChange('custom')} className={mode === 'custom' ? '!border-text !bg-text !text-bg' : ''}>
+            {mode === 'custom' && <span aria-hidden="true">✓</span>} My own list
+          </Btn>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <div className="relative flex-1">
-          <input
-            type="text"
-            placeholder="Search stock by name, symbol, or ticker..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full min-h-[44px] bg-bg border border-line px-3.5 py-2 text-xs text-text placeholder-muted focus:border-text transition-colors"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text text-xs min-h-[44px] min-w-[44px] flex items-center justify-center"
-            >
-              ✕
-            </button>
-          )}
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <div className="flex-1">
+          <label htmlFor="universe-search" className="block text-sm text-text">Search by name or symbol</label>
+          <div className="relative mt-1">
+            <input
+              id="universe-search"
+              type="search"
+              placeholder="For example: Tata, INFY, bank"
+              autoComplete="off"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="min-h-[44px] w-full border border-line-strong bg-bg px-3 text-base text-text placeholder:text-faint"
+            />
+          </div>
         </div>
-
-        <select
-          value={selectedSector}
-          onChange={(e) => setSelectedSector(e.target.value)}
-          className="bg-bg border border-line px-3 py-2 min-h-[44px] text-xs text-text focus:border-text"
-        >
-          {sectors.map(sec => (
-            <option key={sec} value={sec} className="bg-surface text-text">
-              {sec === 'ALL' ? 'All Sectors' : sec}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="universe-sector" className="block text-sm text-text">Industry</label>
+          <select
+            id="universe-sector"
+            value={selectedSector}
+            onChange={(e) => setSelectedSector(e.target.value)}
+            className="mt-1 min-h-[44px] w-full border border-line-strong bg-bg px-3 text-base text-text sm:w-56"
+          >
+            {sectors.map((sec) => (
+              <option key={sec} value={sec} className="bg-bg text-text">{sec === 'ALL' ? 'All industries' : sec}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* Stock rows: 32px, two columns on desktop */}
-      <div className="max-h-72 overflow-y-auto md:grid md:grid-cols-2 md:gap-x-4 border-t border-line">
-        {filteredAssets.map(asset => {
+      {mode === 'all' && (
+        <p className="mt-3 text-sm text-muted">
+          Choose “My own list” to pick individual stocks. The boxes below are read-only while all NIFTY 50 stocks are used.
+        </p>
+      )}
+
+      <p className="sr-only" role="status" aria-live="polite">{filteredAssets.length} stocks shown.</p>
+      <ul role="list" className="mt-3 max-h-80 overflow-y-auto border-t border-line md:grid md:grid-cols-2 md:gap-x-4">
+        {filteredAssets.map((asset) => {
           const disabled = !!asset.excluded_reason;
-          const selected = isSelected(asset.ticker);
-
+          const selected = isSelected(asset);
           return (
-            <label
-              key={asset.ticker}
-              title={disabled ? asset.excluded_reason ?? undefined : `${asset.name} · ${asset.sector}`}
-              className={`flex items-center gap-2 h-8 px-1 border-b border-line text-xs ${
-                disabled
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'cursor-pointer hover:bg-surface'
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={selected}
-                disabled={disabled || mode === 'all'}
-                onChange={() => toggleTicker(asset.ticker)}
-                className="accent-white cursor-pointer shrink-0"
-              />
-              <span className={`font-bold shrink-0 ${selected ? 'text-text' : 'text-muted'}`}>
-                {asset.symbol}
-              </span>
-              <span className="text-muted truncate min-w-0 flex-1">
-                {asset.name}
-              </span>
-              <span className="text-[10px] text-faint truncate max-w-[38%] shrink-0">
-                {disabled ? `⚠ ${asset.excluded_reason}` : asset.sector}
-              </span>
-            </label>
+            <li key={asset.ticker} className="border-b border-line">
+              <label className={`flex min-h-[44px] items-center gap-3 px-1 py-1 text-sm md:min-h-[40px] ${disabled || mode === 'all' ? 'cursor-default' : 'cursor-pointer hover:bg-bg'}`}>
+                <input
+                  type="checkbox"
+                  checked={selected}
+                  disabled={disabled || mode === 'all'}
+                  onChange={() => toggleTicker(asset.ticker)}
+                  className="h-5 w-5 shrink-0"
+                />
+                <span className={`shrink-0 font-medium ${selected ? 'text-text' : 'text-muted'}`}>{asset.symbol}</span>
+                <span className="min-w-0 flex-1 truncate text-muted">{asset.name}</span>
+                <span className="max-w-[40%] shrink-0 truncate text-xs text-muted">
+                  {disabled ? `Not used: ${asset.excluded_reason}` : asset.sector}
+                </span>
+              </label>
+            </li>
           );
         })}
-      </div>
+      </ul>
+      {filteredAssets.length === 0 && <p className="mt-3 text-sm text-muted">No stocks match your search. Clear the search or choose another industry.</p>}
     </div>
   );
 };

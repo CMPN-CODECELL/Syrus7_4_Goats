@@ -13,25 +13,29 @@ function markerPath(shape: SeriesStyle['shape']): string {
 }
 
 // Marker drawn inside an existing <svg>/<g>, used as a Recharts shape and for dots on a line
-export const MarkerGlyph: React.FC<{ style: SeriesStyle; cx: number; cy: number; scale?: number }> = ({ style, cx, cy, scale = 1 }) => {
-  if (typeof cx !== 'number' || typeof cy !== 'number' || isNaN(cx) || isNaN(cy)) return null;
+// `hollow` overrides the style's own fill, so markers that share a point can be nested as outlines.
+export const MarkerGlyph: React.FC<{ style: SeriesStyle; cx: number; cy: number; scale?: number; hollow?: boolean }> = ({ style, cx, cy, scale = 1, hollow }) => {
+  if (typeof cx !== 'number' || typeof cy !== 'number' || !Number.isFinite(cx) || !Number.isFinite(cy)) return null;
   const t = `translate(${cx},${cy}) scale(${scale})`;
+  const isHollow = hollow ?? style.hollow;
+  // vectorEffect keeps the outline a constant width however much the marker is scaled
   if (style.shape === 'circle') {
-    return <circle cx={cx} cy={cy} r={5 * scale} fill={style.hollow ? '#000000' : style.color} stroke={style.color} strokeWidth={1.5} />;
+    return <circle cx={cx} cy={cy} r={5 * scale} fill={isHollow ? '#000000' : style.color} stroke={style.color} strokeWidth={1.5} />;
   }
   if (style.shape === 'dash') {
     return <line x1={cx - 6} x2={cx + 6} y1={cy} y2={cy} stroke={style.color} strokeWidth={2} strokeDasharray="3 2" />;
   }
   if (style.shape === 'cross') {
-    return <path transform={t} d={markerPath('cross')} stroke={style.color} strokeWidth={2} fill="none" />;
+    return <path transform={t} d={markerPath('cross')} stroke={style.color} strokeWidth={2} fill="none" vectorEffect="non-scaling-stroke" />;
   }
   return (
     <path
       transform={t}
       d={markerPath(style.shape)}
-      fill={style.hollow ? '#000000' : style.color}
+      fill={isHollow ? '#000000' : style.color}
       stroke={style.color}
       strokeWidth={1.5}
+      vectorEffect="non-scaling-stroke"
     />
   );
 };
