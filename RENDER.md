@@ -27,7 +27,7 @@ Render can automatically read the [`render.yaml`](render.yaml) file in the root 
    - Service name: `quantum-portfolio-backend`
    - Root directory: `backend`
    - Fast `uv` build command: `pip install --upgrade pip && pip install uv && uv pip install --system -r requirements.txt`
-   - Start command: `uvicorn qportfolio.api.main:app --host 0.0.0.0 --port $PORT`
+   - Start command: `python -m uvicorn qportfolio.api.main:app --host 0.0.0.0 --port $PORT`
    - Health check: `/api/health`
 5. Click **Apply**. Render will build and deploy the service.
 
@@ -47,12 +47,12 @@ If you prefer to configure the service manually in the Render UI:
    - **Runtime**: `Python`
    - **Build Command**:
      ```bash
-     pip install --upgrade pip && pip install uv && uv pip install --system -r requirements.txt
+     pip install --upgrade pip && pip install uv && uv pip install -r requirements.txt
      ```
-     *(Using `uv` installs all 200+ dependencies in ~20 seconds instead of 10 minutes, avoiding Render's build timeout)*
+     *(Using `uv` installs all dependencies in ~20 seconds instead of 10 minutes, avoiding Render's build timeout)*
    - **Start Command**:
      ```bash
-     uvicorn qportfolio.api.main:app --host 0.0.0.0 --port $PORT
+     python -m uvicorn qportfolio.api.main:app --host 0.0.0.0 --port $PORT
      ```
    - **Instance Type**: `Free`
 
