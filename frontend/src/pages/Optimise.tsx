@@ -21,6 +21,7 @@ import { FrontierChart } from '../components/FrontierChart';
 import { ConvergenceChart } from '../components/ConvergenceChart';
 import { BitstringHistogram } from '../components/BitstringHistogram';
 import { HonestyPanel } from '../components/HonestyPanel';
+import { StressTest } from '../components/StressTest';
 import { OutOfSample } from '../components/OutOfSample';
 import { getSolverStyle } from '../lib/chartColors';
 import { SolverMarker } from '../components/SolverMarker';
@@ -900,6 +901,9 @@ export const Optimise: React.FC = () => {
                     verdict={runResult.verdict}
                     qaoaResult={runResult.qaoa}
                   /></div>
+
+                  {/* Market crash stress tests on the selected portfolio */}
+                  <StressTest key={selectedSolver.solver} solver={selectedSolver} betas={runResult.betas} />
 
                   {/* Markowitz Efficient Frontier */}
                   <div data-research><FrontierChart

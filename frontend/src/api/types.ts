@@ -219,6 +219,8 @@ export interface RunResult {
   };
   verdict: Verdict;
   recommended: string;
+  /** Beta of each stock to the equal-weight market of the requested universe (estimation window). Used by the stress tests. */
+  betas?: Record<string, number> | null;
 }
 
 export interface JobStatus {

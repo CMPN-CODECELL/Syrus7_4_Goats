@@ -218,7 +218,8 @@ Base path is `/api`. Every response is JSON. An error body looks like `{"detail"
               "headline": "QAOA found a portfolio within 0.8% of the exact optimum.",
               "details": ["It sampled the exact optimum with probability 8.3%, 17x more often than a random guess (0.48%).",
                           "Brute force solved this 10-stock instance exactly in 0.04 s; no speed benefit is claimed at this size."]},
-  "recommended": "brute_force"
+  "recommended": "brute_force",
+  "betas": {"TCS.NS": 0.82, "...": 1.0}
 }
 ```
 - **Solver ids:** `brute_force`, `relaxation`, `annealing`, `qaoa_standard`, `qaoa_xy`.

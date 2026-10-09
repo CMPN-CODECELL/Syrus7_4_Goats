@@ -229,6 +229,7 @@ class RunResult(BaseModel):
     benchmarks: dict[str, OOS]
     verdict: Verdict
     recommended: SolverId
+    betas: dict[str, float] | None = None  # stress tests: beta to the equal-weight market of the requested universe, estimation window only
 
 
 # --- 2.5 JobStatus ----------------------------------------------------------
