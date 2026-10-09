@@ -40,6 +40,11 @@ export const ScreenPreview: React.FC<ScreenPreviewProps> = ({ screenInfo, loadin
             {screenInfo.rule}
           </p>
 
+          <div className="mt-2 text-[10px] text-muted flex items-center gap-1.5">
+            <span className="text-accent-blue-hover">ℹ Candidate Pool:</span>
+            <span>Screened assets form the search space for the solver. The final portfolio ({qubitCap ? 'K stocks' : ''}) is selected by the optimizer.</span>
+          </div>
+
           {screenInfo.applied && (
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-2.5 bg-bg border border-line/60">

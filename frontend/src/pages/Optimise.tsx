@@ -357,24 +357,24 @@ export const Optimise: React.FC = () => {
       />
 
       {/* =========================================================================
-          STAGE 1: DEDICATED FULL-SCREEN FORMULATION & CONFIGURATION
+          STAGE 1: DEDICATED GUIDED FORMULATION & CONFIGURATION WORKFLOW
           ========================================================================= */}
       {activeStage === 'configure' && (
-        <div className="space-y-6">
-          {/* Stage 1 Header Ribbon */}
+        <div className="space-y-8">
+          {/* Formulation Header */}
           <div className="bg-surface border border-line p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2">
                 <span className="w-2.5 h-2.5 bg-accent-blue"></span>
                 <h2 className="text-base font-medium text-text uppercase tracking-wide">
-                  Portfolio-Pulse — Formulation &amp; Optimization Setup
+                  Portfolio-Pulse — Guided Formulation &amp; Optimization
                 </h2>
                 <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-muted border border-line">
-                  STAGE 1 OF 2
+                  PROGRESSIVE WORKFLOW
                 </span>
               </div>
               <p className="text-xs text-muted mt-1">
-                Configure your NIFTY 50 asset universe, Markowitz risk parameters, and Qiskit QAOA circuit options.
+                Configure assets, constraints, and quantum solver across 3 structured stages before running the pipeline.
               </p>
             </div>
 
@@ -391,36 +391,6 @@ export const Optimise: React.FC = () => {
             )}
           </div>
 
-          {/* Quick Presets Bar */}
-          <div className="bg-surface border border-line p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="label text-[10px] text-muted">QUICK FORMULATION PRESETS</span>
-              <span className="text-[10px] text-faint">Click to apply standard risk &amp; cardinality configs</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {PRESETS.map((p) => {
-                const isCurrent = k === p.k && Math.abs(riskAversion - p.q) < 0.01;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => applyPreset(p)}
-                    className={`p-3 text-left border transition-all ${isCurrent
-                      ? 'bg-surface-elevated border-accent-blue/80 text-white'
-                      : 'bg-bg border-line hover:border-line-strong text-muted hover:text-text'
-                      }`}
-                  >
-                    <div className="text-xs font-medium text-text flex items-center justify-between">
-                      <span>{p.label}</span>
-                      {isCurrent && <span className="w-1.5 h-1.5 bg-accent-blue rounded-full"></span>}
-                    </div>
-                    <div className="text-[10px] text-muted mt-0.5 truncate">{p.desc}</div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* Validation Error Alert */}
           {validationError && (
             <div className="p-4 bg-loss/10 border border-loss text-xs text-text font-medium flex items-start gap-2.5">
@@ -432,89 +402,299 @@ export const Optimise: React.FC = () => {
             </div>
           )}
 
-          {/* Main 2-Column Full-Width Grid for Inputs */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Column A: Asset Universe & Portfolio Constraints */}
-            <div className="lg:col-span-7 space-y-6">
-              <UniversePicker
-                assets={universe?.assets || []}
-                selectedTickers={selectedTickers}
-                onChange={setSelectedTickers}
-              />
-
-              <ConstraintsForm
-                k={k}
-                setK={setK}
-                riskAversion={riskAversion}
-                setRiskAversion={setRiskAversion}
-                sectorCap={sectorCap}
-                setSectorCap={setSectorCap}
-                targetReturn={targetReturn}
-                setTargetReturn={setTargetReturn}
-                capital={capital}
-                setCapital={setCapital}
-                holdingsText={holdingsText}
-                setHoldingsText={setHoldingsText}
-              />
+          {/* =========================================================================
+              STAGE 1: CHOOSE YOUR ASSETS
+              ========================================================================= */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between border-b border-line pb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-mono font-medium px-2 py-0.5 bg-surface text-accent-blue-hover border border-line-strong">
+                  STAGE 01
+                </span>
+                <h3 className="text-sm font-medium text-text uppercase tracking-wide">
+                  Choose Your Assets &amp; Candidate Screening
+                </h3>
+              </div>
+              <span className="text-[11px] text-muted hidden sm:inline">
+                Presets, universe selection &amp; qubit capacity screening
+              </span>
             </div>
 
-            {/* Column B: Live Qubit Budget & Quantum Engine Settings */}
-            <div className="lg:col-span-5 space-y-6">
-              <ScreenPreview
-                screenInfo={screenInfo}
-                loading={screenLoading && !screenInfo}
-                qubitCap={qubitCap}
-              />
+            {/* Quick Formulation Presets Bar */}
+            <div className="bg-surface border border-line p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="label text-[10px] text-muted">QUICK FORMULATION PRESETS</span>
+                <span className="text-[10px] text-faint">Instant configuration of standard risk &amp; pick setups</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {PRESETS.map((p) => {
+                  const isCurrent = k === p.k && Math.abs(riskAversion - p.q) < 0.01;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => applyPreset(p)}
+                      className={`p-3 text-left border transition-all ${isCurrent
+                        ? 'bg-surface-elevated border-accent-blue/80 text-white'
+                        : 'bg-bg border-line hover:border-line-strong text-muted hover:text-text'
+                        }`}
+                    >
+                      <div className="text-xs font-medium text-text flex items-center justify-between">
+                        <span>{p.label}</span>
+                        {isCurrent && <span className="w-1.5 h-1.5 bg-accent-blue rounded-full"></span>}
+                      </div>
+                      <div className="text-[10px] text-muted mt-0.5 truncate">{p.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-              <AdvancedQaoa
-                settings={qaoaSettings}
-                onChange={setQaoaSettings}
-              />
+            {/* Asset Selection & Screening Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              <div className="lg:col-span-7">
+                <UniversePicker
+                  assets={universe?.assets || []}
+                  selectedTickers={selectedTickers}
+                  onChange={setSelectedTickers}
+                />
+              </div>
+              <div className="lg:col-span-5">
+                <ScreenPreview
+                  screenInfo={screenInfo}
+                  loading={screenLoading && !screenInfo}
+                  qubitCap={qubitCap}
+                />
+              </div>
+            </div>
+          </section>
 
-              {/* Execution Summary Breakdown Card */}
-              <div className="bg-surface border border-line p-5 space-y-3">
-                <h3 className="text-xs font-medium text-text uppercase tracking-wider flex items-center gap-2">
-                  <span>Execution Specification</span>
+          {/* =========================================================================
+              STAGE 2: SET PORTFOLIO AND RISK CONSTRAINTS
+              ========================================================================= */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between border-b border-line pb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-mono font-medium px-2 py-0.5 bg-surface text-accent-blue-hover border border-line-strong">
+                  STAGE 02
+                </span>
+                <h3 className="text-sm font-medium text-text uppercase tracking-wide">
+                  Set Portfolio &amp; Risk Constraints
                 </h3>
+              </div>
+              <span className="text-[11px] text-muted hidden sm:inline">
+                Cardinality (K), Risk parameter (q), Sector cap, Target return &amp; Capital
+              </span>
+            </div>
+
+            <ConstraintsForm
+              k={k}
+              setK={setK}
+              riskAversion={riskAversion}
+              setRiskAversion={setRiskAversion}
+              sectorCap={sectorCap}
+              setSectorCap={setSectorCap}
+              targetReturn={targetReturn}
+              setTargetReturn={setTargetReturn}
+              capital={capital}
+              setCapital={setCapital}
+              holdingsText={holdingsText}
+              setHoldingsText={setHoldingsText}
+            />
+          </section>
+
+          {/* =========================================================================
+              STAGE 3: CHOOSE AND CONFIGURE THE SOLVER
+              ========================================================================= */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between border-b border-line pb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-mono font-medium px-2 py-0.5 bg-surface text-accent-blue-hover border border-line-strong">
+                  STAGE 03
+                </span>
+                <h3 className="text-sm font-medium text-text uppercase tracking-wide">
+                  Choose &amp; Configure Solvers
+                </h3>
+              </div>
+              <span className="text-[11px] text-muted hidden sm:inline">
+                QAOA Quantum Circuit, Classical Baselines &amp; Hyperparameters
+              </span>
+            </div>
+
+            {/* Solvers & Baselines 2-Card Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Card 1: Quantum Engine Pipeline Summary */}
+              <div className="bg-surface border border-line p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-medium text-text uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 bg-accent-blue"></span>
+                    <span>Primary Quantum Solver</span>
+                  </h4>
+                  <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-text border border-line-strong">
+                    QISKIT QAOA
+                  </span>
+                </div>
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between py-1 border-b border-line/40">
-                    <span className="text-muted">Target Portfolio Cardinality:</span>
-                    <span className="text-text font-mono font-medium">{k} stocks</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-line/40">
-                    <span className="text-muted">Risk Aversion Parameter (q):</span>
-                    <span className="text-text font-mono font-medium">{riskAversion.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-line/40">
-                    <span className="text-muted">Estimated Qubit Allocation:</span>
+                    <span className="text-muted">Mixer &amp; Ansatz:</span>
                     <span className="text-text font-mono font-medium">
-                      {screenInfo ? `${screenInfo.qubits.total} / ${qubitCap} qubits` : 'Calculating...'}
+                      {qaoaSettings.variant === 'xy' ? 'XY Ring Mixer (Dicke Init)' : 'Standard Pauli-X Mixer'}
                     </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-line/40">
-                    <span className="text-muted">Quantum Solver Pipeline:</span>
-                    <span className="text-text font-mono font-medium">
-                      QAOA ({qaoaSettings.variant.toUpperCase()}, p={qaoaSettings.reps})
-                    </span>
+                    <span className="text-muted">Circuit Depth (p):</span>
+                    <span className="text-text font-mono font-medium">p = {qaoaSettings.reps}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-line/40">
+                    <span className="text-muted">Measurement Shots:</span>
+                    <span className="text-text font-mono font-medium">{qaoaSettings.shots.toLocaleString()} shots</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-line/40">
+                    <span className="text-muted">Classical Optimizer:</span>
+                    <span className="text-text font-mono font-medium">{qaoaSettings.optimizer}</span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-muted">Classical Baselines:</span>
-                    <span className="text-text font-mono font-medium">Brute Force, CVXPY, Annealing</span>
+                    <span className="text-muted">Hardware Noise:</span>
+                    <span className={`font-mono font-medium ${qaoaSettings.noise ? 'text-loss' : 'text-muted'}`}>
+                      {qaoaSettings.noise ? 'IBM Guadalupe Noise' : 'None (Ideal Aer)'}
+                    </span>
                   </div>
                 </div>
+              </div>
 
-                <div className="pt-3">
-                  <button
-                    type="button"
-                    onClick={handleStartRun}
-                    disabled={isJobRunning}
-                    className="w-full py-4 px-6 min-h-[48px] bg-text text-bg hover:bg-accent-blue hover:text-white transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center justify-center space-x-2"
-                  >
-                    <span>Run Portfolio-Pulse Optimization Pipeline</span>
-                    <span className="text-[10px] opacity-75 font-mono">[Ctrl+↵]</span>
-                  </button>
+              {/* Card 2: Classical Baselines & Qubit Split */}
+              <div className="bg-surface border border-line p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-medium text-text uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 bg-text"></span>
+                    <span>Benchmark Solvers (Parallel)</span>
+                  </h4>
+                  <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-muted border border-line">
+                    3 BASELINES
+                  </span>
+                </div>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between py-1 border-b border-line/40">
+                    <span className="text-muted">Brute-Force Optimum:</span>
+                    <span className="text-text font-mono font-medium">Exact Combinatorial Ground Truth</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-line/40">
+                    <span className="text-muted">CVXPY Convex Solver:</span>
+                    <span className="text-text font-mono font-medium">Continuous QP + Top-K Rounding</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-line/40">
+                    <span className="text-muted">Simulated Annealing:</span>
+                    <span className="text-text font-mono font-medium">Discrete QUBO Stochastic Heuristic</span>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="text-muted">Qubit Budget Split:</span>
+                    <span className="text-text font-mono font-medium">
+                      {screenInfo ? `${screenInfo.qubits.total} / ${qubitCap} qubits (${screenInfo.qubits.assets} assets + ${screenInfo.qubits.slack} slack)` : 'Calculating...'}
+                    </span>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Collapsible Advanced Quantum Settings */}
+            <AdvancedQaoa
+              settings={qaoaSettings}
+              onChange={setQaoaSettings}
+            />
+          </section>
+
+          {/* =========================================================================
+              PRE-RUN SUMMARY & PRIMARY ACTION BAR
+              ========================================================================= */}
+          <div className="bg-surface border border-line-strong p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line pb-3">
+              <div>
+                <h3 className="text-xs font-medium text-text uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-2 h-2 bg-gain"></span>
+                  <span>Pre-Run Configuration Summary</span>
+                </h3>
+                <p className="text-[11px] text-muted mt-0.5">
+                  Review specifications before executing the full quantum and classical optimization pipeline.
+                </p>
+              </div>
+              <span className="text-[10px] font-mono px-2.5 py-1 bg-bg border border-line text-muted self-start sm:self-auto">
+                PRESS CTRL+ENTER TO RUN
+              </span>
+            </div>
+
+            {/* Compact Spec Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
+              <div className="p-2.5 bg-bg border border-line">
+                <span className="text-[10px] text-muted block uppercase">Universe</span>
+                <span className="text-text font-mono font-medium">
+                  {selectedTickers ? `${selectedTickers.length} Custom` : 'Full NIFTY 50'}
+                </span>
+                <span className="text-[10px] text-muted block">
+                  {screenInfo ? `→ ${screenInfo.qubits.assets} screened` : ''}
+                </span>
+              </div>
+
+              <div className="p-2.5 bg-bg border border-line">
+                <span className="text-[10px] text-muted block uppercase">Target Picks (K)</span>
+                <span className="text-text font-mono font-medium">{k} stocks</span>
+                <span className="text-[10px] text-muted block">Equal-weighted</span>
+              </div>
+
+              <div className="p-2.5 bg-bg border border-line">
+                <span className="text-[10px] text-muted block uppercase">Risk Aversion (q)</span>
+                <span className="text-text font-mono font-medium">{riskAversion.toFixed(2)}</span>
+                <span className="text-[10px] text-muted block">
+                  {riskAversion >= 0.7 ? 'Defensive' : riskAversion <= 0.3 ? 'Growth' : 'Balanced'}
+                </span>
+              </div>
+
+              <div className="p-2.5 bg-bg border border-line">
+                <span className="text-[10px] text-muted block uppercase">Active Constraints</span>
+                <span className="text-text font-mono font-medium">
+                  {sectorCap ? `Sec Cap ≤ ${sectorCap}` : 'No Sector Cap'}
+                </span>
+                <span className="text-[10px] text-muted block">
+                  {targetReturn !== null ? `Ret ≥ ${(targetReturn * 100).toFixed(0)}%` : 'No Return Floor'}
+                </span>
+              </div>
+
+              <div className="p-2.5 bg-bg border border-line">
+                <span className="text-[10px] text-muted block uppercase">Quantum Engine</span>
+                <span className="text-text font-mono font-medium">
+                  QAOA (p={qaoaSettings.reps})
+                </span>
+                <span className="text-[10px] text-muted block">
+                  {qaoaSettings.variant.toUpperCase()} mixer
+                </span>
+              </div>
+
+              <div className="p-2.5 bg-bg border border-line">
+                <span className="text-[10px] text-muted block uppercase">Capital &amp; Costs</span>
+                <span className="text-text font-mono font-medium">₹{(capital / 100000).toFixed(1)}L</span>
+                <span className="text-[10px] text-muted block">Buy 15bps / Sell 25bps</span>
+              </div>
+            </div>
+
+            {/* Primary Action Button */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleStartRun}
+                disabled={isJobRunning}
+                className="w-full py-4 px-6 min-h-[48px] bg-text text-bg hover:bg-accent-blue hover:text-white transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isJobRunning ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-bg border-t-transparent animate-spin mr-2"></span>
+                    <span>Optimization In Progress...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Run Portfolio-Pulse Optimization Pipeline</span>
+                    <span className="text-[10px] opacity-75 font-mono">[Ctrl+↵]</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

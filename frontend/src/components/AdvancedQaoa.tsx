@@ -19,23 +19,37 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-line/20 transition-colors text-left"
+        className="w-full px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-line/20 transition-colors text-left"
       >
-        <div className="flex items-center space-x-3">
-                    <div>
-            <h2 className="text-sm font-medium text-text flex items-center gap-2">
-              Advanced QAOA Hyperparameters
-              <span className="text-[10px] px-2 py-0.5 bg-surface text-text font-normal border border-line-strong">
-                {settings.variant.toUpperCase()} (p={settings.reps}, {settings.shots} shots)
-              </span>
-            </h2>
-            <p className="text-[11px] text-muted">
-              Configure quantum circuit depth p, mixer type, classical optimizer, and noise simulation.
-            </p>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-text uppercase tracking-wider">
+              Advanced Quantum Settings
+            </span>
+            <span className="text-[10px] text-muted font-mono">
+              [Click to {isOpen ? 'collapse' : 'expand'}]
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-mono text-muted">
+            <span className="px-1.5 py-0.5 bg-bg border border-line text-text">
+              {settings.variant === 'xy' ? 'XY Ring Mixer' : 'Standard Pauli-X'}
+            </span>
+            <span className="px-1.5 py-0.5 bg-bg border border-line text-text">
+              p={settings.reps}
+            </span>
+            <span className="px-1.5 py-0.5 bg-bg border border-line text-text">
+              {settings.shots} shots
+            </span>
+            <span className="px-1.5 py-0.5 bg-bg border border-line text-text">
+              {settings.optimizer}
+            </span>
+            <span className={`px-1.5 py-0.5 border ${settings.noise ? 'bg-loss/10 border-loss text-loss' : 'bg-bg border-line text-muted'}`}>
+              {settings.noise ? 'Noise: FakeGuadalupe' : 'Noise: None (Ideal)'}
+            </span>
           </div>
         </div>
 
-        <span className={`text-muted transition-transform text-xs font-medium ${isOpen ? 'rotate-180' : ''}`}>
+        <span className={`text-muted transition-transform text-xs font-medium shrink-0 self-end sm:self-center ${isOpen ? 'rotate-180' : ''}`}>
           ▼
         </span>
       </button>

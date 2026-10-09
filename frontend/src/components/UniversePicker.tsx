@@ -15,6 +15,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
   const [search, setSearch] = useState('');
   const [selectedSector, setSelectedSector] = useState<string>('ALL');
   const [mode, setMode] = useState<'all' | 'custom'>(selectedTickers === null ? 'all' : 'custom');
+  const [isListExpanded, setIsListExpanded] = useState<boolean>(selectedTickers !== null);
 
   const availableTickers = useMemo(() => {
     return assets.filter(a => !a.excluded_reason).map(a => a.ticker);
@@ -39,9 +40,10 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
     setMode(newMode);
     if (newMode === 'all') {
       onChange(null);
+      setIsListExpanded(false);
     } else {
-      // Default custom selection to top available
       onChange(availableTickers.slice(0, 10));
+      setIsListExpanded(true);
     }
   };
 
@@ -68,22 +70,31 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
     ? availableTickers.length
     : (selectedTickers ? selectedTickers.length : availableTickers.length);
 
+  const selectTopN = (n: number) => {
+    setMode('custom');
+    setIsListExpanded(true);
+    onChange(availableTickers.slice(0, n));
+  };
+
   return (
-    <div className="bg-surface border border-line p-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-line mb-4">
+    <div className="bg-surface border border-line p-5 space-y-4">
+      {/* Header & Mode Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-line">
         <div>
-          <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
-            <span>Asset Universe</span>
-            <span className="text-[10px] font-mono px-2 py-0.5 bg-surface-elevated text-text border border-line-strong">
-              {activeCount} selected
+          <div className="flex items-center space-x-2">
+            <h3 className="text-sm font-medium text-text uppercase tracking-wide">
+              Stock Universe Selection
+            </h3>
+            <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-text border border-line-strong">
+              {activeCount} / {availableTickers.length} Active
             </span>
-          </h2>
+          </div>
           <p className="text-xs text-muted mt-0.5">
-            Select stocks from the NIFTY 50 universe for portfolio construction.
+            Choose whether to optimize across the full NIFTY 50 universe or specify custom candidate assets.
           </p>
         </div>
 
-        {/* Mode Toggle */}
+        {/* Mode Selector Buttons */}
         <div className="flex bg-bg p-1 border border-line self-start sm:self-auto gap-0.5">
           <button
             type="button"
@@ -110,75 +121,134 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <div className="relative flex-1">
-          <input
-            type="text"
-            placeholder="Search stock by name, symbol, or ticker..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full min-h-[44px] bg-bg border border-line px-3.5 py-2 text-xs text-text placeholder-muted focus:border-text transition-colors"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text text-xs min-h-[44px] min-w-[44px] flex items-center justify-center"
-            >
-              ✕
-            </button>
-          )}
+      {/* Full Universe Status Banner (When list is collapsed in All mode) */}
+      {!isListExpanded && mode === 'all' ? (
+        <div className="bg-bg border border-line p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center space-x-2.5 text-xs text-muted">
+            <span className="w-2 h-2 rounded-full bg-gain shrink-0"></span>
+            <span>
+              All <strong className="text-text font-medium">{availableTickers.length}</strong> non-excluded NIFTY 50 equities active across {sectors.length - 1} sectors.
+              <span className="text-faint ml-1.5">(1 excluded: TMPV.NS demerger)</span>
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsListExpanded(true)}
+            className="text-xs text-muted hover:text-text bg-surface border border-line hover:border-line-strong px-3 py-1.5 transition-colors whitespace-nowrap self-start sm:self-auto flex items-center space-x-1.5"
+          >
+            <span>Inspect Asset Catalog</span>
+            <span className="font-mono text-[10px]">▾</span>
+          </button>
         </div>
+      ) : (
+        <div className="space-y-3">
+          {/* Controls: Search, Sector, Quick Select Chips */}
+          <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
+            <div className="flex flex-1 gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="Search stock by name, symbol, or ticker..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full min-h-[40px] bg-bg border border-line px-3.5 py-1.5 text-xs text-text placeholder-muted focus:border-text transition-colors"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text text-xs min-h-[32px] min-w-[32px] flex items-center justify-center"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
 
-        <select
-          value={selectedSector}
-          onChange={(e) => setSelectedSector(e.target.value)}
-          className="bg-bg border border-line px-3 py-2 min-h-[44px] text-xs text-text focus:border-text"
-        >
-          {sectors.map(sec => (
-            <option key={sec} value={sec} className="bg-surface text-text">
-              {sec === 'ALL' ? 'All Sectors' : sec}
-            </option>
-          ))}
-        </select>
-      </div>
+              <select
+                value={selectedSector}
+                onChange={(e) => setSelectedSector(e.target.value)}
+                className="bg-bg border border-line px-3 py-1.5 min-h-[40px] text-xs text-text focus:border-text"
+              >
+                {sectors.map(sec => (
+                  <option key={sec} value={sec} className="bg-surface text-text">
+                    {sec === 'ALL' ? 'All Sectors' : sec}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* Stock rows: 32px, two columns on desktop */}
-      <div className="max-h-72 overflow-y-auto md:grid md:grid-cols-2 md:gap-x-4 border-t border-line">
-        {filteredAssets.map(asset => {
-          const disabled = !!asset.excluded_reason;
-          const selected = isSelected(asset.ticker);
+            {/* Quick Actions & Collapse Toggle */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {mode === 'custom' && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => selectTopN(10)}
+                    className="text-[11px] text-muted hover:text-text px-2 py-1 bg-bg border border-line hover:border-line-strong"
+                  >
+                    Top 10
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => selectTopN(15)}
+                    className="text-[11px] text-muted hover:text-text px-2 py-1 bg-bg border border-line hover:border-line-strong"
+                  >
+                    Top 15
+                  </button>
+                </>
+              )}
 
-          return (
-            <label
-              key={asset.ticker}
-              title={disabled ? asset.excluded_reason ?? undefined : `${asset.name} · ${asset.sector}`}
-              className={`flex items-center gap-2 h-8 px-1 border-b border-line text-xs ${
-                disabled
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'cursor-pointer hover:bg-surface'
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={selected}
-                disabled={disabled || mode === 'all'}
-                onChange={() => toggleTicker(asset.ticker)}
-                className="accent-white cursor-pointer shrink-0"
-              />
-              <span className={`font-bold shrink-0 ${selected ? 'text-text' : 'text-muted'}`}>
-                {asset.symbol}
-              </span>
-              <span className="text-muted truncate min-w-0 flex-1">
-                {asset.name}
-              </span>
-              <span className="text-[10px] text-faint truncate max-w-[38%] shrink-0">
-                {disabled ? `⚠ ${asset.excluded_reason}` : asset.sector}
-              </span>
-            </label>
-          );
-        })}
-      </div>
+              {mode === 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setIsListExpanded(false)}
+                  className="text-[11px] text-muted hover:text-text px-2.5 py-1 bg-bg border border-line hover:border-line-strong flex items-center space-x-1"
+                >
+                  <span>Collapse</span>
+                  <span className="font-mono text-[9px]">▲</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Responsive 2-Column Asset Grid */}
+          <div className="max-h-64 overflow-y-auto border border-line bg-bg p-1 grid grid-cols-1 md:grid-cols-2 gap-x-3 divide-y md:divide-y-0 divide-line/40">
+            {filteredAssets.map(asset => {
+              const disabled = !!asset.excluded_reason;
+              const selected = isSelected(asset.ticker);
+
+              return (
+                <label
+                  key={asset.ticker}
+                  title={disabled ? asset.excluded_reason ?? undefined : `${asset.name} · ${asset.sector}`}
+                  className={`flex items-center gap-2 h-8 px-2 text-xs border-b border-line/30 transition-colors ${
+                    disabled
+                      ? 'opacity-40 cursor-not-allowed bg-surface/30'
+                      : 'cursor-pointer hover:bg-surface'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    disabled={disabled || mode === 'all'}
+                    onChange={() => toggleTicker(asset.ticker)}
+                    className="accent-white cursor-pointer shrink-0"
+                  />
+                  <span className={`font-mono font-medium shrink-0 ${selected ? 'text-text' : 'text-muted'}`}>
+                    {asset.symbol}
+                  </span>
+                  <span className="text-muted truncate min-w-0 flex-1 text-[11px]">
+                    {asset.name}
+                  </span>
+                  <span className="text-[10px] text-faint truncate max-w-[36%] shrink-0">
+                    {disabled ? `⚠ ${asset.excluded_reason}` : asset.sector}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
