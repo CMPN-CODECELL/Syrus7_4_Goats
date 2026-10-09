@@ -1,0 +1,83 @@
+{
+ "id": "depth",
+ "title": "Effect of circuit depth",
+ "description": "Mean over 5 fixed-seed 10-asset, K=5, q=0.5 instances (no sector cap or target, zero costs), est window 2023-10-01..2025-09-30. COBYLA, ramp init.",
+ "x_label": "QAOA depth p",
+ "y_label": "1 - approximation ratio",
+ "series": [
+  {
+   "label": "Standard mixer",
+   "points": [
+    {
+     "x": 1.0,
+     "y": 0.8578190683947253,
+     "yerr": 0.04556606355515961
+    },
+    {
+     "x": 2.0,
+     "y": 0.7371636406318333,
+     "yerr": 0.09204751271899575
+    },
+    {
+     "x": 3.0,
+     "y": 0.7989891992377552,
+     "yerr": 0.09534512493442543
+    },
+    {
+     "x": 4.0,
+     "y": 0.8615462107940479,
+     "yerr": 0.07212318883307064
+    }
+   ]
+  },
+  {
+   "label": "XY mixer + Dicke",
+   "points": [
+    {
+     "x": 1.0,
+     "y": 0.34681934424262045,
+     "yerr": 0.09437294921098928
+    },
+    {
+     "x": 2.0,
+     "y": 0.2890317969745503,
+     "yerr": 0.05224890340238195
+    },
+    {
+     "x": 3.0,
+     "y": 0.2932031390595727,
+     "yerr": 0.07760789528123781
+    },
+    {
+     "x": 4.0,
+     "y": 0.24077002482648494,
+     "yerr": 0.014609557869407187
+    }
+   ]
+  }
+ ],
+ "instance": {
+  "n_assets": 10,
+  "k": 5,
+  "q": 0.5,
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "shots": 4096,
+  "maxiter": 60
+ },
+ "notes": [
+  "Noiseless statevector simulation.",
+  "Depth p = 1..4.",
+  "Mean P(opt) for p = 1..4, Standard mixer: 0.0031, 0.0019, 0.0023, 0.0022",
+  "Mean P(opt) for p = 1..4, XY mixer + Dicke: 0.0128, 0.0189, 0.0339, 0.0379",
+  "Synthetic subset of NIFTY 50 tickers; estimation window 2023-10-01..2025-09-30",
+  "5 instance(s) with seeds [1, 2, 3, 4, 5], QAOA seed = instance seed, maxiter 60, 4096 shots; yerr is the sample standard deviation over instances."
+ ],
+ "generated_at": "2026-10-09",
+ "wall_time_s": 155.1
+}

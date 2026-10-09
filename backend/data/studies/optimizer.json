@@ -1,0 +1,60 @@
+{
+ "id": "optimizer",
+ "title": "Classical optimiser",
+ "description": "Mean over 5 fixed-seed 10-asset, K=5, q=0.5 instances (no sector cap or target, zero costs), est window 2023-10-01..2025-09-30. Standard mixer, p = 3, ramp init.",
+ "x_label": "Optimiser (0 = COBYLA, 1 = SPSA, 2 = Nelder-Mead)",
+ "y_label": "1 - approximation ratio",
+ "series": [
+  {
+   "label": "COBYLA",
+   "points": [
+    {
+     "x": 0.0,
+     "y": 0.7989891992377552,
+     "yerr": 0.09534512493442543
+    }
+   ]
+  },
+  {
+   "label": "SPSA",
+   "points": [
+    {
+     "x": 1.0,
+     "y": 0.8502311730390698,
+     "yerr": 0.029211925602200938
+    }
+   ]
+  },
+  {
+   "label": "Nelder-Mead",
+   "points": [
+    {
+     "x": 2.0,
+     "y": 0.9158100761230454,
+     "yerr": 0.041535849191874086
+    }
+   ]
+  }
+ ],
+ "instance": {
+  "n_assets": 10,
+  "k": 5,
+  "q": 0.5,
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "shots": 4096,
+  "maxiter": 60
+ },
+ "notes": [
+  "Noiseless statevector simulation.",
+  "Synthetic subset of NIFTY 50 tickers; estimation window 2023-10-01..2025-09-30",
+  "5 instance(s) with seeds [1, 2, 3, 4, 5], QAOA seed = instance seed, maxiter 60, 4096 shots; yerr is the sample standard deviation over instances."
+ ],
+ "generated_at": "2026-10-09",
+ "wall_time_s": 31.6
+}
