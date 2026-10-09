@@ -36,14 +36,25 @@ app = FastAPI(
     redoc_url=None,
 )
 
-# CORS configuration per CONTRACTS.md §2: allow Vite frontend dev server
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+import os
+
+# CORS configuration per CONTRACTS.md §2: allow Vite frontend dev server and production domains
+cors_env = os.getenv("CORS_ORIGINS", "*").strip()
+if cors_env == "*" or not cors_env:
+    cors_origins = ["*"]
+    cors_credentials = False
+else:
+    cors_origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-    ],
-    allow_credentials=True,
+        *[o.strip() for o in cors_env.split(",") if o.strip()],
+    ]
+    cors_credentials = True
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=cors_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
