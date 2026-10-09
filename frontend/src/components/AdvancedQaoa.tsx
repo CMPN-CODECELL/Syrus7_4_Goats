@@ -45,13 +45,14 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
         <div className="p-5 border-t border-line bg-ink/30 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {/* QAOA Variant & Mixer */}
           <div>
-            <label className="text-xs font-bold text-text mb-1.5 block flex items-center gap-1">
+            <label htmlFor="qaoa-variant" className="text-xs font-bold text-text mb-1.5 block flex items-center gap-1">
               Mixer Variant
               <GlossaryTermTooltip termKey="mixer">
                 <span>[?]</span>
               </GlossaryTermTooltip>
             </label>
             <select
+              id="qaoa-variant"
               value={settings.variant}
               onChange={(e) => update('variant', e.target.value as 'standard' | 'xy')}
               className="w-full bg-ink border border-line rounded-xl px-3 py-2 text-xs text-text focus:outline-none focus:border-peach"
@@ -67,7 +68,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
           {/* Circuit Depth p */}
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-bold text-text flex items-center gap-1">
+              <label htmlFor="qaoa-reps" className="text-xs font-bold text-text flex items-center gap-1">
                 Circuit Depth (p)
                 <GlossaryTermTooltip termKey="depth">
                   <span>[?]</span>
@@ -76,6 +77,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
               <span className="text-xs font-bold text-peach font-mono">p = {settings.reps}</span>
             </div>
             <input
+              id="qaoa-reps"
               type="range"
               min={1}
               max={5}
@@ -91,10 +93,11 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
 
           {/* Optimizer */}
           <div>
-            <label className="text-xs font-bold text-text mb-1.5 block">
+            <label htmlFor="qaoa-optimizer" className="text-xs font-bold text-text mb-1.5 block">
               Classical Optimizer
             </label>
             <select
+              id="qaoa-optimizer"
               value={settings.optimizer}
               onChange={(e) => update('optimizer', e.target.value as any)}
               className="w-full bg-ink border border-line rounded-xl px-3 py-2 text-xs text-text focus:outline-none focus:border-peach"
@@ -107,13 +110,14 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
 
           {/* Initialization */}
           <div>
-            <label className="text-xs font-bold text-text mb-1.5 block flex items-center gap-1">
+            <label htmlFor="qaoa-init" className="text-xs font-bold text-text mb-1.5 block flex items-center gap-1">
               Parameter Initialization
               <GlossaryTermTooltip termKey="warm_start">
                 <span>[?]</span>
               </GlossaryTermTooltip>
             </label>
             <select
+              id="qaoa-init"
               value={settings.init}
               onChange={(e) => update('init', e.target.value as any)}
               className="w-full bg-ink border border-line rounded-xl px-3 py-2 text-xs text-text focus:outline-none focus:border-peach"
@@ -132,7 +136,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
           {/* Measurement Shots */}
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-bold text-text flex items-center gap-1">
+              <label htmlFor="qaoa-shots" className="text-xs font-bold text-text flex items-center gap-1">
                 Measurement Shots
                 <GlossaryTermTooltip termKey="shots">
                   <span>[?]</span>
@@ -141,6 +145,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
               <span className="text-xs font-bold text-peach font-mono">{settings.shots}</span>
             </div>
             <select
+              id="qaoa-shots"
               value={settings.shots}
               onChange={(e) => update('shots', Number(e.target.value))}
               className="w-full bg-ink border border-line rounded-xl px-3 py-2 text-xs text-text focus:outline-none focus:border-peach"
@@ -156,8 +161,9 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
           <div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-xs font-bold text-text mb-1 block">Max Iterations</label>
+                <label htmlFor="qaoa-maxiter" className="text-xs font-bold text-text mb-1 block">Max Iterations</label>
                 <input
+                  id="qaoa-maxiter"
                   type="number"
                   min={20}
                   max={500}
@@ -167,8 +173,9 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-text mb-1 block">RNG Seed</label>
+                <label htmlFor="qaoa-seed" className="text-xs font-bold text-text mb-1 block">RNG Seed</label>
                 <input
+                  id="qaoa-seed"
                   type="number"
                   value={settings.seed}
                   onChange={(e) => update('seed', Number(e.target.value))}
@@ -184,6 +191,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
+                  aria-label="Simulate hardware noise"
                   checked={settings.noise}
                   onChange={(e) => update('noise', e.target.checked)}
                   className="sr-only peer"
@@ -195,7 +203,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
                   Simulate IBM Guadalupe Hardware Noise
                 </span>
                 <span className="text-[11px] text-muted">
-                  Runs Aer density-matrix noise model (FakeGuadalupeV2) alongside noiseless simulation.
+                  Samples the optimised circuit on Aer with the FakeGuadalupeV2 noise model, next to the noiseless run.
                 </span>
               </div>
             </div>

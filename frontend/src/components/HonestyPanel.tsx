@@ -10,21 +10,14 @@ interface HonestyPanelProps {
 export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult }) => {
   const { metrics, noise, circuit } = qaoaResult;
 
-  const getLevelBadge = (level: Verdict['level']) => {
-    switch (level) {
-      case 'exact':
-        return { text: 'EXACT OPTIMUM FOUND', bg: 'bg-peach/20 text-peach border-peach/40' };
-      case 'near':
-        return { text: 'NEAR OPTIMAL (CLOSE APPROXIMATION)', bg: 'bg-peach/15 text-peach border-peach/30' };
-      case 'poor':
-        return { text: 'SUBOPTIMAL SAMPLING', bg: 'bg-line/60 text-muted border-line' };
-      case 'infeasible':
-        return { text: 'INFEASIBLE (CONSTRAINTS VIOLATED)', bg: 'bg-wine/40 text-red border-wine' };
-    }
+  const badges: Record<Verdict['level'], { text: string; bg: string }> = {
+    matched: { text: 'MATCHED THE EXACT OPTIMUM', bg: 'bg-peach/20 text-peach border-peach/40' },
+    near: { text: 'NEAR THE OPTIMUM', bg: 'bg-peach/15 text-peach border-peach/30' },
+    worse: { text: 'WORSE THAN THE OPTIMUM', bg: 'bg-line/60 text-muted border-line' },
+    'no-feasible': { text: 'NO FEASIBLE SAMPLE', bg: 'bg-wine/40 text-[#FF8A8A] border-wine' }
   };
-
-  const badge = getLevelBadge(verdict.level);
-  const pOptMultiplier = metrics.p_random > 0 ? (metrics.p_opt / metrics.p_random).toFixed(1) : '1.0';
+  const badge = badges[verdict.level] ?? { text: verdict.level.toUpperCase(), bg: 'bg-line/60 text-muted border-line' };
+  const pOptMultiplier = metrics.p_random > 0 ? (metrics.p_opt / metrics.p_random).toFixed(1) : '—';
 
   return (
     <div className="bg-panel border border-line rounded-2xl p-6 shadow-panel mb-6 space-y-5">
@@ -106,7 +99,7 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
             </div>
             <div className="p-2.5 bg-ink/70 rounded-lg border border-line">
               <span className="text-[10px] text-muted block">Noisy Backend</span>
-              <span className="text-red font-bold">Ratio: {noise.noisy.approx_ratio.toFixed(2)}</span>
+              <span className="text-[#FF8A8A] font-bold">Ratio: {noise.noisy.approx_ratio.toFixed(2)}</span>
             </div>
             <div className="p-2.5 bg-ink/70 rounded-lg border border-line">
               <span className="text-[10px] text-muted block">P(opt) Drop</span>

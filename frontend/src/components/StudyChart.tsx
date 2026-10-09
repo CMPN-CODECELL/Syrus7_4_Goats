@@ -1,6 +1,6 @@
 import React from 'react';
 import { Study } from '../api/types';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ErrorBar } from 'recharts';
 import { CHART_COLORS } from '../lib/chartColors';
 
 interface StudyChartProps {
@@ -88,7 +88,9 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
                 dot={{ r: 3.5, fill: SERIES_COLOR_LIST[idx % SERIES_COLOR_LIST.length] }}
                 activeDot={{ r: 6, fill: SERIES_COLOR_LIST[idx % SERIES_COLOR_LIST.length], stroke: '#161E2F', strokeWidth: 2 }}
                 isAnimationActive={false}
-              />
+              >
+                <ErrorBar dataKey={`${s.label}_err`} stroke={SERIES_COLOR_LIST[idx % SERIES_COLOR_LIST.length]} width={4} />
+              </Line>
             ))}
           </LineChart>
         </ResponsiveContainer>

@@ -54,7 +54,7 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
                     : 'text-muted hover:text-text'
                 }`}
               >
-                {s.label.split(' ')[0]}
+                {s.label}
               </button>
             );
           })}
@@ -65,13 +65,19 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
       {isNoFeasible ? (
         <div className="p-8 bg-wine/30 border border-wine rounded-xl text-center space-y-2">
           <div className="text-xl">⚠️</div>
-          <h3 className="font-bold text-red text-sm">
-            QAOA Found No Feasible Portfolio
+          <h3 className="font-bold text-[#FF8A8A] text-sm">
+            {currentSolver.label} found no feasible portfolio
           </h3>
-          <p className="text-xs text-text max-w-md mx-auto">
-            All measured bitstrings violated penalty constraints. Feasible sample rate was{' '}
-            <strong className="text-peach">{formatPercent(currentSolver.feasible_rate)}</strong>.
-          </p>
+          {currentSolver.kind === 'quantum' ? (
+            <p className="text-xs text-text max-w-md mx-auto">
+              No sampled bitstring met every constraint, so no portfolio is shown. Feasible sample rate was{' '}
+              <strong className="text-peach">{formatPercent(currentSolver.feasible_rate)}</strong>.
+            </p>
+          ) : (
+            <p className="text-xs text-text max-w-md mx-auto">
+              Its answer violates: {currentSolver.violations.join('; ') || 'a constraint'}.
+            </p>
+          )}
         </div>
       ) : (
         <>

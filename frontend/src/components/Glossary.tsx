@@ -87,6 +87,7 @@ export const GlossaryTermTooltip: React.FC<{ termKey: string; children: React.Re
         onBlur={() => setOpen(false)}
         className="underline decoration-dotted decoration-peach/60 hover:decoration-peach text-peach cursor-help font-medium focus:outline-none focus:ring-1 focus:ring-peach rounded"
         aria-expanded={open}
+        aria-label={`What is ${termObj.term}?`}
       >
         {children}
       </button>

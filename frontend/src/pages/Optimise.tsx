@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   Universe,
   RunRequest,
@@ -47,8 +47,9 @@ export const Optimise: React.FC = () => {
   const [sectorCap, setSectorCap] = useState<number | null>(2);
   const [targetReturn, setTargetReturn] = useState<number | null>(null);
   const [capital, setCapital] = useState<number>(1000000);
+  const [holdingsText, setHoldingsText] = useState('');
   const [qaoaSettings, setQaoaSettings] = useState<QaoaSettings>(DEFAULT_QAOA);
-  const qubitCap = 16;
+  const qubitCap = 12; // contract default: a live run stays under a minute (16 is allowed but takes ~3 min)
 
   // Pre-screen State
   const [screenInfo, setScreenInfo] = useState<ScreenInfo | null>(null);
@@ -60,6 +61,7 @@ export const Optimise: React.FC = () => {
   const [selectedSolverKey, setSelectedSolverKey] = useState<string>('brute_force');
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  // Pending poll timeout; null means "not polling", so a reply that lands after cancel or unmount is dropped
   const pollTimerRef = useRef<number | null>(null);
 
   const fetchUniverseData = useCallback(async () => {
@@ -79,6 +81,22 @@ export const Optimise: React.FC = () => {
     fetchUniverseData();
   }, [fetchUniverseData]);
 
+  // Holdings textarea: one "SYMBOL shares" per line -> {"TCS.NS": 52}, or an error message
+  const holdings = useMemo((): Record<string, number> | string => {
+    const known = new Set(universe?.assets.map(a => a.ticker));
+    const out: Record<string, number> = {};
+    for (const line of holdingsText.split('\n').map(l => l.trim()).filter(Boolean)) {
+      const [sym, count, ...rest] = line.toUpperCase().split(/[\s,:=]+/);
+      const ticker = sym.includes('.') ? sym : `${sym}.NS`;
+      const shares = Number(count);
+      if (rest.length || !known.has(ticker) || !Number.isInteger(shares) || shares <= 0) {
+        return `Cannot read holdings line "${line}". Use one NIFTY 50 symbol and a whole number of shares per line, e.g. "TCS 52".`;
+      }
+      out[ticker] = shares;
+    }
+    return out;
+  }, [holdingsText, universe]);
+
   // Construct current RunRequest payload
   const buildRunRequest = useCallback((): RunRequest => {
     return {
@@ -88,32 +106,33 @@ export const Optimise: React.FC = () => {
       sector_cap: sectorCap,
       target_return: targetReturn,
       capital,
-      holdings: {},
+      holdings: typeof holdings === 'string' ? {} : holdings,
       qubit_cap: qubitCap,
       qaoa: qaoaSettings
     };
-  }, [selectedTickers, k, riskAversion, sectorCap, targetReturn, capital, qubitCap, qaoaSettings]);
+  }, [selectedTickers, k, riskAversion, sectorCap, targetReturn, capital, holdings, qubitCap, qaoaSettings]);
 
-  // Trigger Pre-screen API call on form changes
+  // Pre-screen preview: debounced, and a reply for an outdated form is ignored
   useEffect(() => {
     if (!universe) return;
-
-    const req = buildRunRequest();
-    setScreenLoading(true);
-    postScreen(req)
-      .then(res => setScreenInfo(res))
-      .catch(() => setScreenInfo(null))
-      .finally(() => setScreenLoading(false));
+    let stale = false;
+    const timer = window.setTimeout(() => {
+      setScreenLoading(true);
+      postScreen(buildRunRequest())
+        .then(res => { if (!stale) setScreenInfo(res); })
+        .catch(() => { if (!stale) setScreenInfo(null); })
+        .finally(() => { if (!stale) setScreenLoading(false); });
+    }, 300);
+    return () => { stale = true; clearTimeout(timer); };
   }, [universe, buildRunRequest]);
 
+  const stopPolling = () => {
+    if (pollTimerRef.current !== null) clearTimeout(pollTimerRef.current);
+    pollTimerRef.current = null;
+  };
+
   // Clear polling timer on unmount
-  useEffect(() => {
-    return () => {
-      if (pollTimerRef.current !== null) {
-        clearInterval(pollTimerRef.current);
-      }
-    };
-  }, []);
+  useEffect(() => stopPolling, []);
 
   // Set default solver selection when result arrives
   useEffect(() => {
@@ -122,25 +141,19 @@ export const Optimise: React.FC = () => {
     }
   }, [runResult]);
 
-  // Handle Polling Loop
+  // Poll every 500 ms; the next request starts only after the previous reply, so replies never overlap
   const startPolling = (jobId: string) => {
-    if (pollTimerRef.current !== null) {
-      clearInterval(pollTimerRef.current);
-    }
-
-    pollTimerRef.current = window.setInterval(async () => {
+    pollTimerRef.current = window.setTimeout(async () => {
       try {
         const status = await getRun(jobId);
+        if (pollTimerRef.current === null) return;
         setActiveJobStatus(status);
-
-        if (status.state === 'done') {
-          if (pollTimerRef.current !== null) clearInterval(pollTimerRef.current);
-          setRunResult(status.result);
-        } else if (status.state === 'error' || status.state === 'cancelled') {
-          if (pollTimerRef.current !== null) clearInterval(pollTimerRef.current);
-        }
+        if (status.state === 'done') setRunResult(status.result);
+        if (status.state === 'queued' || status.state === 'running') startPolling(jobId);
+        else pollTimerRef.current = null;
       } catch (err: any) {
-        if (pollTimerRef.current !== null) clearInterval(pollTimerRef.current);
+        if (pollTimerRef.current === null) return;
+        pollTimerRef.current = null;
         setActiveJobStatus(prev => prev ? { ...prev, state: 'error', error: err.message } : null);
       }
     }, 500);
@@ -163,7 +176,17 @@ export const Optimise: React.FC = () => {
       setValidationError('Shots must be between 256 and 20,000.');
       return;
     }
+    const nStocks = selectedTickers?.length ?? universe?.assets.filter(a => !a.excluded_reason).length ?? 0;
+    if (k > nStocks) {
+      setValidationError(`You picked ${nStocks} stocks, so a portfolio of ${k} cannot be built. Add stocks or lower K.`);
+      return;
+    }
+    if (typeof holdings === 'string') {
+      setValidationError(holdings);
+      return;
+    }
 
+    stopPolling();
     const req = buildRunRequest();
     try {
       const { job_id } = await startRun(req);
@@ -186,7 +209,7 @@ export const Optimise: React.FC = () => {
   // Cancel Handler
   const handleCancel = async () => {
     if (!activeJobStatus) return;
-    if (pollTimerRef.current !== null) clearInterval(pollTimerRef.current);
+    stopPolling();
 
     try {
       const status = await cancelRun(activeJobStatus.job_id);
@@ -209,14 +232,14 @@ export const Optimise: React.FC = () => {
     return (
       <div className="max-w-2xl mx-auto p-6 bg-wine/30 border border-wine rounded-2xl text-center space-y-4 shadow-panel">
         <div className="text-2xl">⚠️</div>
-        <h2 className="text-base font-bold text-red">Backend Connection Offline</h2>
+        <h2 className="text-base font-bold text-[#FF8A8A]">Backend Connection Offline</h2>
         <p className="text-xs text-muted font-mono">{apiError}</p>
         <p className="text-xs text-text">
           Ensure FastAPI backend is running on <code className="text-peach font-mono">http://localhost:8000</code> or launch with <code className="text-peach font-mono">VITE_USE_MOCKS=1</code> for offline mock mode.
         </p>
         <button
           onClick={fetchUniverseData}
-          className="px-5 py-2.5 bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
+          className="px-5 py-2.5 min-h-[44px] bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
         >
           Retry Connection
         </button>
@@ -232,6 +255,8 @@ export const Optimise: React.FC = () => {
       <DataBanner
         source={universe?.source}
         asOf={universe?.as_of}
+        estWindow={runResult?.data.est_window}
+        testWindow={runResult?.data.test_window}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -254,6 +279,8 @@ export const Optimise: React.FC = () => {
             setTargetReturn={setTargetReturn}
             capital={capital}
             setCapital={setCapital}
+            holdingsText={holdingsText}
+            setHoldingsText={setHoldingsText}
           />
 
           <AdvancedQaoa
@@ -263,7 +290,7 @@ export const Optimise: React.FC = () => {
 
           {/* Validation Error Banner */}
           {validationError && (
-            <div className="p-4 bg-wine/40 border border-wine rounded-2xl text-xs text-red font-medium flex items-center gap-2">
+            <div className="p-4 bg-wine/40 border border-wine rounded-2xl text-xs text-[#FF8A8A] font-medium flex items-center gap-2">
               <span>🛑</span> {validationError}
             </div>
           )}
@@ -273,7 +300,7 @@ export const Optimise: React.FC = () => {
             type="button"
             onClick={handleStartRun}
             disabled={activeJobStatus?.state === 'running' || activeJobStatus?.state === 'queued'}
-            className={`w-full py-4 px-6 text-sm font-extrabold rounded-2xl shadow-panel transition-all transform active:scale-[0.99] flex items-center justify-center space-x-2 ${
+            className={`w-full py-4 px-6 min-h-[48px] text-sm font-extrabold rounded-2xl shadow-panel transition-all transform active:scale-[0.99] flex items-center justify-center space-x-2 ${
               activeJobStatus?.state === 'running' || activeJobStatus?.state === 'queued'
                 ? 'bg-line text-muted cursor-not-allowed opacity-60'
                 : 'bg-hero-bar text-ink hover:opacity-95 text-text font-bold border border-peach/40 cursor-pointer'
@@ -288,12 +315,12 @@ export const Optimise: React.FC = () => {
           {/* Live Qubit Pre-screen Preview */}
           <ScreenPreview
             screenInfo={screenInfo}
-            loading={screenLoading}
+            loading={screenLoading && !screenInfo}
             qubitCap={qubitCap}
           />
 
           {/* Active Job Progress Panel */}
-          {activeJobStatus && activeJobStatus.state !== 'done' && (
+          {(activeJobStatus?.state === 'queued' || activeJobStatus?.state === 'running') && (
             <RunProgress
               jobStatus={activeJobStatus}
               onCancel={handleCancel}
@@ -303,7 +330,7 @@ export const Optimise: React.FC = () => {
           {/* Job Error State */}
           {activeJobStatus?.state === 'error' && (
             <div className="p-5 bg-wine/40 border border-wine rounded-2xl text-xs space-y-2">
-              <h3 className="font-bold text-red flex items-center gap-2">
+              <h3 className="font-bold text-[#FF8A8A] flex items-center gap-2">
                 <span>❌</span> Optimization Failed
               </h3>
               <p className="text-text font-mono text-[11px] leading-relaxed">
@@ -318,7 +345,7 @@ export const Optimise: React.FC = () => {
               <span>Run was cancelled. Input form is ready for a new optimization run.</span>
               <button
                 onClick={() => setActiveJobStatus(null)}
-                className="text-peach font-bold underline"
+                className="text-peach font-bold underline min-h-[44px] flex items-center px-2"
               >
                 Reset
               </button>
@@ -389,6 +416,25 @@ export const Optimise: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Sticky Mobile Cancel Banner during active run (U15) */}
+      {activeJobStatus && (activeJobStatus.state === 'running' || activeJobStatus.state === 'queued') && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-panel/95 backdrop-blur-md border-t border-peach/40 p-3 px-4 shadow-panel flex items-center justify-between sm:hidden animate-in slide-in-from-bottom duration-200">
+          <div className="flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-peach animate-ping"></span>
+            <span className="text-xs font-bold text-text truncate max-w-[190px]">
+              {activeJobStatus.stage || 'Optimizing...'}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="px-4 py-2 min-h-[44px] bg-red/20 text-[#FF8A8A] border border-red/40 hover:bg-wine text-xs font-bold rounded-xl transition-all flex items-center justify-center"
+          >
+            Cancel Run
+          </button>
+        </div>
+      )}
     </div>
   );
 };
