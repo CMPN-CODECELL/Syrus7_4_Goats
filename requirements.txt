@@ -1,0 +1,15 @@
+# Streamlit Community Cloud and Deployment Requirements
+# Quantum Portfolio Optimiser (QAOA vs Classical Baselines on NIFTY 50)
+streamlit>=1.35.0
+plotly>=5.18.0
+qiskit>=2.0.0
+qiskit-aer>=0.15.0
+cvxpy>=1.4.0
+pandas>=2.0.0
+numpy>=1.26.0
+scipy>=1.12.0
+pyarrow>=15.0.0
+pydantic>=2.0.0
+yfinance>=0.2.0
+fastapi>=0.110.0
+uvicorn>=0.28.0
