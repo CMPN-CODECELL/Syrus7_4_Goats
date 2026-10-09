@@ -66,10 +66,10 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={topSamples} margin={{ top: 24, right: 10, left: -10, bottom: 70 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" />
             <XAxis
               dataKey="bitstring"
-              stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }}
+              stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }}
               fontSize={9}
               fontFamily="monospace"
               angle={-45}
@@ -77,12 +77,12 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
               interval={0}
             />
             <YAxis
-              stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }}
+              stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }}
               fontSize={10}
               tickFormatter={(v: any) => formatPercent(v, 2)}
             />
             <Tooltip
-              contentStyle={{ backgroundColor: '#0A0A0A', borderColor: '#6B6B6B', borderRadius: 0, fontSize: '11px', color: '#FFFFFF' }}
+              contentStyle={{ backgroundColor: 'var(--c-surface2)', borderColor: 'var(--c-mid)', borderRadius: 0, fontSize: '11px', color: 'var(--c-fg)' }}
               formatter={(val: any, _: any, item: any) => [
                 `${formatPercent(Number(val), 2)} (${item.payload.stateType})`,
                 'Probability'

@@ -682,7 +682,7 @@ export const Optimise: React.FC = () => {
                 data-tour="run"
                 onClick={handleStartRun}
                 disabled={isJobRunning}
-                className="w-full py-4 px-6 min-h-[48px] bg-text text-bg hover:bg-[#D4D4D4] transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 px-6 min-h-[48px] bg-text text-bg hover:opacity-80 transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isJobRunning ? (
                   <>
@@ -751,7 +751,7 @@ export const Optimise: React.FC = () => {
                 type="button"
                 onClick={handleStartRun}
                 disabled={isJobRunning}
-                className="px-4 py-2.5 bg-text text-bg hover:bg-[#D4D4D4] transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center space-x-1.5"
+                className="px-4 py-2.5 bg-text text-bg hover:opacity-80 transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center space-x-1.5"
                 title="Execute a fresh run with current parameters"
               >
                 <span>Rerun</span>
@@ -958,7 +958,7 @@ export const Optimise: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveStage('configure')}
-                className="px-6 py-2.5 bg-text text-bg hover:bg-[#D4D4D4] font-medium text-xs uppercase transition-colors"
+                className="px-6 py-2.5 bg-text text-bg hover:opacity-80 font-medium text-xs uppercase transition-colors"
               >
                 Go to Formulation Setup
               </button>

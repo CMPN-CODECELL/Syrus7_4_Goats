@@ -66,11 +66,11 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
-            <XAxis dataKey="x" stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={11} />
-            <YAxis stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={11} width={48} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" />
+            <XAxis dataKey="x" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={11} />
+            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={11} width={48} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#0A0A0A', borderColor: '#6B6B6B', borderRadius: 0, fontSize: '11px', color: '#FFFFFF' }}
+              contentStyle={{ backgroundColor: 'var(--c-surface2)', borderColor: 'var(--c-mid)', borderRadius: 0, fontSize: '11px', color: 'var(--c-fg)' }}
               labelFormatter={(val: any) => `x = ${val}`}
               formatter={(val: any, name: any) => [fmt(val), name]}
             />

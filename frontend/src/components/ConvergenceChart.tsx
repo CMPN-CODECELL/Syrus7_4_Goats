@@ -39,11 +39,11 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
       <div className="h-60 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={convergence} margin={{ top: 5, right: 15, left: -15, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
-            <XAxis dataKey="iter" stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={10} tickLine={false} />
-            <YAxis stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={10} tickLine={false} domain={['auto', 'auto']} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" />
+            <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
+            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} domain={['auto', 'auto']} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#0A0A0A', borderColor: '#6B6B6B', borderRadius: 0, fontSize: '11px', color: '#FFFFFF' }}
+              contentStyle={{ backgroundColor: 'var(--c-surface2)', borderColor: 'var(--c-mid)', borderRadius: 0, fontSize: '11px', color: 'var(--c-fg)' }}
               labelFormatter={(iter: any) => `Iteration ${iter}`}
               formatter={(val: any) => [formatNumber(Number(val), 5), 'Energy ⟨H⟩']}
             />
@@ -53,7 +53,7 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
               stroke={CHART_COLORS.qaoa_standard}
               strokeWidth={2}
               dot={{ r: 2, fill: CHART_COLORS.qaoa_standard }}
-              activeDot={{ r: 5, fill: CHART_COLORS.qaoa_standard, stroke: '#000000', strokeWidth: 2 }}
+              activeDot={{ r: 5, fill: CHART_COLORS.qaoa_standard, stroke: 'var(--c-bg2)', strokeWidth: 2 }}
               isAnimationActive={false}
             />
           </LineChart>

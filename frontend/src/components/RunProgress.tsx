@@ -67,21 +67,21 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
           <div className="h-44 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={convergence} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
-                <XAxis dataKey="iter" stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={10} tickLine={false} />
-                <YAxis stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={10} tickLine={false} domain={['auto', 'auto']} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" />
+                <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
+                <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} domain={['auto', 'auto']} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0A0A0A', borderColor: '#6B6B6B', borderRadius: 0, fontSize: '11px', color: '#FFFFFF' }}
+                  contentStyle={{ backgroundColor: 'var(--c-surface2)', borderColor: 'var(--c-mid)', borderRadius: 0, fontSize: '11px', color: 'var(--c-fg)' }}
                   labelFormatter={(label: any) => `Iteration ${label}`}
                   formatter={(val: any) => [Number(val).toFixed(5), 'Energy F(x)']}
                 />
                 <Line
                   type="monotone"
                   dataKey="energy"
-                  stroke="#FFFFFF"
+                  stroke="var(--c-fg)"
                   strokeWidth={2}
-                  dot={{ r: 2, fill: '#FFFFFF' }}
-                  activeDot={{ r: 5, fill: '#FFFFFF', stroke: '#000000', strokeWidth: 2 }}
+                  dot={{ r: 2, fill: 'var(--c-fg)' }}
+                  activeDot={{ r: 5, fill: 'var(--c-fg)', stroke: 'var(--c-bg2)', strokeWidth: 2 }}
                   isAnimationActive={false}
                 />
               </LineChart>

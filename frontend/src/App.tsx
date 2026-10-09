@@ -25,6 +25,17 @@ export const App: React.FC = () => {
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const [home, setHome] = useState(true);
   const [tourOpen, setTourOpen] = useState(false);
+  // White theme by default; the choice is remembered in this browser.
+  const [dark, setDark] = useState(() => { try { return localStorage.getItem('qp_theme') === 'dark'; } catch { return false; } });
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark);
+    try { localStorage.setItem('qp_theme', dark ? 'dark' : 'light'); } catch { /* storage blocked */ }
+  }, [dark]);
+  const themeButton = (
+    <button type="button" onClick={() => setDark(!dark)} aria-pressed={dark} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[10px] font-mono uppercase text-muted hover:text-text">
+      {dark ? 'White mode' : 'Black mode'}
+    </button>
+  );
 
   // Poll backend health status periodically
   useEffect(() => {
@@ -132,6 +143,7 @@ export const App: React.FC = () => {
     {home && (
       <div className="min-h-screen bg-bg text-text px-4 sm:px-6 py-10">
         <div className="max-w-5xl mx-auto">
+          <div className="flex justify-end mb-4">{themeButton}</div>
           <Landing onStart={() => start(false)} onTour={() => start(true)} />
         </div>
       </div>
@@ -158,9 +170,9 @@ export const App: React.FC = () => {
                   stroke="currentColor"
                   strokeWidth="1.5"
                 >
-                  <circle cx="12" cy="12" r="3" fill="#FFFFFF" />
-                  <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(30 12 12)" stroke="#8E8EA0" />
-                  <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" stroke="#8E8EA0" />
+                  <circle cx="12" cy="12" r="3" fill="var(--c-fg)" />
+                  <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(30 12 12)" stroke="var(--c-muted3)" />
+                  <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" stroke="var(--c-muted3)" />
                 </svg>
               </div>
 
@@ -319,6 +331,7 @@ export const App: React.FC = () => {
             <button type="button" onClick={() => start(true)} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[10px] font-mono uppercase text-muted hover:text-text">
               Tour
             </button>
+            {themeButton}
             <span className="hidden sm:inline-flex items-center px-2 py-0.5 bg-surface text-muted border border-line text-[10px] font-mono">
               UNIVERSE: NIFTY 50
             </span>

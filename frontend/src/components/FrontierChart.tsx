@@ -68,24 +68,24 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" />
             <XAxis
               dataKey="risk"
               type="number"
               domain={['auto', 'auto']}
-              stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }}
+              stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }}
               fontSize={11}
               tickFormatter={(v: any) => formatPercent(v, 0)}
-              label={{ value: 'Annualised Volatility (Risk)', position: 'insideBottom', offset: -12, fill: '#A3A3A3', fontSize: 11 }}
+              label={{ value: 'Annualised Volatility (Risk)', position: 'insideBottom', offset: -12, fill: 'var(--c-muted2)', fontSize: 11 }}
             />
             <YAxis
               dataKey="ret"
               type="number"
               domain={['auto', 'auto']}
-              stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }}
+              stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }}
               fontSize={11}
               tickFormatter={(v: any) => formatPercent(v, 0)}
-              label={{ value: 'Expected Return', angle: -90, position: 'insideLeft', offset: 10, fill: '#A3A3A3', fontSize: 11 }}
+              label={{ value: 'Expected Return', angle: -90, position: 'insideLeft', offset: 10, fill: 'var(--c-muted2)', fontSize: 11 }}
             />
             <Tooltip
               shared={false}
