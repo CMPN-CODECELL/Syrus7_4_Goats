@@ -262,7 +262,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             {/* Current Holdings Input */}
             <div className="p-3.5 bg-surface border border-line space-y-2">
               <label htmlFor="holdings" className="text-xs font-medium text-text flex items-center justify-between">
-                <span>Current Holdings Portfolio <span className="font-normal text-muted">(Optional)</span></span>
+                <span>Current Holdings Portfolio <span className="font-medium text-muted">(Optional)</span></span>
                 <span className="text-[10px] text-faint">Rebalancing Friction Baseline</span>
               </label>
               <textarea

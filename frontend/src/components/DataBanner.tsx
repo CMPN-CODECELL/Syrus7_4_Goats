@@ -25,7 +25,7 @@ export const DataBanner: React.FC<DataBannerProps> = ({ source, asOf, estWindow,
           </span>
 
           <span className="text-muted text-[11px]">
-            As of: <strong className="text-text font-mono font-normal">{asOf ?? '2026-10-07'}</strong>
+            As of: <strong className="text-text font-mono font-medium">{asOf ?? '2026-10-07'}</strong>
           </span>
 
           {source && (
@@ -37,20 +37,20 @@ export const DataBanner: React.FC<DataBannerProps> = ({ source, asOf, estWindow,
           <span className="text-line-strong hidden sm:inline">•</span>
 
           <span className="text-muted text-[11px]">
-            Rf: <strong className="text-text font-mono font-normal">5.57%</strong>
+            Rf: <strong className="text-text font-mono font-medium">5.57%</strong>
           </span>
 
           <span className="text-line-strong hidden sm:inline">•</span>
 
           <span className="text-muted text-[11px]">
-            Costs: <strong className="text-text font-mono font-normal">Buy 0.1187% / Sell 0.1037%</strong>
+            Costs: <strong className="text-text font-mono font-medium">Buy 0.1187% / Sell 0.1037%</strong>
           </span>
 
           {estWindow && (
             <>
               <span className="text-line-strong hidden md:inline">•</span>
               <span className="text-muted text-[11px]">
-                Est: <strong className="text-text font-mono font-normal">{estWindow[0]}</strong> to <strong className="text-text font-mono font-normal">{estWindow[1]}</strong>
+                Est: <strong className="text-text font-mono font-medium">{estWindow[0]}</strong> to <strong className="text-text font-mono font-medium">{estWindow[1]}</strong>
               </span>
             </>
           )}
@@ -59,7 +59,7 @@ export const DataBanner: React.FC<DataBannerProps> = ({ source, asOf, estWindow,
             <>
               <span className="text-line-strong hidden md:inline">•</span>
               <span className="text-muted text-[11px]">
-                Test: <strong className="text-text font-mono font-normal">{testWindow[0]}</strong> to <strong className="text-text font-mono font-normal">{testWindow[1]}</strong>
+                Test: <strong className="text-text font-mono font-medium">{testWindow[0]}</strong> to <strong className="text-text font-mono font-medium">{testWindow[1]}</strong>
               </span>
             </>
           )}

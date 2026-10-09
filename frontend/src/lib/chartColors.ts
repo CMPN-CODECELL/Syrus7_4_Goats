@@ -1,33 +1,33 @@
 // Monochrome chart palette. Shape carries the series identity so colour is never the only signal.
 export const CHART_COLORS = {
   // Solver series
-  qaoa_standard: '#FFFFFF',
-  qaoa_xy: '#FFFFFF',
-  brute_force: '#D4D4D4',
-  relaxation: '#A3A3A3',
-  annealing: '#737373',
-  nifty50: '#A3A3A3',
+  qaoa_standard: 'var(--c-fg)',
+  qaoa_xy: 'var(--c-fg)',
+  brute_force: 'var(--c-d4)',
+  relaxation: 'var(--c-muted2)',
+  annealing: 'var(--c-faint2)',
+  nifty50: 'var(--c-muted2)',
 
   // Histogram state colours
-  optimal: '#FFFFFF',
-  feasible: '#737373',
-  infeasible: '#1A1A1A',
-  infeasibleStroke: '#6B6B6B',
+  optimal: 'var(--c-fg)',
+  feasible: 'var(--c-faint2)',
+  infeasible: 'var(--c-deep)',
+  infeasibleStroke: 'var(--c-mid)',
 
   // Chart chrome
-  grid: '#262626',
-  tick: '#A3A3A3',
+  grid: 'var(--c-grid)',
+  tick: 'var(--c-muted2)',
 
   // UI palette
-  bg: '#000000',
-  surface: '#0A0A0A',
-  line: '#262626',
-  lineStrong: '#6B6B6B',
-  text: '#FFFFFF',
-  muted: '#A3A3A3',
-  faint: '#737373',
-  gain: '#22C55E',
-  loss: '#EF4444'
+  bg: 'var(--c-bg2)',
+  surface: 'var(--c-surface2)',
+  line: 'var(--c-grid)',
+  lineStrong: 'var(--c-mid)',
+  text: 'var(--c-fg)',
+  muted: 'var(--c-muted2)',
+  faint: 'var(--c-faint2)',
+  gain: 'var(--c-gain2)',
+  loss: 'var(--c-loss2)'
 } as const;
 
 export type MarkerShape = 'circle' | 'diamond' | 'square' | 'triangle' | 'cross' | 'dash';
