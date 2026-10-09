@@ -139,9 +139,15 @@ thead th {
   font-variant-numeric: tabular-nums;
 }
 
-/* Square corners everywhere */
-*, *::before, *::after {
-  border-radius: 0 !important;
+/* Soft rounded corners everywhere. In the base layer, so a rounded-* utility (e.g. round dots) still wins. */
+@layer base {
+  *, *::before, *::after {
+    border-radius: 6px;
+  }
+  /* Tailwind's preflight squares form controls with a more specific selector; round them too. */
+  button, input, select, textarea, ::file-selector-button {
+    border-radius: 6px;
+  }
 }
 
 /* Form controls: stronger border, white accent */
