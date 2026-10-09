@@ -58,14 +58,19 @@
 }
 :root.dark { color-scheme: dark; }
 
-/* Landing hero art: a black-on-white image, blended softly into either theme and faded at the edges. */
-.landing-art {
-  mix-blend-mode: multiply;
-  opacity: 0.45;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 55%, transparent 100%);
-  mask-image: radial-gradient(ellipse at center, #000 55%, transparent 100%);
+/* Landing hero ASCII art: real text in the theme colour, scaled so its 400 columns fill the hero column. */
+.landing-ascii-wrap { container-type: inline-size; overflow: hidden; }
+.landing-ascii {
+  margin: 0;
+  font-family: Consolas, 'Courier New', ui-monospace, monospace;
+  font-size: calc(100cqw / 240);
+  line-height: 1.2;
+  white-space: pre;
+  color: var(--color-text);
+  opacity: 0.8;
+  user-select: none;
+  pointer-events: none;
 }
-.dark .landing-art { filter: invert(1); mix-blend-mode: screen; opacity: 0.35; }
 
 /* Simple mode hides research detail; Research mode hides the simple-only copies. */
 :root.simple [data-research] { display: none !important; }

@@ -1,6 +1,6 @@
 // Landing page: what the app does, in plain English, with the honest scorecard up front.
 import { Card, Eyebrow } from '../components/ui';
-import landingArt from '../assets/landing-art.webp';
+import landingArt from '../assets/landing-art.txt?raw';
 
 const STEPS = [
   'Choose stocks, your risk level and how many to hold.',
@@ -41,8 +41,10 @@ export function Landing({ onStart, onTour }: { onStart: () => void; onTour: () =
           <button type="button" onClick={onTour} className={`${btn} border-line-strong text-text hover:border-white`}>Take the 60-second tour</button>
         </div>
         </div>
-        {/* Decorative hero art, blended into the theme (see .landing-art in index.css) */}
-        <img src={landingArt} alt="" aria-hidden="true" className="landing-art hidden md:block w-full h-auto select-none pointer-events-none" />
+        {/* Decorative ASCII hero art, drawn as text in the theme colour (see .landing-ascii in index.css) */}
+        <div className="landing-ascii-wrap hidden md:block" aria-hidden="true">
+          <pre className="landing-ascii">{landingArt}</pre>
+        </div>
       </section>
 
       <section aria-labelledby="how-title">
