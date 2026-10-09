@@ -27,7 +27,8 @@ def tune_penalties(problem: Problem) -> dict[str, float]:
     evals = [problem.evaluate(x) for x in all_states(n)]
     feasible = np.array([e.feasible for e in evals])
     if not feasible.any():
-        raise ValueError("no feasible selection: nothing to tune the penalties against")
+        raise ValueError(f"No {problem.k}-stock portfolio from these {n} stocks meets every constraint. "
+                         "Raise the sector cap, lower the target return, add more stocks, or choose a smaller K.")
     f = np.array([e.objective for e in evals])[feasible]
     threshold = (f.min() + f.mean()) / 2
 

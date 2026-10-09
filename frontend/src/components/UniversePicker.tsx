@@ -69,13 +69,13 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
     : (selectedTickers ? selectedTickers.length : availableTickers.length);
 
   return (
-    <div className="bg-panel border border-line rounded-2xl p-5 shadow-panel mb-6">
+    <div className="bg-surface border border-line p-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-line mb-4">
         <div>
-          <h2 className="text-base font-bold text-text flex items-center gap-2">
+          <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
             <span>Asset Universe</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-peach/20 text-peach border border-peach/30">
-              {activeCount} Stocks Active
+            <span className="text-[10px] font-mono px-2 py-0.5 bg-surface-elevated text-text border border-line-strong">
+              {activeCount} selected
             </span>
           </h2>
           <p className="text-xs text-muted mt-0.5">
@@ -84,14 +84,14 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
         </div>
 
         {/* Mode Toggle */}
-        <div className="flex bg-ink/60 p-1 rounded-xl border border-line self-start sm:self-auto">
+        <div className="flex bg-bg p-1 border border-line self-start sm:self-auto gap-0.5">
           <button
             type="button"
             onClick={() => handleModeChange('all')}
-            className={`px-3 py-2 min-h-[44px] text-xs font-medium rounded-lg transition-all flex items-center justify-center ${
+            className={`px-3 py-1.5 min-h-[36px] text-xs font-medium transition-all flex items-center justify-center border ${
               mode === 'all'
-                ? 'bg-peach text-ink font-bold shadow'
-                : 'text-muted hover:text-text'
+                ? 'bg-surface-elevated text-white border-accent-blue/60'
+                : 'border-transparent text-muted hover:text-text'
             }`}
           >
             Full NIFTY 50 ({availableTickers.length})
@@ -99,10 +99,10 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
           <button
             type="button"
             onClick={() => handleModeChange('custom')}
-            className={`px-3 py-2 min-h-[44px] text-xs font-medium rounded-lg transition-all flex items-center justify-center ${
+            className={`px-3 py-1.5 min-h-[36px] text-xs font-medium transition-all flex items-center justify-center border ${
               mode === 'custom'
-                ? 'bg-peach text-ink font-bold shadow'
-                : 'text-muted hover:text-text'
+                ? 'bg-surface-elevated text-white border-accent-blue/60'
+                : 'border-transparent text-muted hover:text-text'
             }`}
           >
             Custom Sub-Universe
@@ -118,7 +118,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
             placeholder="Search stock by name, symbol, or ticker..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full min-h-[44px] bg-ink/80 border border-line rounded-xl px-3.5 py-2 text-xs text-text placeholder-muted focus:outline-none focus:border-peach focus:ring-1 focus:ring-peach transition-colors"
+            className="w-full min-h-[44px] bg-bg border border-line px-3.5 py-2 text-xs text-text placeholder-muted focus:border-text transition-colors"
           />
           {search && (
             <button
@@ -133,18 +133,18 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
         <select
           value={selectedSector}
           onChange={(e) => setSelectedSector(e.target.value)}
-          className="bg-ink/80 border border-line rounded-xl px-3 py-2 min-h-[44px] text-xs text-text focus:outline-none focus:border-peach focus:ring-1 focus:ring-peach"
+          className="bg-bg border border-line px-3 py-2 min-h-[44px] text-xs text-text focus:border-text"
         >
           {sectors.map(sec => (
-            <option key={sec} value={sec} className="bg-panel text-text">
+            <option key={sec} value={sec} className="bg-surface text-text">
               {sec === 'ALL' ? 'All Sectors' : sec}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Stock Grid */}
-      <div className="max-h-56 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+      {/* Stock rows: 32px, two columns on desktop */}
+      <div className="max-h-72 overflow-y-auto md:grid md:grid-cols-2 md:gap-x-4 border-t border-line">
         {filteredAssets.map(asset => {
           const disabled = !!asset.excluded_reason;
           const selected = isSelected(asset.ticker);
@@ -152,38 +152,29 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
           return (
             <label
               key={asset.ticker}
-              className={`block p-2.5 rounded-xl border text-left transition-all ${
+              title={disabled ? asset.excluded_reason ?? undefined : `${asset.name} · ${asset.sector}`}
+              className={`flex items-center gap-2 h-8 px-1 border-b border-line text-xs ${
                 disabled
-                  ? 'bg-ink/30 border-line/40 opacity-50 cursor-not-allowed'
-                  : selected
-                  ? 'bg-peach/10 border-peach text-text shadow-sm cursor-pointer'
-                  : 'bg-ink/60 border-line/70 text-muted hover:border-line hover:text-text cursor-pointer'
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'cursor-pointer hover:bg-surface'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-xs text-text flex items-center gap-1.5">
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    disabled={disabled || mode === 'all'}
-                    onChange={() => toggleTicker(asset.ticker)}
-                    className="accent-peach rounded cursor-pointer"
-                  />
-                  {asset.symbol}
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-line/40 text-muted font-mono">
-                  {asset.sector}
-                </span>
-              </div>
-              <div className="text-[11px] text-muted truncate mt-1">
+              <input
+                type="checkbox"
+                checked={selected}
+                disabled={disabled || mode === 'all'}
+                onChange={() => toggleTicker(asset.ticker)}
+                className="accent-white cursor-pointer shrink-0"
+              />
+              <span className={`font-bold shrink-0 ${selected ? 'text-text' : 'text-muted'}`}>
+                {asset.symbol}
+              </span>
+              <span className="text-muted truncate min-w-0 flex-1">
                 {asset.name}
-              </div>
-
-              {disabled && (
-                <div className="mt-1 text-[10px] text-[#FF8A8A] font-medium flex items-center gap-1">
-                  <span>⚠️</span> {asset.excluded_reason}
-                </div>
-              )}
+              </span>
+              <span className="text-[10px] text-faint truncate max-w-[38%] shrink-0">
+                {disabled ? `⚠ ${asset.excluded_reason}` : asset.sector}
+              </span>
             </label>
           );
         })}

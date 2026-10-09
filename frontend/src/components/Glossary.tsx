@@ -85,7 +85,7 @@ export const GlossaryTermTooltip: React.FC<{ termKey: string; children: React.Re
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        className="underline decoration-dotted decoration-peach/60 hover:decoration-peach text-peach cursor-help font-medium focus:outline-none focus:ring-1 focus:ring-peach rounded"
+        className="underline decoration-dotted decoration-muted hover:decoration-text text-text cursor-help font-medium"
         aria-expanded={open}
         aria-label={`What is ${termObj.term}?`}
       >
@@ -95,11 +95,11 @@ export const GlossaryTermTooltip: React.FC<{ termKey: string; children: React.Re
       {open && (
         <div
           role="tooltip"
-          className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-panel border border-line rounded-xl shadow-panel text-left text-xs text-text pointer-events-none transition-all duration-150 animate-in fade-in zoom-in-95"
+          className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-surface border border-line text-left text-xs text-text pointer-events-none transition-all"
         >
-          <div className="font-bold text-peach mb-1">{termObj.term} <span className="text-[10px] text-muted font-normal">({termObj.short})</span></div>
+          <div className="font-medium text-text mb-1">{termObj.term} <span className="text-[10px] text-muted font-normal">({termObj.short})</span></div>
           <p className="text-muted text-[11px] leading-relaxed">{termObj.description}</p>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-panel"></div>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-surface"></div>
         </div>
       )}
     </span>
@@ -110,16 +110,16 @@ export const GlossaryDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-ink/70 backdrop-blur-sm transition-opacity">
-      <div className="w-full max-w-md bg-panel border-l border-line p-6 overflow-y-auto flex flex-col justify-between shadow-2xl">
+    <div className="fixed inset-0 z-50 flex justify-end bg-bg/80 transition-opacity">
+      <div className="w-full max-w-md bg-surface border-l border-line p-6 overflow-y-auto flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between pb-4 border-b border-line mb-4">
-            <h2 className="text-lg font-bold text-text flex items-center gap-2">
-              <span className="text-peach">✦</span> Quantum Investor Glossary
+            <h2 className="text-lg font-medium text-text flex items-center gap-2">
+              Portfolio-Pulse Investor Glossary
             </h2>
             <button
               onClick={onClose}
-              className="text-muted hover:text-peach text-xl font-bold p-1 rounded-lg hover:bg-line/50 transition-colors"
+              className="text-muted hover:text-text text-xl font-medium p-1 hover:bg-line/50 transition-colors"
               aria-label="Close glossary"
             >
               ✕
@@ -131,10 +131,10 @@ export const GlossaryDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> 
 
           <div className="space-y-4">
             {GLOSSARY_TERMS.map((t) => (
-              <div key={t.key} className="p-3.5 bg-ink/40 border border-line/60 rounded-xl hover:border-peach/40 transition-colors">
+              <div key={t.key} className="p-3.5 bg-bg border border-line/60 hover:border-text transition-colors">
                 <div className="flex items-baseline justify-between mb-1">
-                  <h3 className="font-bold text-peach text-sm">{t.term}</h3>
-                  <span className="text-[10px] text-muted font-mono">{t.short}</span>
+                  <h3 className="font-medium text-text text-sm">{t.term}</h3>
+                  <span className="text-[10px] text-muted">{t.short}</span>
                 </div>
                 <p className="text-xs text-text/90 leading-relaxed">{t.description}</p>
               </div>
@@ -145,7 +145,7 @@ export const GlossaryDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> 
         <div className="pt-6 border-t border-line mt-6 text-center">
           <button
             onClick={onClose}
-            className="w-full py-2.5 bg-line text-text hover:bg-line/80 font-medium text-xs rounded-xl transition-colors"
+            className="w-full py-2.5 bg-line text-text hover:bg-line/80 font-medium text-xs transition-colors"
           >
             Close Glossary
           </button>

@@ -1,39 +1,13 @@
-# Design: "Sunset Navy" palette (dark theme, chosen by the team)
-
-Read this before PROMPT-1. Every colour in the app comes from this file.
-
-| Token | Hex | Use |
-|---|---|---|
-| `--color-ink` | #161E2F | page background |
-| `--color-panel` | #242F49 | cards, form panels, header |
-| `--color-line` | #384358 | borders, gridlines, disabled, muted fills |
-| `--color-peach` | #FFA586 | primary accent: Run button, QAOA series, links, focus ring, "optimal" bars |
-| `--color-red` | #B51A2B | infeasible bars, error banners (fill only), cancel button |
-| `--color-wine` | #541A2E | hover or pressed state of red; danger panel background |
-| `--color-text` | #F4EFEA | main text (derived; not in the image) |
-| `--color-muted` | #A9B3C9 | secondary text, axis labels (derived) |
-| `--color-slate` | #8FA3C8 | feasible-but-not-optimal bars, relaxation series (derived) |
-
-**Hero band:** the page header uses the image's gradient, top to bottom: #541A2E → #B51A2B → #FFA586 → #384358 → #161E2F. It may also run left to right on a thin bar. Use it only in the header, never behind body text.
-
-**Chart series (fixed for every chart and the frontier):**
-
-| Series | Colour |
-|---|---|
-| QAOA standard | #FFA586 |
-| QAOA XY | #FFD2C2 |
-| Brute force (exact) | #F4EFEA |
-| Relaxation | #8FA3C8 |
-| Simulated annealing | #C9566A |
-| NIFTY 50 benchmark | #A9B3C9, dashed |
-
-**Bitstring histogram:** optimal #FFA586, feasible #8FA3C8, infeasible #B51A2B. Add a legend that says each one in words.
-
-**Contrast rules:**
-- Text sits only on ink or panel, in text, muted or peach.
-- Never put red #B51A2B text on navy (contrast too low). For error text use #FF8A8A on #541A2E.
-- Every colour meaning also has a text label or icon, so colour is never the only signal.
-
-**Shapes:** rounded-2xl cards (the pill shapes in the image), soft shadow `0 10px 30px rgb(0 0 0 / .35)`, 16px mobile side gutter, system font stack.
-
-**Tailwind v4:** declare tokens in `@theme { --color-ink: #161E2F; ... }` in `src/index.css` after `@import "tailwindcss";`, then use classes like `bg-ink`, `bg-panel`, `text-peach`.
+# DESIGN: Monochrome (Sunset Navy retired)
+Very basic, clean black and white. No gradients, glass, blur, glow, shadows, emoji or rounded corners.
+- Tokens (Tailwind v4 `@theme` in `src/index.css`): bg #000000, surface #0A0A0A, line #262626, line-strong #6B6B6B, text #FFFFFF, muted #A3A3A3, faint #737373, gain #22C55E, loss #EF4444.
+- Type: headings Barlow Condensed 300 UPPERCASE; small labels Geist Mono 11px UPPERCASE, 0.08em tracking, muted; body Hanken Grotesk 400/500. All numbers are tabular-nums in Hanken Grotesk, never mono.
+- Header: one compact row, "QUANTUM PORTFOLIO" plus mono label "PS-03 · NIFTY 50". Tabs Optimise / Evidence / Method are plain uppercase mono text, active tab has a 2px white underline.
+- Primary button is white with black text. Inputs and buttons use a line-strong border. Focus-visible is a 2px solid white ring. `prefers-reduced-motion` is respected.
+- Green and red mean gain and loss only: "▲ +x%" in gain, "▼ −x%" in loss. Infeasible and error states are neutral grey or white with a "⚠" text prefix, never red.
+- Charts are monochrome and shape-coded: QAOA white circle; XY white hollow diamond, dashed; brute force #D4D4D4 square; relaxation #A3A3A3 triangle; annealing #737373 cross; NIFTY #A3A3A3 dashed line.
+- Chart chrome: grid #262626, axis ticks #A3A3A3, no animation. Histogram: optimal white with "★ optimal" label, feasible #737373, infeasible #1A1A1A with a #6B6B6B outline.
+- Stock picker: dense 32px rows (checkbox, bold symbol, muted name, small sector), two columns on desktop, with search, sector filter and selected count.
+- Defaults for a faster run: QAOA variant xy, reps 2, maxiter 80, shots 2048, qubit_cap 12.
+- Data source is always named "Yahoo Finance via yfinance (adjusted close), cached snapshot", beside the as-of date.
+- Footer: "Educational tool, not investment advice. Past performance does not guarantee future returns."

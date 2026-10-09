@@ -25,6 +25,7 @@ from qportfolio.qubo.ising import to_sparse_pauli
 
 OPTIMIZERS = {"COBYLA": optimizers.cobyla, "SPSA": optimizers.spsa, "NELDER_MEAD": optimizers.nelder_mead}
 LABELS = {"standard": "QAOA (standard mixer)", "xy": "QAOA (XY mixer)"}
+NOISY_SHOTS_CAP = 1024
 
 
 def _decode(counts: dict[str, int], n_assets: int) -> dict[str, float]:
@@ -107,7 +108,10 @@ def qaoa_solve(
     transpiled = {"depth": stats["depth"], "two_qubit_gates": stats["two_qubit_gates"]}
     noise = None
     if settings.noise:
-        noisy_metrics = summarise(sample_noisy(circuit, values, settings.shots, settings.seed))[1]
+        # Noisy sampling dominates the live-run time, so it is capped (ideal sampling is untouched). NoiseInfo has no
+        # field for the shot count and pydantic would silently drop an extra key, so it is not recorded.
+        noisy_shots = min(settings.shots, NOISY_SHOTS_CAP)
+        noisy_metrics = summarise(sample_noisy(circuit, values, noisy_shots, settings.seed))[1]
         noise = {"backend": BACKEND_NAME, "ideal": metrics, "noisy": noisy_metrics, "transpiled": transpiled}
 
     feasible = [s for s in samples if s.feasible]
@@ -126,6 +130,21 @@ def qaoa_solve(
         result = SolverResult(
             selection=None, bitstring=None, objective=None, exp_return=None, volatility=None, variance=None,
             txn_cost=None, feasible=False, violations=["no feasible sample"], **common)
+
+    # The histogram lists the top 20 by probability. Add the landscape optimum and QAOA's own answer when they were
+    # drawn but fall outside it. Only samples that were actually drawn are added.
+    opt_bits = "".join(str(int(b)) for b in landscape.optimum) if landscape is not None else None
+    drawn = {s.bitstring: s for s in samples}
+    shown = {s.bitstring for s in top}
+    top = list(top)
+    for bits in (opt_bits, best.bitstring if feasible else None):
+        if bits is None or bits in shown or bits not in drawn:
+            continue
+        s = drawn[bits]
+        near_min = landscape is not None and s.objective is not None and abs(s.objective - landscape.f_min) <= 1e-9
+        top.append(Sample(bitstring=bits, prob=s.prob, objective=s.objective, feasible=s.feasible,
+                          optimal=bits == opt_bits or near_min))
+        shown.add(bits)
 
     block = {
         "solver": solver,

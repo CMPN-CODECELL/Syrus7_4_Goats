@@ -19,70 +19,75 @@ import {
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === '1';
 
-async function handleResponse<T>(res: Response): Promise<T> {
+// One place for every call: a plain-language message for network failures, FastAPI errors and non-JSON replies.
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(url, init);
+  } catch {
+    throw new Error('Cannot reach the server. Check that the backend is running on http://localhost:8000.');
+  }
   if (!res.ok) {
-    let errorMsg = `HTTP Error ${res.status}: ${res.statusText}`;
+    let msg = `The server returned an error (${res.status}).`;
     try {
       const data = await res.json();
-      if (data.detail) {
-        errorMsg = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
-      }
+      const d = data?.detail;
+      if (typeof d === 'string') msg = d;
+      else if (Array.isArray(d)) msg = d.map((e: any) => e?.msg ?? String(e)).join('; ');
     } catch {
-      // Ignore JSON parse error on non-JSON body
+      // body was not JSON: keep the generic message
     }
-    throw new Error(errorMsg);
+    throw new Error(msg);
   }
-  return res.json() as Promise<T>;
+  try {
+    return (await res.json()) as T;
+  } catch {
+    throw new Error('The server sent a reply that could not be read.');
+  }
+}
+
+const postJson = (body: unknown): RequestInit => ({
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body)
+});
+
+export async function getHealth(): Promise<{ ok: boolean; version: string }> {
+  if (USE_MOCKS) return { ok: true, version: '0.1.0' };
+  return request<{ ok: boolean; version: string }>('/api/health');
 }
 
 export async function getUniverse(): Promise<Universe> {
   if (USE_MOCKS) return mockGetUniverse();
-  const res = await fetch('/api/universe');
-  return handleResponse<Universe>(res);
+  return request<Universe>('/api/universe');
 }
 
 export async function postScreen(req: RunRequest): Promise<ScreenInfo> {
   if (USE_MOCKS) return mockPostScreen(req);
-  const res = await fetch('/api/screen', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(req)
-  });
-  return handleResponse<ScreenInfo>(res);
+  return request<ScreenInfo>('/api/screen', postJson(req));
 }
 
 export async function startRun(req: RunRequest): Promise<{ job_id: string }> {
   if (USE_MOCKS) return mockStartRun(req);
-  const res = await fetch('/api/runs', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(req)
-  });
-  return handleResponse<{ job_id: string }>(res);
+  return request<{ job_id: string }>('/api/runs', postJson(req));
 }
 
 export async function getRun(jobId: string): Promise<JobStatus> {
   if (USE_MOCKS) return mockGetRun(jobId);
-  const res = await fetch(`/api/runs/${jobId}`);
-  return handleResponse<JobStatus>(res);
+  return request<JobStatus>(`/api/runs/${encodeURIComponent(jobId)}`);
 }
 
 export async function cancelRun(jobId: string): Promise<JobStatus> {
   if (USE_MOCKS) return mockCancelRun(jobId);
-  const res = await fetch(`/api/runs/${jobId}`, {
-    method: 'DELETE'
-  });
-  return handleResponse<JobStatus>(res);
+  return request<JobStatus>(`/api/runs/${encodeURIComponent(jobId)}`, { method: 'DELETE' });
 }
 
 export async function listStudies(): Promise<StudySummary[]> {
   if (USE_MOCKS) return mockListStudies();
-  const res = await fetch('/api/studies');
-  return handleResponse<StudySummary[]>(res);
+  return request<StudySummary[]>('/api/studies');
 }
 
 export async function getStudy(id: string): Promise<Study> {
   if (USE_MOCKS) return mockGetStudy(id);
-  const res = await fetch(`/api/studies/${id}`);
-  return handleResponse<Study>(res);
+  return request<Study>(`/api/studies/${encodeURIComponent(id)}`);
 }

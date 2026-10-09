@@ -33,23 +33,25 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
   maxKLimit = 15
 }) => {
   return (
-    <div className="bg-panel border border-line rounded-2xl p-5 shadow-panel mb-6">
-      <h2 className="text-base font-bold text-text mb-4 pb-3 border-b border-line flex items-center gap-2">
-        <span>Portfolio &amp; Risk Constraints</span>
-        <span className="text-xs text-muted font-normal">(QUBO Objective &amp; Slack Terms)</span>
+    <div className="bg-surface border border-line p-5">
+      <h2 className="text-sm font-medium text-text mb-4 pb-3 border-b border-line flex items-center justify-between uppercase tracking-wide">
+        <div className="flex items-center gap-2">
+          <span>Portfolio &amp; Risk Constraints</span>
+        </div>
+        <span className="text-[10px] font-mono text-muted font-normal lowercase">(QUBO &amp; Slack Terms)</span>
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Cardinality (k) */}
         <div>
           <div className="flex justify-between items-center mb-1.5">
-            <label htmlFor="k" className="text-xs font-bold text-text flex items-center gap-1">
+            <label htmlFor="k" className="text-xs font-medium text-text flex items-center gap-1">
               Exact Stock Picks (K)
               <GlossaryTermTooltip termKey="qubo">
                 <span>[?]</span>
               </GlossaryTermTooltip>
             </label>
-            <span className="text-sm font-extrabold text-peach bg-peach/10 px-2 py-0.5 rounded border border-peach/30 font-mono">
+            <span className="text-sm font-medium text-text bg-surface px-2 py-0.5 border border-line-strong">
               {k} stocks
             </span>
           </div>
@@ -60,7 +62,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             max={maxKLimit}
             value={k}
             onChange={(e) => setK(Number(e.target.value))}
-            className="w-full accent-peach bg-ink h-2 rounded-lg cursor-pointer"
+            className="w-full accent-white bg-bg h-2 cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-muted mt-1">
             <span>2 (Concentrated)</span>
@@ -71,10 +73,10 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
         {/* Risk Aversion (q) */}
         <div>
           <div className="flex justify-between items-center mb-1.5">
-            <label htmlFor="risk-aversion" className="text-xs font-bold text-text flex items-center gap-1">
+            <label htmlFor="risk-aversion" className="text-xs font-medium text-text flex items-center gap-1">
               Risk Aversion Parameter (q)
             </label>
-            <span className="text-xs font-bold text-peach bg-peach/10 px-2 py-0.5 rounded border border-peach/30 font-mono">
+            <span className="text-xs font-medium text-text bg-surface px-2 py-0.5 border border-line-strong">
               q = {riskAversion.toFixed(2)} ({riskAversion < 0.3 ? 'Growth Focus' : riskAversion > 0.7 ? 'Min Variance' : 'Balanced'})
             </span>
           </div>
@@ -86,7 +88,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             step={0.05}
             value={riskAversion}
             onChange={(e) => setRiskAversion(Number(e.target.value))}
-            className="w-full accent-peach bg-ink h-2 rounded-lg cursor-pointer"
+            className="w-full accent-white bg-bg h-2 cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-muted mt-1">
             <span>0.0 (Max Return)</span>
@@ -98,17 +100,17 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
         {/* Sector Cap Constraint */}
         <div>
           <div className="flex justify-between items-center mb-1.5">
-            <label htmlFor="sector-cap" className="text-xs font-bold text-text flex items-center gap-1">
+            <label htmlFor="sector-cap" className="text-xs font-medium text-text flex items-center gap-1">
               Max Stocks Per Sector
             </label>
             <div className="flex items-center space-x-2">
               <button
                 type="button"
                 onClick={() => setSectorCap(sectorCap === null ? 2 : null)}
-                className={`text-xs px-3 py-1.5 min-h-[44px] rounded-xl font-medium transition-colors flex items-center justify-center ${
+                className={`text-xs px-3 py-1.5 min-h-[44px] font-medium transition-colors flex items-center justify-center ${
                   sectorCap === null
                     ? 'bg-line text-muted'
-                    : 'bg-peach text-ink font-bold shadow'
+                    : 'bg-text text-bg font-medium'
                 }`}
               >
                 {sectorCap === null ? 'OFF' : `ON (${sectorCap})`}
@@ -124,7 +126,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                 max={5}
                 value={sectorCap}
                 onChange={(e) => setSectorCap(Math.max(1, Math.min(5, Number(e.target.value))))}
-                className="w-24 min-h-[44px] bg-ink border border-line rounded-xl px-3 py-1.5 text-xs text-text focus:outline-none focus:border-peach"
+                className="w-24 min-h-[44px] bg-bg border border-line px-3 py-1.5 text-xs text-text focus:border-text"
               />
               <span className="text-xs text-muted">Max stocks per individual industry sector</span>
             </div>
@@ -136,16 +138,16 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
         {/* Target Net Return Constraint */}
         <div>
           <div className="flex justify-between items-center mb-1.5">
-            <label htmlFor="target-return" className="text-xs font-bold text-text flex items-center gap-1">
+            <label htmlFor="target-return" className="text-xs font-medium text-text flex items-center gap-1">
               Target Annual Net Return (%)
             </label>
             <button
               type="button"
               onClick={() => setTargetReturn(targetReturn === null ? 0.12 : null)}
-              className={`text-xs px-3 py-1.5 min-h-[44px] rounded-xl font-medium transition-colors flex items-center justify-center ${
+              className={`text-xs px-3 py-1.5 min-h-[44px] font-medium transition-colors flex items-center justify-center ${
                 targetReturn === null
                   ? 'bg-line text-muted'
-                  : 'bg-peach text-ink font-bold shadow'
+                  : 'bg-text text-bg font-medium'
               }`}
             >
               {targetReturn === null ? 'OFF' : `ON (${(targetReturn * 100).toFixed(1)}%)`}
@@ -161,7 +163,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                 step={0.5}
                 value={Math.round(targetReturn * 10000) / 100}
                 onChange={(e) => setTargetReturn(Number(e.target.value) / 100)}
-                className="w-24 min-h-[44px] bg-ink border border-line rounded-xl px-3 py-1.5 text-xs text-text focus:outline-none focus:border-peach"
+                className="w-24 min-h-[44px] bg-bg border border-line px-3 py-1.5 text-xs text-text focus:border-text"
               />
               <span className="text-xs text-muted">Min required net annual return after transaction costs</span>
             </div>
@@ -173,10 +175,10 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
         {/* Total Capital */}
         <div className="md:col-span-2">
           <div className="flex justify-between items-center mb-1.5">
-            <label className="text-xs font-bold text-text">
+            <label className="text-xs font-medium text-text">
               Investment Capital (INR ₹)
             </label>
-            <span className="text-xs font-mono text-muted">
+            <span className="text-xs text-muted">
               ₹{capital.toLocaleString('en-IN')}
             </span>
           </div>
@@ -186,10 +188,10 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                 key={val}
                 type="button"
                 onClick={() => setCapital(val)}
-                className={`py-2 px-3 min-h-[44px] text-xs font-medium rounded-xl border transition-all flex items-center justify-center ${
+                className={`py-2 px-3 min-h-[44px] text-xs font-medium border transition-all flex items-center justify-center ${
                   capital === val
-                    ? 'bg-peach/15 border-peach text-peach font-bold'
-                    : 'bg-ink/50 border-line text-muted hover:text-text'
+                    ? 'bg-surface border-text text-text font-medium'
+                    : 'bg-bg border-line text-muted hover:text-text'
                 }`}
               >
                 ₹{val / 100000} Lakh{val > 100000 ? 's' : ''}
@@ -200,7 +202,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
 
         {/* Current Holdings (optional): transaction costs are charged relative to these */}
         <div className="md:col-span-2">
-          <label htmlFor="holdings" className="text-xs font-bold text-text block mb-1.5">
+          <label htmlFor="holdings" className="text-xs font-medium text-text block mb-1.5">
             Current Holdings <span className="font-normal text-muted">(optional)</span>
           </label>
           <textarea
@@ -209,7 +211,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             value={holdingsText}
             onChange={(e) => setHoldingsText(e.target.value)}
             placeholder={'One per line: symbol and shares, e.g.\nTCS 52\nINFY 120'}
-            className="w-full bg-ink border border-line rounded-xl px-3 py-2 text-xs text-text font-mono placeholder-muted focus:outline-none focus:border-peach"
+            className="w-full bg-bg border border-line px-3 py-2 text-xs text-text placeholder-muted focus:border-text"
           />
           <p className="text-[11px] text-muted mt-1">
             Costs are charged relative to these shares (selling a dropped holding costs 0.1037%). Leave empty to start from cash.
