@@ -97,8 +97,8 @@ export const GlossaryTermTooltip: React.FC<{ termKey: string; children: React.Re
           role="tooltip"
           className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-surface border border-line text-left text-xs text-text pointer-events-none transition-all"
         >
-          <div className="font-medium text-text mb-1">{termObj.term} <span className="text-[10px] text-muted font-medium">({termObj.short})</span></div>
-          <p className="text-muted text-[11px] leading-relaxed">{termObj.description}</p>
+          <div className="font-medium text-text mb-1">{termObj.term} <span className="text-[13px] text-muted font-medium">({termObj.short})</span></div>
+          <p className="text-muted text-[14px] leading-relaxed">{termObj.description}</p>
           <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-surface"></div>
         </div>
       )}
@@ -134,7 +134,7 @@ export const GlossaryDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> 
               <div key={t.key} className="p-3.5 bg-bg border border-line/60 hover:border-text transition-colors">
                 <div className="flex items-baseline justify-between mb-1">
                   <h3 className="font-medium text-text text-sm">{t.term}</h3>
-                  <span className="text-[10px] text-muted">{t.short}</span>
+                  <span className="text-[13px] text-muted">{t.short}</span>
                 </div>
                 <p className="text-xs text-text/90 leading-relaxed">{t.description}</p>
               </div>

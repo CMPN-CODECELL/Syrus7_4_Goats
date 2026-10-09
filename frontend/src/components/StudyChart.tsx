@@ -47,12 +47,12 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
         <div className="text-right shrink-0">
           <span className="label block">Generated</span>
           <span className="text-xs font-medium text-text">{study.generated_at}</span>
-          <span className="text-[10px] text-muted block mt-0.5">Wall time: {Number(study.wall_time_s).toFixed(1)} s</span>
+          <span className="text-[13px] text-muted block mt-0.5">Wall time: {Number(study.wall_time_s).toFixed(1)} s</span>
         </div>
       </div>
 
       {/* Legend in words, outside the SVG so it wraps on a phone */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] text-text">
+      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[14px] text-text">
         {study.series.map((s, idx) => (
           <span key={idx} className="flex items-center gap-1.5">
             <SolverMarker style={getSeriesStyle(idx)} />
@@ -60,15 +60,15 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
           </span>
         ))}
       </div>
-      <p className="text-[11px] text-muted -mt-2">Vertical axis: {study.y_label}. Error bars show the spread over instances.</p>
+      <p className="text-[14px] text-muted -mt-2">Vertical axis: {study.y_label}. Error bars show the spread over instances.</p>
 
       {/* Multi-Series Recharts LineChart */}
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 12, right: 20, left: 15, bottom: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" vertical={false} />
-            <XAxis dataKey="x" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
-            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} width={52} tickLine={false} />
+            <XAxis dataKey="x" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={12} tickLine={false} />
+            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={12} width={52} tickLine={false} />
             <Tooltip
               content={({ active, payload, label }: any) => {
                 if (!active || !payload?.length) return null;
@@ -110,7 +110,7 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-[11px] text-muted text-center -mt-3">Horizontal axis: {study.x_label}</p>
+      <p className="text-[14px] text-muted text-center -mt-3">Horizontal axis: {study.x_label}</p>
 
       {/* Plain table of the plotted values, so single-point series are readable too */}
       <div className="overflow-x-auto">
@@ -145,20 +145,20 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
       <div className="pt-4 border-t border-line grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
         <div className="bg-bg p-3.5 border border-line/60">
           <span className="label block mb-1">Instance Configuration</span>
-          <div className="grid grid-cols-2 gap-2 text-text text-[11px]">
+          <div className="grid grid-cols-2 gap-2 text-text text-[14px]">
             <div>Assets: <strong>{study.instance.n_assets}</strong></div>
             <div>Cardinality K: <strong>{study.instance.k}</strong></div>
             <div>Risk q: <strong>{study.instance.q}</strong></div>
             <div>Shots: <strong>{study.instance.shots}</strong></div>
           </div>
-          <div className="text-[10px] text-muted mt-2">
+          <div className="text-[13px] text-muted mt-2">
             Seeds: [{(study.instance.seeds ?? []).join(', ')}]
           </div>
         </div>
 
         <div className="bg-bg p-3.5 border border-line/60">
           <span className="label block mb-1">Notes &amp; Execution Environment</span>
-          <ul className="list-disc list-inside text-muted text-[11px] space-y-1">
+          <ul className="list-disc list-inside text-muted text-[14px] space-y-1">
             {(study.notes ?? []).map((n, i) => (
               <li key={i}>{n}</li>
             ))}

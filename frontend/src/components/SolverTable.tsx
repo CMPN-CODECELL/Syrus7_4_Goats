@@ -21,7 +21,7 @@ export const SolverTable: React.FC<SolverTableProps> = ({
       <div className="pb-3 border-b border-line mb-4">
         <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
           <span>Solver Benchmark Comparison</span>
-          <span className="text-[10px] font-mono text-muted font-medium lowercase">(Quantum vs Classical Solvers)</span>
+          <span className="text-[13px] font-mono text-muted font-medium lowercase">(Quantum vs Classical Solvers)</span>
         </h2>
         <p className="text-xs text-muted mt-0.5">
           Side-by-side objective evaluation, risk metrics, feasibility rates, and execution runtimes.
@@ -64,7 +64,7 @@ export const SolverTable: React.FC<SolverTableProps> = ({
                       <SolverMarker style={style} />
                       <span className="font-medium text-text">{s.label}</span>
                       {isRec && (
-                        <span className="text-[9px] px-1.5 py-0.5 bg-surface text-text border border-line-strong font-medium uppercase">
+                        <span className="text-[12px] px-1.5 py-0.5 bg-surface text-text border border-line-strong font-medium uppercase">
                           Rec
                         </span>
                       )}

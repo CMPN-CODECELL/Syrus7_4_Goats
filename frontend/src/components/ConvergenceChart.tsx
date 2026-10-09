@@ -40,8 +40,8 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={convergence} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" vertical={false} />
-            <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
-            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} width={55} domain={['auto', 'auto']} />
+            <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={12} tickLine={false} />
+            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={12} tickLine={false} width={55} domain={['auto', 'auto']} />
             <Tooltip
               content={({ active, payload, label }: any) => {
                 if (!active || !payload?.[0]) return null;

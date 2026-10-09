@@ -74,11 +74,11 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
               type="number"
               domain={['auto', 'auto']}
               stroke="var(--c-muted2)"
-              tick={{ fill: 'var(--c-muted2)', fontSize: 10 }}
-              fontSize={10}
+              tick={{ fill: 'var(--c-muted2)' }}
+              fontSize={12}
               tickLine={false}
               tickFormatter={(v: any) => formatPercent(v, 1)}
-              label={{ value: 'Annualised Volatility (Risk)', position: 'insideBottom', offset: -14, fill: 'var(--c-muted2)', fontSize: 11 }}
+              label={{ value: 'Annualised Volatility (Risk)', position: 'insideBottom', offset: -12, fill: 'var(--c-muted2)', fontSize: 12 }}
             />
             <YAxis
               dataKey="ret"
@@ -86,11 +86,11 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
               domain={['auto', 'auto']}
               width={52}
               stroke="var(--c-muted2)"
-              tick={{ fill: 'var(--c-muted2)', fontSize: 10 }}
-              fontSize={10}
+              tick={{ fill: 'var(--c-muted2)' }}
+              fontSize={12}
               tickLine={false}
               tickFormatter={(v: any) => formatPercent(v, 1)}
-              label={{ value: 'Expected Return', angle: -90, position: 'insideLeft', offset: -5, fill: 'var(--c-muted2)', fontSize: 11 }}
+              label={{ value: 'Expected Return', angle: -90, position: 'insideLeft', offset: -5, fill: 'var(--c-muted2)', fontSize: 12 }}
             />
             <Tooltip
               shared={false}
@@ -161,7 +161,7 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
       </div>
 
       {/* Legend in words (colour is never the only signal) */}
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] text-muted">
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-[14px] text-muted">
         <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-muted"></span> Continuous frontier</span>
         <span className="flex items-center gap-1.5"><span className="text-faint leading-none">●</span> Discrete frontier</span>
         {validSolverPoints.map(p => (
@@ -176,7 +176,7 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
         <div className="mt-3 pt-3 border-t border-line/60 text-xs text-muted flex items-center gap-2">
           <span>⚠ Solvers without valid feasible solutions:</span>
           {unplottableSolvers.map(s => (
-            <span key={s.solver} className="px-2 py-0.5 bg-surface border border-line-strong text-text text-[10px]">
+            <span key={s.solver} className="px-2 py-0.5 bg-surface border border-line-strong text-text text-[13px]">
               {s.label} (Infeasible)
             </span>
           ))}

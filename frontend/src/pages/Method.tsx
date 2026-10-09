@@ -57,13 +57,13 @@ export const Method: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 text-xs">
           <div className="p-3 bg-bg border border-line/60">
             <h3 className="font-medium text-text mb-1">Risk-Weighted Variance</h3>
-            <p className="text-muted text-[11px]">
+            <p className="text-muted text-[14px]">
               Encodes portfolio variance scaled by risk aversion <code className="text-text">q</code>.
             </p>
           </div>
           <div className="p-3 bg-bg border border-line/60">
             <h3 className="font-medium text-text mb-1">Net Expected Return</h3>
-            <p className="text-muted text-[11px]">
+            <p className="text-muted text-[14px]">
               Deducts transaction costs <code className="text-text">tc(x)</code> from raw expected return.
             </p>
           </div>
@@ -78,15 +78,15 @@ export const Method: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div className="p-4 bg-bg border border-line">
             <div className="font-medium text-text mb-1">1. Brute Force (Exact)</div>
-            <p className="text-muted text-[11px]">Evaluates all C(N, K) combinations to guarantee finding the exact global minimum.</p>
+            <p className="text-muted text-[14px]">Evaluates all C(N, K) combinations to guarantee finding the exact global minimum.</p>
           </div>
           <div className="p-4 bg-bg border border-line">
             <div className="font-medium text-text mb-1">2. Relaxation + Rounding</div>
-            <p className="text-muted text-[11px]">Relaxes 0/1 integer constraints to continuous [0, 1] bounds, solved via CVXPY then rounded.</p>
+            <p className="text-muted text-[14px]">Relaxes 0/1 integer constraints to continuous [0, 1] bounds, solved via CVXPY then rounded.</p>
           </div>
           <div className="p-4 bg-bg border border-line">
             <div className="font-medium text-text mb-1">3. Simulated Annealing</div>
-            <p className="text-muted text-[11px]">Classical thermal fluctuation heuristic over the 2ⁿ QUBO energy landscape.</p>
+            <p className="text-muted text-[14px]">Classical thermal fluctuation heuristic over the 2ⁿ QUBO energy landscape.</p>
           </div>
         </div>
       </div>

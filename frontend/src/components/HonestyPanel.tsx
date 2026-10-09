@@ -57,7 +57,7 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
           <span className={`text-base font-medium ${negativeClass(metrics.approx_ratio)}`}>
             {formatNumber(metrics.approx_ratio, 2)}
           </span>
-          <span className="text-[10px] text-muted block mt-0.5">1.0 = Exact Optimum</span>
+          <span className="text-[13px] text-muted block mt-0.5">1.0 = Exact Optimum</span>
         </div>
 
         <div className="bg-bg p-3 border border-line/60">
@@ -65,7 +65,7 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
           <span className="text-base font-medium text-text">
             {formatPercent(metrics.p_opt, 2)}
           </span>
-          <span className="text-[10px] text-muted block mt-0.5">{pOptMultiplier}x random guess ({formatPercent(metrics.p_random, 2)})</span>
+          <span className="text-[13px] text-muted block mt-0.5">{pOptMultiplier}x random guess ({formatPercent(metrics.p_random, 2)})</span>
         </div>
 
         <div className="bg-bg p-3 border border-line/60">
@@ -73,7 +73,7 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
           <span className={`text-base font-medium ${metrics.feasible_rate === 0 ? 'text-loss' : 'text-text'}`}>
             {formatPercent(metrics.feasible_rate)}
           </span>
-          <span className="text-[10px] text-muted block mt-0.5">Bitstrings meeting rules</span>
+          <span className="text-[13px] text-muted block mt-0.5">Bitstrings meeting rules</span>
         </div>
 
         <div className="bg-bg p-3 border border-line/60">
@@ -81,7 +81,7 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
           <span className="text-base font-medium text-text">
             {circuit?.depth ?? '—'} d / {circuit?.two_qubit_gates ?? '—'} 2q
           </span>
-          <span className="text-[10px] text-muted block mt-0.5">{circuit?.qubits ?? '—'} Qubits (p={circuit?.reps ?? '—'})</span>
+          <span className="text-[13px] text-muted block mt-0.5">{circuit?.qubits ?? '—'} Qubits (p={circuit?.reps ?? '—'})</span>
         </div>
       </div>
 
@@ -92,20 +92,20 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
             <h4 className="text-xs font-medium text-text flex items-center gap-1.5">
               <span>⚠</span> Hardware Noise Simulation ({noise.backend})
             </h4>
-            <span className="text-[10px] text-muted">Transpiled depth: {noise.transpiled?.depth ?? '—'} | 2-qubit gates: {noise.transpiled?.two_qubit_gates ?? '—'}</span>
+            <span className="text-[13px] text-muted">Transpiled depth: {noise.transpiled?.depth ?? '—'} | 2-qubit gates: {noise.transpiled?.two_qubit_gates ?? '—'}</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <div className="p-2.5 bg-bg border border-line">
-              <span className="text-[10px] text-muted block">Ideal (no noise)</span>
+              <span className="text-[13px] text-muted block">Ideal (no noise)</span>
               <span className={`font-medium ${negativeClass(noise.ideal?.approx_ratio)}`}>Ratio: {formatNumber(noise.ideal?.approx_ratio, 2)}</span>
             </div>
             <div className="p-2.5 bg-bg border border-line">
-              <span className="text-[10px] text-muted block">Noisy backend</span>
+              <span className="text-[13px] text-muted block">Noisy backend</span>
               <span className={`font-medium ${negativeClass(noise.noisy?.approx_ratio)}`}>Ratio: {formatNumber(noise.noisy?.approx_ratio, 2)}</span>
             </div>
             <div className="p-2.5 bg-bg border border-line">
-              <span className="text-[10px] text-muted block">P(opt), ideal to noisy</span>
+              <span className="text-[13px] text-muted block">P(opt), ideal to noisy</span>
               <span className="text-text font-medium">{formatPercent(noise.ideal?.p_opt, 2)} → {formatPercent(noise.noisy?.p_opt, 2)}</span>
             </div>
           </div>

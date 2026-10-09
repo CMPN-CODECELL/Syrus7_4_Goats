@@ -19,7 +19,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ solver }) => {
         <div className={`text-xl font-medium ${isFeasible ? gainLossClass(solver.exp_return) : 'text-text'}`}>
           {isFeasible ? formatSignedPercent(solver.exp_return) : '—'}
         </div>
-        <div className="text-[10px] text-muted mt-1">
+        <div className="text-[13px] text-muted mt-1">
           {isFeasible && solver.exp_return !== null && solver.txn_cost !== null ? (
             <span>
               Net of costs:{' '}
@@ -41,7 +41,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ solver }) => {
         <div className={`text-xl font-medium ${isFeasible ? negativeClass(solver.volatility) : 'text-text'}`}>
           {isFeasible ? formatPercent(solver.volatility) : '—'}
         </div>
-        <div className="text-[10px] text-muted mt-1">
+        <div className="text-[13px] text-muted mt-1">
           Variance: <span className={isFeasible ? negativeClass(solver.variance) : ''}>{isFeasible ? formatNumber(solver.variance, 4) : '—'}</span>
         </div>
       </div>
@@ -54,7 +54,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ solver }) => {
         <div className={`text-xl font-medium ${isFeasible ? negativeClass(solver.objective) : 'text-text'}`}>
           {isFeasible ? formatNumber(solver.objective, 4) : '—'}
         </div>
-        <div className="text-[10px] text-muted mt-1">Lower is better</div>
+        <div className="text-[13px] text-muted mt-1">Lower is better</div>
       </div>
 
       {/* Transaction Cost */}
@@ -65,7 +65,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ solver }) => {
         <div className={`text-xl font-medium ${isFeasible ? negativeClass(solver.txn_cost) : 'text-text'}`}>
           {isFeasible ? formatPercent(solver.txn_cost, 3) : '—'}
         </div>
-        <div className="text-[10px] text-muted mt-1">
+        <div className="text-[13px] text-muted mt-1">
           {isFeasible && solver.portfolio && solver.txn_cost !== null
             ? `of capital, about ${formatINR((solver.portfolio.invested + solver.portfolio.cash_left) * solver.txn_cost)}`
             : 'Buy 0.1187% / Sell 0.1037%'}

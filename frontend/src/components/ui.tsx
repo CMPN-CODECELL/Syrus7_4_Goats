@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 
 export function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="font-mono text-xs uppercase tracking-[0.08em] text-muted">{children}</p>;
+  return <p className="font-mono text-xs uppercase tracking-[0.08em] text-accent-blue-hover">{children}</p>;
 }
 
 /** A page section: mono eyebrow, condensed title, optional lead line. */

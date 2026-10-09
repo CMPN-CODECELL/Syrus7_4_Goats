@@ -57,10 +57,10 @@ export const GlossaryPage: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-2 self-start md:self-auto text-xs">
-            <span className="px-2.5 py-1 bg-surface-elevated text-text border border-line text-[11px] font-mono">
+            <span className="px-2.5 py-1 bg-surface-elevated text-text border border-line text-[14px] font-mono">
               {GLOSSARY_TERMS.length} Terms Documented
             </span>
-            <span className="px-2.5 py-1 bg-accent-blue/10 text-accent-blue-hover border border-accent-blue/30 text-[11px] font-mono">
+            <span className="px-2.5 py-1 bg-accent-blue/10 text-accent-blue-hover border border-accent-blue/30 text-[14px] font-mono">
               Qiskit 2.5
             </span>
           </div>
@@ -131,7 +131,7 @@ export const GlossaryPage: React.FC = () => {
                         {t.short}
                       </span>
                     </div>
-                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 bg-bg text-muted border border-line shrink-0">
+                    <span className="text-[13px] uppercase font-mono px-2 py-0.5 bg-bg text-muted border border-line shrink-0">
                       {category}
                     </span>
                   </div>
@@ -141,9 +141,9 @@ export const GlossaryPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="pt-2 text-[11px] text-muted flex items-center justify-between border-t border-line/30">
-                  <span className="font-mono text-[10px] text-faint">ID: {t.key}</span>
-                  <span className="text-accent-blue-hover text-[11px]">PS-03 Standard</span>
+                <div className="pt-2 text-[14px] text-muted flex items-center justify-between border-t border-line/30">
+                  <span className="font-mono text-[13px] text-faint">ID: {t.key}</span>
+                  <span className="text-accent-blue-hover text-[14px]">PS-03 Standard</span>
                 </div>
               </div>
             );
