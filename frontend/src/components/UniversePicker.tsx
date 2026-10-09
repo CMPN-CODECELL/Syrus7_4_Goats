@@ -85,7 +85,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
             <h3 className="text-sm font-medium text-text uppercase tracking-wide">
               Stock Universe Selection
             </h3>
-            <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-text border border-line-strong">
+            <span className="text-[13px] font-mono px-2 py-0.5 bg-bg text-text border border-line-strong">
               {activeCount} / {availableTickers.length} Active
             </span>
           </div>
@@ -123,7 +123,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
 
       {/* Full Universe Status Banner (When list is collapsed in All mode) */}
       {!isListExpanded && mode === 'all' ? (
-        <div className="bg-bg border border-line p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div data-research className="bg-bg border border-line p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-2.5 text-xs text-muted">
             <span className="w-2 h-2 rounded-full bg-gain shrink-0"></span>
             <span>
@@ -138,7 +138,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
             className="text-xs text-muted hover:text-text bg-surface border border-line hover:border-line-strong px-3 py-1.5 transition-colors whitespace-nowrap self-start sm:self-auto flex items-center space-x-1.5"
           >
             <span>Inspect Asset Catalog</span>
-            <span className="font-mono text-[10px]">▾</span>
+            <span className="font-mono text-[13px]">▾</span>
           </button>
         </div>
       ) : (
@@ -184,14 +184,14 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
                   <button
                     type="button"
                     onClick={() => selectTopN(10)}
-                    className="text-[11px] text-muted hover:text-text px-2 py-1 bg-bg border border-line hover:border-line-strong"
+                    className="text-[14px] text-muted hover:text-text px-2 py-1 bg-bg border border-line hover:border-line-strong"
                   >
                     Top 10
                   </button>
                   <button
                     type="button"
                     onClick={() => selectTopN(15)}
-                    className="text-[11px] text-muted hover:text-text px-2 py-1 bg-bg border border-line hover:border-line-strong"
+                    className="text-[14px] text-muted hover:text-text px-2 py-1 bg-bg border border-line hover:border-line-strong"
                   >
                     Top 15
                   </button>
@@ -202,10 +202,10 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsListExpanded(false)}
-                  className="text-[11px] text-muted hover:text-text px-2.5 py-1 bg-bg border border-line hover:border-line-strong flex items-center space-x-1"
+                  className="text-[14px] text-muted hover:text-text px-2.5 py-1 bg-bg border border-line hover:border-line-strong flex items-center space-x-1"
                 >
                   <span>Collapse</span>
-                  <span className="font-mono text-[9px]">▲</span>
+                  <span className="font-mono text-[12px]">▲</span>
                 </button>
               )}
             </div>
@@ -237,10 +237,10 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
                   <span className={`font-mono font-medium shrink-0 ${selected ? 'text-text' : 'text-muted'}`}>
                     {asset.symbol}
                   </span>
-                  <span className="text-muted truncate min-w-0 flex-1 text-[11px]">
+                  <span className="text-muted truncate min-w-0 flex-1 text-[14px]">
                     {asset.name}
                   </span>
-                  <span className="text-[10px] text-faint truncate max-w-[36%] shrink-0">
+                  <span className="text-[13px] text-faint truncate max-w-[36%] shrink-0">
                     {disabled ? `⚠ ${asset.excluded_reason}` : asset.sector}
                   </span>
                 </label>

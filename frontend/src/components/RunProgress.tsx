@@ -24,7 +24,7 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
             </h2>
           </div>
           <p className="text-xs text-muted mt-1">
-            Job ID: <code className="text-text font-mono text-[11px]">{jobStatus.job_id}</code> | Elapsed: <strong className="text-text font-mono">{jobStatus.elapsed_s.toFixed(1)} s</strong>
+            Job ID: <code className="text-text font-mono text-[14px]">{jobStatus.job_id}</code> | Elapsed: <strong className="text-text font-mono">{jobStatus.elapsed_s.toFixed(1)} s</strong>
           </p>
         </div>
 
@@ -58,7 +58,7 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
             <h3 className="text-xs font-medium text-text flex items-center gap-1.5">
               Live Energy Convergence
             </h3>
-            <span className="text-[10px] text-muted">
+            <span className="text-[13px] text-muted">
               Latest Energy: <strong className={negativeClass(latestEnergy)}>{latestEnergy?.toFixed(4)}</strong>
             </span>
           </div>
@@ -68,8 +68,8 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={convergence} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" />
-                <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
-                <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} domain={['auto', 'auto']} />
+                <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={12} tickLine={false} />
+                <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={12} tickLine={false} domain={['auto', 'auto']} />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'var(--c-surface2)', borderColor: 'var(--c-mid)', borderRadius: 0, fontSize: '11px', color: 'var(--c-fg)' }}
                   labelFormatter={(label: any) => `Iteration ${label}`}

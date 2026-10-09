@@ -14,10 +14,11 @@
   --color-faint: #565666;
   --color-gain: #22C55E;
   --color-loss: #EF4444;
-  --color-accent-blue: #FFFFFF; /* black-and-white theme: the old blue accent is now white */
-  --color-accent-blue-hover: #FFFFFF;
-  --color-accent-blue-subtle: rgba(255, 255, 255, 0.08);
-  --color-accent-blue-border: rgba(255, 255, 255, 0.35);
+  --color-accent-blue: #3B82F6; /* a hint of blue for active and interactive items */
+  --color-accent-blue-hover: #60A5FA;
+  --color-accent-blue-subtle: rgba(59, 130, 246, 0.14);
+  --color-accent-blue-border: rgba(59, 130, 246, 0.45);
+  --text-xs: 0.875rem; /* small text is 14px so it stays readable */
 
   --font-sans: 'Times New Roman', Times, serif;
   --font-display: 'Times New Roman', Times, serif;
@@ -31,31 +32,35 @@
   --c-gain2: #22C55E; --c-loss2: #EF4444;
 }
 :root:not(.dark) {
-  --color-bg: #FFFFFF;
-  --color-surface: #FAFAFA;
-  --color-surface-elevated: #F2F2F2;
-  --color-surface-card: #F7F7F7;
-  --color-line: #E5E5E5;
-  --color-line-strong: #8A8A8A;
-  --color-line-subtle: #EFEFEF;
+  --color-bg: #E6E6E6;
+  --color-surface: #D9D9D9;
+  --color-surface-elevated: #CCCCCC;
+  --color-surface-card: #DEDEDE;
+  --color-line: #BDBDBD;
+  --color-line-strong: #737373;
+  --color-line-subtle: #CCCCCC;
   --color-text: #000000;
   --color-text-dim: #1A1A1A;
-  --color-muted: #525252;
-  --color-faint: #6B6B6B;
+  --color-muted: #3D3D3D;
+  --color-faint: #575757;
   --color-gain: #15803D;
   --color-loss: #B91C1C;
-  --color-accent-blue: #000000;
-  --color-accent-blue-hover: #000000;
-  --color-accent-blue-subtle: rgba(0, 0, 0, 0.06);
-  --color-accent-blue-border: rgba(0, 0, 0, 0.35);
+  --color-accent-blue: #1D4ED8;
+  --color-accent-blue-hover: #1D4ED8;
+  --color-accent-blue-subtle: rgba(29, 78, 216, 0.08);
+  --color-accent-blue-border: rgba(29, 78, 216, 0.4);
   --color-white: #000000; /* text-white / bg-white mean "foreground" in this app, so they flip too */
-  --color-black: #FFFFFF;
-  --c-fg: #000000; --c-bg2: #FFFFFF; --c-surface2: #F7F7F7; --c-grid: #E5E5E5; --c-muted2: #525252;
-  --c-muted3: #6B6B6B; --c-mid: #8A8A8A; --c-faint2: #737373; --c-d4: #404040; --c-deep: #EDEDED;
+  --color-black: #E6E6E6;
+  --c-fg: #000000; --c-bg2: #E6E6E6; --c-surface2: #DEDEDE; --c-grid: #BDBDBD; --c-muted2: #3D3D3D;
+  --c-muted3: #6B6B6B; --c-mid: #8A8A8A; --c-faint2: #737373; --c-d4: #404040; --c-deep: #CCCCCC;
   --c-gain2: #15803D; --c-loss2: #B91C1C;
   color-scheme: light;
 }
 :root.dark { color-scheme: dark; }
+
+/* Simple mode hides research detail; Research mode hides the simple-only copies. */
+:root.simple [data-research] { display: none !important; }
+:root:not(.simple) [data-simple-only] { display: none !important; }
 
 /* Explicit Gain (Growth/Green) and Loss (Red) Utility Overrides */
 .text-gain {
@@ -112,7 +117,7 @@ strong, b { font-weight: 700; }
 .label,
 thead th {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -147,7 +152,7 @@ button:disabled { cursor: not-allowed; }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid var(--color-text);
+  outline: 2px solid var(--color-accent-blue);
   outline-offset: 2px;
 }
 

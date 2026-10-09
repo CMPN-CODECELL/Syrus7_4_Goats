@@ -29,7 +29,7 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
           <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
             <span>Portfolio Asset Allocation &amp; Shares</span>
             {currentSolver.solver === recommendedSolverId && (
-              <span className="text-[10px] font-mono px-2 py-0.5 bg-accent-blue/10 text-accent-blue-hover border border-accent-blue/40 uppercase">
+              <span className="text-[13px] font-mono px-2 py-0.5 bg-accent-blue/10 text-accent-blue-hover border border-accent-blue/40 uppercase">
                 Recommended Choice
               </span>
             )}
@@ -100,10 +100,10 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
                       <div className="font-medium text-text flex items-center gap-1.5">
                         <span className="text-text">{row.symbol || row.ticker.replace('.NS', '')}</span>
                       </div>
-                      <div className="text-[10px] text-muted truncate max-w-[180px]">{row.name}</div>
+                      <div className="text-[13px] text-muted truncate max-w-[180px]">{row.name}</div>
                     </td>
                     <td className="py-3 px-3">
-                      <span className="px-2 py-0.5 bg-line/50 text-muted text-[10px]">
+                      <span className="px-2 py-0.5 bg-line/50 text-muted text-[13px]">
                         {row.sector}
                       </span>
                     </td>
@@ -152,7 +152,7 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
               )}
             </div>
 
-            <span className="text-[11px] text-muted italic">
+            <span className="text-[14px] text-muted italic">
               Equal-weighted allocation across selected K={currentSolver.selection?.length || 0} stocks.
             </span>
           </div>

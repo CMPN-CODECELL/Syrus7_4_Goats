@@ -26,11 +26,11 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
             <span className="text-xs font-medium text-text uppercase tracking-wider">
               Advanced Quantum Settings
             </span>
-            <span className="text-[10px] text-muted font-mono">
+            <span className="text-[13px] text-muted font-mono">
               [Click to {isOpen ? 'collapse' : 'expand'}]
             </span>
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-mono text-muted">
+          <div className="flex flex-wrap items-center gap-1.5 text-[14px] font-mono text-muted">
             <span className="px-1.5 py-0.5 bg-bg border border-line text-text">
               {settings.variant === 'xy' ? 'XY Ring Mixer' : 'Standard Pauli-X'}
             </span>
@@ -73,7 +73,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
               <option value="standard">Standard Pauli-X Mixer</option>
               <option value="xy">XY Ring Mixer + Dicke State Init</option>
             </select>
-            <span className="text-[10px] text-muted mt-1 block">
+            <span className="text-[13px] text-muted mt-1 block">
               {settings.variant === 'xy' ? 'Preserves stock count K automatically.' : 'Standard unconstrained mixer.'}
             </span>
           </div>
@@ -98,7 +98,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
               onChange={(e) => update('reps', Number(e.target.value))}
               className="w-full accent-white bg-bg h-2 cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-muted mt-1">
+            <div className="flex justify-between text-[13px] text-muted mt-1">
               <span>p=1 (Fast)</span>
               <span>p=5 (High Expressiveness)</span>
             </div>
@@ -140,7 +140,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
               <option value="random">Random Initialization</option>
             </select>
             {settings.init === 'interp' && (
-              <span className="text-[10px] text-text font-medium mt-1 block">
+              <span className="text-[13px] text-text font-medium mt-1 block">
                 Warm Start: Uses previous depth parameters. PS-03 compliant.
               </span>
             )}
@@ -216,7 +216,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
                 <span className="text-xs font-medium text-text block">
                   Simulate IBM Guadalupe Hardware Noise
                 </span>
-                <span className="text-[11px] text-muted">
+                <span className="text-[14px] text-muted">
                   Samples the optimised circuit on Aer with the FakeGuadalupeV2 noise model, next to the noiseless run.
                 </span>
               </div>

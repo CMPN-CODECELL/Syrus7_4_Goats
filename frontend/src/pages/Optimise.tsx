@@ -348,13 +348,13 @@ export const Optimise: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Market Context Data Banner */}
-      <DataBanner
+      <div data-research><DataBanner
         source={universe?.source}
         asOf={universe?.as_of}
         estWindow={runResult?.data.est_window}
         testWindow={runResult?.data.test_window}
         notes={runResult?.data.notes}
-      />
+      /></div>
 
       {/* =========================================================================
           STAGE 1: DEDICATED GUIDED FORMULATION & CONFIGURATION WORKFLOW
@@ -362,14 +362,14 @@ export const Optimise: React.FC = () => {
       {activeStage === 'configure' && (
         <div className="space-y-8">
           {/* Formulation Header */}
-          <div className="bg-surface border border-line p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div data-research className="bg-surface border border-line p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2">
                 <span className="w-2.5 h-2.5 bg-accent-blue"></span>
                 <h2 className="text-base font-medium text-text uppercase tracking-wide">
                   Portfolio-Pulse — Guided Formulation &amp; Optimization
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-muted border border-line">
+                <span className="text-[13px] font-mono px-2 py-0.5 bg-bg text-muted border border-line">
                   PROGRESSIVE WORKFLOW
                 </span>
               </div>
@@ -415,7 +415,7 @@ export const Optimise: React.FC = () => {
                   Choose Your Assets &amp; Candidate Screening
                 </h3>
               </div>
-              <span className="text-[11px] text-muted hidden sm:inline">
+              <span data-research className="text-[14px] text-muted hidden sm:inline">
                 Presets, universe selection &amp; qubit capacity screening
               </span>
             </div>
@@ -423,8 +423,8 @@ export const Optimise: React.FC = () => {
             {/* Quick Formulation Presets Bar */}
             <div className="bg-surface border border-line p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="label text-[10px] text-muted">QUICK FORMULATION PRESETS</span>
-                <span className="text-[10px] text-faint">Instant configuration of standard risk &amp; pick setups</span>
+                <span className="label text-[13px] text-muted">QUICK FORMULATION PRESETS</span>
+                <span className="text-[13px] text-faint">Instant configuration of standard risk &amp; pick setups</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {PRESETS.map((p) => {
@@ -443,7 +443,7 @@ export const Optimise: React.FC = () => {
                         <span>{p.label}</span>
                         {isCurrent && <span className="w-1.5 h-1.5 bg-accent-blue rounded-full"></span>}
                       </div>
-                      <div className="text-[10px] text-muted mt-0.5 truncate">{p.desc}</div>
+                      <div className="text-[13px] text-muted mt-0.5 truncate">{p.desc}</div>
                     </button>
                   );
                 })}
@@ -460,11 +460,11 @@ export const Optimise: React.FC = () => {
                 />
               </div>
               <div className="lg:col-span-5">
-                <ScreenPreview
+                <div data-research><ScreenPreview
                   screenInfo={screenInfo}
                   loading={screenLoading && !screenInfo}
                   qubitCap={qubitCap}
-                />
+                /></div>
               </div>
             </div>
           </section>
@@ -482,7 +482,7 @@ export const Optimise: React.FC = () => {
                   Set Portfolio &amp; Risk Constraints
                 </h3>
               </div>
-              <span className="text-[11px] text-muted hidden sm:inline">
+              <span data-research className="text-[14px] text-muted hidden sm:inline">
                 Cardinality (K), Risk parameter (q), Sector cap, Target return &amp; Capital
               </span>
             </div>
@@ -506,7 +506,7 @@ export const Optimise: React.FC = () => {
           {/* =========================================================================
               STAGE 3: CHOOSE AND CONFIGURE THE SOLVER
               ========================================================================= */}
-          <section className="space-y-4">
+          <section data-research className="space-y-4">
             <div className="flex items-center justify-between border-b border-line pb-2">
               <div className="flex items-center space-x-2">
                 <span className="text-xs font-mono font-medium px-2 py-0.5 bg-surface text-accent-blue-hover border border-line-strong">
@@ -516,13 +516,13 @@ export const Optimise: React.FC = () => {
                   Choose &amp; Configure Solvers
                 </h3>
               </div>
-              <span className="text-[11px] text-muted hidden sm:inline">
+              <span data-research className="text-[14px] text-muted hidden sm:inline">
                 QAOA Quantum Circuit, Classical Baselines &amp; Hyperparameters
               </span>
             </div>
 
             {/* Solvers & Baselines 2-Card Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div data-research className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Card 1: Quantum Engine Pipeline Summary */}
               <div className="bg-surface border border-line p-5 space-y-3">
                 <div className="flex items-center justify-between">
@@ -530,7 +530,7 @@ export const Optimise: React.FC = () => {
                     <span className="w-2 h-2 bg-accent-blue"></span>
                     <span>Primary Quantum Solver</span>
                   </h4>
-                  <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-text border border-line-strong">
+                  <span className="text-[13px] font-mono px-2 py-0.5 bg-bg text-text border border-line-strong">
                     QISKIT QAOA
                   </span>
                 </div>
@@ -569,7 +569,7 @@ export const Optimise: React.FC = () => {
                     <span className="w-2 h-2 bg-text"></span>
                     <span>Benchmark Solvers (Parallel)</span>
                   </h4>
-                  <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-muted border border-line">
+                  <span className="text-[13px] font-mono px-2 py-0.5 bg-bg text-muted border border-line">
                     3 BASELINES
                   </span>
                 </div>
@@ -597,10 +597,10 @@ export const Optimise: React.FC = () => {
             </div>
 
             {/* Collapsible Advanced Quantum Settings */}
-            <AdvancedQaoa
+            <div data-research><AdvancedQaoa
               settings={qaoaSettings}
               onChange={setQaoaSettings}
-            />
+            /></div>
           </section>
 
           {/* =========================================================================
@@ -613,11 +613,11 @@ export const Optimise: React.FC = () => {
                   <span className="w-2 h-2 bg-gain"></span>
                   <span>Pre-Run Configuration Summary</span>
                 </h3>
-                <p className="text-[11px] text-muted mt-0.5">
+                <p className="text-[14px] text-muted mt-0.5">
                   Review specifications before executing the full quantum and classical optimization pipeline.
                 </p>
               </div>
-              <span className="text-[10px] font-mono px-2.5 py-1 bg-bg border border-line text-muted self-start sm:self-auto">
+              <span className="text-[13px] font-mono px-2.5 py-1 bg-bg border border-line text-muted self-start sm:self-auto">
                 PRESS CTRL+ENTER TO RUN
               </span>
             </div>
@@ -625,53 +625,53 @@ export const Optimise: React.FC = () => {
             {/* Compact Spec Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
               <div className="p-2.5 bg-bg border border-line">
-                <span className="text-[10px] text-muted block uppercase">Universe</span>
+                <span className="text-[13px] text-muted block uppercase">Universe</span>
                 <span className="text-text font-mono font-medium">
                   {selectedTickers ? `${selectedTickers.length} Custom` : 'Full NIFTY 50'}
                 </span>
-                <span className="text-[10px] text-muted block">
+                <span className="text-[13px] text-muted block">
                   {screenInfo ? `→ ${screenInfo.qubits.assets} screened` : ''}
                 </span>
               </div>
 
               <div className="p-2.5 bg-bg border border-line">
-                <span className="text-[10px] text-muted block uppercase">Target Picks (K)</span>
+                <span className="text-[13px] text-muted block uppercase">Target Picks (K)</span>
                 <span className="text-text font-mono font-medium">{k} stocks</span>
-                <span className="text-[10px] text-muted block">Equal-weighted</span>
+                <span className="text-[13px] text-muted block">Equal-weighted</span>
               </div>
 
               <div className="p-2.5 bg-bg border border-line">
-                <span className="text-[10px] text-muted block uppercase">Risk Aversion (q)</span>
+                <span className="text-[13px] text-muted block uppercase">Risk Aversion (q)</span>
                 <span className="text-text font-mono font-medium">{riskAversion.toFixed(2)}</span>
-                <span className="text-[10px] text-muted block">
+                <span className="text-[13px] text-muted block">
                   {riskAversion >= 0.7 ? 'Defensive' : riskAversion <= 0.3 ? 'Growth' : 'Balanced'}
                 </span>
               </div>
 
               <div className="p-2.5 bg-bg border border-line">
-                <span className="text-[10px] text-muted block uppercase">Active Constraints</span>
+                <span className="text-[13px] text-muted block uppercase">Active Constraints</span>
                 <span className="text-text font-mono font-medium">
                   {sectorCap ? `Sec Cap ≤ ${sectorCap}` : 'No Sector Cap'}
                 </span>
-                <span className="text-[10px] text-muted block">
+                <span className="text-[13px] text-muted block">
                   {targetReturn !== null ? `Ret ≥ ${(targetReturn * 100).toFixed(0)}%` : 'No Return Floor'}
                 </span>
               </div>
 
               <div className="p-2.5 bg-bg border border-line">
-                <span className="text-[10px] text-muted block uppercase">Quantum Engine</span>
+                <span className="text-[13px] text-muted block uppercase">Quantum Engine</span>
                 <span className="text-text font-mono font-medium">
                   QAOA (p={qaoaSettings.reps})
                 </span>
-                <span className="text-[10px] text-muted block">
+                <span className="text-[13px] text-muted block">
                   {qaoaSettings.variant.toUpperCase()} mixer
                 </span>
               </div>
 
               <div className="p-2.5 bg-bg border border-line">
-                <span className="text-[10px] text-muted block uppercase">Capital &amp; Costs</span>
+                <span className="text-[13px] text-muted block uppercase">Capital &amp; Costs</span>
                 <span className="text-text font-mono font-medium">₹{(capital / 100000).toFixed(1)}L</span>
-                <span className="text-[10px] text-muted block">Buy 15bps / Sell 25bps</span>
+                <span className="text-[13px] text-muted block">Buy 15bps / Sell 25bps</span>
               </div>
             </div>
 
@@ -692,7 +692,7 @@ export const Optimise: React.FC = () => {
                 ) : (
                   <>
                     <span>Run Portfolio-Pulse Optimization Pipeline</span>
-                    <span className="text-[10px] opacity-75 font-mono">[Ctrl+↵]</span>
+                    <span className="text-[13px] opacity-75 font-mono">[Ctrl+↵]</span>
                   </>
                 )}
               </button>
@@ -714,11 +714,11 @@ export const Optimise: React.FC = () => {
                 <h2 className="text-sm font-medium text-text uppercase tracking-wide">
                   Portfolio-Pulse — Quantitative Results Dashboard
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 bg-bg text-muted border border-line">
+                <span className="text-[13px] font-mono px-2 py-0.5 bg-bg text-muted border border-line">
                   STAGE 2 OF 2
                 </span>
                 {runResult?.recommended && (
-                  <span className="text-[10px] font-mono px-2 py-0.5 bg-accent-blue/15 text-accent-blue-hover border border-accent-blue/40 uppercase">
+                  <span className="text-[13px] font-mono px-2 py-0.5 bg-accent-blue/15 text-accent-blue-hover border border-accent-blue/40 uppercase">
                     Recommended: {runResult.recommended}
                   </span>
                 )}
@@ -755,7 +755,7 @@ export const Optimise: React.FC = () => {
                 title="Execute a fresh run with current parameters"
               >
                 <span>Rerun</span>
-                <span className="text-[10px] opacity-75 font-mono">[↵]</span>
+                <span className="text-[13px] opacity-75 font-mono">[↵]</span>
               </button>
             </div>
           </div>
@@ -822,6 +822,7 @@ export const Optimise: React.FC = () => {
                   </button>
                   <button
                     type="button"
+                    data-research
                     onClick={() => setResultsTab('solvers')}
                     className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-all whitespace-nowrap ${resultsTab === 'solvers'
                       ? 'bg-surface-elevated text-white border border-accent-blue/50'
@@ -832,6 +833,7 @@ export const Optimise: React.FC = () => {
                   </button>
                   <button
                     type="button"
+                    data-research
                     onClick={() => setResultsTab('quantum')}
                     className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-all whitespace-nowrap ${resultsTab === 'quantum'
                       ? 'bg-surface-elevated text-white border border-accent-blue/50'
@@ -842,6 +844,7 @@ export const Optimise: React.FC = () => {
                   </button>
                   <button
                     type="button"
+                    data-research
                     onClick={() => setResultsTab('all')}
                     className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-all whitespace-nowrap ${resultsTab === 'all'
                       ? 'bg-surface-elevated text-white border border-accent-blue/50'
@@ -853,8 +856,8 @@ export const Optimise: React.FC = () => {
                 </div>
 
                 {/* Global Solver Switcher */}
-                <div className="flex items-center gap-1.5 overflow-x-auto">
-                  <span className="label text-[10px] text-faint hidden lg:inline mr-1">ACTIVE SOLVER:</span>
+                <div data-research className="flex items-center gap-1.5 overflow-x-auto">
+                  <span className="label text-[13px] text-faint hidden lg:inline mr-1">ACTIVE SOLVER:</span>
                   <div className="flex bg-bg p-1 border border-line gap-1">
                     {runResult.solvers.map((s) => {
                       const isSelected = s.solver === selectedSolverKey;
@@ -892,13 +895,19 @@ export const Optimise: React.FC = () => {
                     onSelectSolver={setSelectedSolverKey}
                   />
 
+                  {/* Simple mode: the honest verdict sits with the portfolio */}
+                  <div data-simple-only data-tour="verdict"><HonestyPanel
+                    verdict={runResult.verdict}
+                    qaoaResult={runResult.qaoa}
+                  /></div>
+
                   {/* Markowitz Efficient Frontier */}
-                  <FrontierChart
+                  <div data-research><FrontierChart
                     frontier={runResult.frontier}
                     solvers={runResult.solvers}
                     selectedSolverKey={selectedSolverKey}
                     onSelectSolver={setSelectedSolverKey}
-                  />
+                  /></div>
                 </div>
               )}
 

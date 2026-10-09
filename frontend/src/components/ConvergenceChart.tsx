@@ -40,8 +40,8 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={convergence} margin={{ top: 5, right: 15, left: -15, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" />
-            <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
-            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} domain={['auto', 'auto']} />
+            <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={12} tickLine={false} />
+            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={12} tickLine={false} domain={['auto', 'auto']} />
             <Tooltip
               contentStyle={{ backgroundColor: 'var(--c-surface2)', borderColor: 'var(--c-mid)', borderRadius: 0, fontSize: '11px', color: 'var(--c-fg)' }}
               labelFormatter={(iter: any) => `Iteration ${iter}`}
