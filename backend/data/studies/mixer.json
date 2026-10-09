@@ -1,0 +1,70 @@
+{
+ "id": "mixer",
+ "title": "Mixer choice",
+ "description": "Mean over 5 fixed-seed 10-asset, K=5, q=0.5 instances (no sector cap or target, zero costs), est window 2023-10-01..2025-09-30. p = 3, COBYLA, ramp init (p = 3 declared for every mixer).",
+ "x_label": "Mixer (0 = Standard mixer, 1 = XY mixer + Dicke)",
+ "y_label": "Probability",
+ "series": [
+  {
+   "label": "Standard mixer: feasible rate",
+   "points": [
+    {
+     "x": 0.0,
+     "y": 0.39384765625,
+     "yerr": 0.2024461994993026
+    }
+   ]
+  },
+  {
+   "label": "Standard mixer: P(opt)",
+   "points": [
+    {
+     "x": 0.0,
+     "y": 0.002294921875,
+     "yerr": 0.0010300304252797356
+    }
+   ]
+  },
+  {
+   "label": "XY mixer + Dicke: feasible rate",
+   "points": [
+    {
+     "x": 1.0,
+     "y": 1.0,
+     "yerr": 0.0
+    }
+   ]
+  },
+  {
+   "label": "XY mixer + Dicke: P(opt)",
+   "points": [
+    {
+     "x": 1.0,
+     "y": 0.033935546875,
+     "yerr": 0.0265170887243544
+    }
+   ]
+  }
+ ],
+ "instance": {
+  "n_assets": 10,
+  "k": 5,
+  "q": 0.5,
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "shots": 4096,
+  "maxiter": 60
+ },
+ "notes": [
+  "Noiseless statevector simulation.",
+  "Synthetic subset of NIFTY 50 tickers; estimation window 2023-10-01..2025-09-30",
+  "5 instance(s) with seeds [1, 2, 3, 4, 5], QAOA seed = instance seed, maxiter 60, 4096 shots; yerr is the sample standard deviation over instances."
+ ],
+ "generated_at": "2026-10-09",
+ "wall_time_s": 52.8
+}

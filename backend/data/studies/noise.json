@@ -1,0 +1,72 @@
+{
+ "id": "noise",
+ "title": "Effect of hardware noise",
+ "description": "Mean over 1 fixed-seed 10-asset, K=5, q=0.5 instances (no sector cap or target, zero costs), est window 2023-10-01..2025-09-30. XY mixer + Dicke, p = 2, COBYLA, ramp init; the same optimised parameters sampled ideally and under noise.",
+ "x_label": "Sampling (0 = ideal, 1 = noisy)",
+ "y_label": "Metric value",
+ "series": [
+  {
+   "label": "Approximation ratio",
+   "points": [
+    {
+     "x": 0.0,
+     "y": 0.6967231853233432,
+     "yerr": 0.0
+    },
+    {
+     "x": 1.0,
+     "y": 0.08120811510226987,
+     "yerr": 0.0
+    }
+   ]
+  },
+  {
+   "label": "P(opt)",
+   "points": [
+    {
+     "x": 0.0,
+     "y": 0.00341796875,
+     "yerr": 0.0
+    },
+    {
+     "x": 1.0,
+     "y": 0.000244140625,
+     "yerr": 0.0
+    }
+   ]
+  },
+  {
+   "label": "Feasible rate",
+   "points": [
+    {
+     "x": 0.0,
+     "y": 1.0,
+     "yerr": 0.0
+    },
+    {
+     "x": 1.0,
+     "y": 0.15966796875,
+     "yerr": 0.0
+    }
+   ]
+  }
+ ],
+ "instance": {
+  "n_assets": 10,
+  "k": 5,
+  "q": 0.5,
+  "seeds": [
+   1
+  ],
+  "shots": 4096,
+  "maxiter": 60
+ },
+ "notes": [
+  "FakeGuadalupeV2 noise model, sample-only (parameters optimised noiselessly)",
+  "Best mixer from the depth study at p = 2 (lowest 1 - r): XY mixer + Dicke.",
+  "Synthetic subset of NIFTY 50 tickers; estimation window 2023-10-01..2025-09-30",
+  "1 instance(s) with seeds [1], QAOA seed = instance seed, maxiter 60, 4096 shots; yerr is the sample standard deviation over instances."
+ ],
+ "generated_at": "2026-10-09",
+ "wall_time_s": 152.3
+}
