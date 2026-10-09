@@ -141,7 +141,7 @@ Base path is `/api`. Every response is JSON. An error body looks like `{"detail"
   "target_return": null,
   "capital": 1000000,
   "holdings": {},
-  "qubit_cap": 16,
+  "qubit_cap": 12,
   "qaoa": {"variant": "standard", "reps": 2, "optimizer": "COBYLA", "init": "ramp",
            "shots": 4096, "maxiter": 150, "noise": false, "seed": 7}
 }
@@ -151,6 +151,7 @@ Base path is `/api`. Every response is JSON. An error body looks like `{"detail"
 - `variant`: `standard` or `xy`.
 - `optimizer`: `COBYLA`, `SPSA` or `NELDER_MEAD`.
 - `init`: `random`, `ramp` or `interp`.
+- `qubit_cap`: default 12 (a live run takes under a minute); max 16, the FakeGuadalupeV2 size (about 3 min per run).
 - Validation: 2 ≤ k ≤ 15, 0 ≤ risk_aversion ≤ 1, 1 ≤ reps ≤ 5, 256 ≤ shots ≤ 20000.
 
 ### 2.3 Sample (inside results)

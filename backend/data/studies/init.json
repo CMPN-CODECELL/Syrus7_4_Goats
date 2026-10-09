@@ -1,0 +1,61 @@
+{
+ "id": "init",
+ "title": "Parameter initialisation",
+ "description": "Mean over 5 fixed-seed 10-asset, K=5, q=0.5 instances (no sector cap or target, zero costs), est window 2023-10-01..2025-09-30. Standard mixer, p = 3, COBYLA.",
+ "x_label": "Initialisation (0 = Random init, 1 = Ramp init, 2 = INTERP warm start)",
+ "y_label": "1 - approximation ratio",
+ "series": [
+  {
+   "label": "Random init",
+   "points": [
+    {
+     "x": 0.0,
+     "y": 0.7932591864570002,
+     "yerr": 0.056081435649882175
+    }
+   ]
+  },
+  {
+   "label": "Ramp init",
+   "points": [
+    {
+     "x": 1.0,
+     "y": 0.7989891992377552,
+     "yerr": 0.09534512493442543
+    }
+   ]
+  },
+  {
+   "label": "INTERP warm start",
+   "points": [
+    {
+     "x": 2.0,
+     "y": 0.8528372231964804,
+     "yerr": 0.04651867063040552
+    }
+   ]
+  }
+ ],
+ "instance": {
+  "n_assets": 10,
+  "k": 5,
+  "q": 0.5,
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "shots": 4096,
+  "maxiter": 60
+ },
+ "notes": [
+  "Noiseless statevector simulation.",
+  "INTERP is the declared warm start: optimise at p = 1 from the ramp, then extend one depth at a time by interpolating the parameters; the evaluation budget is split equally across depths.",
+  "Synthetic subset of NIFTY 50 tickers; estimation window 2023-10-01..2025-09-30",
+  "5 instance(s) with seeds [1, 2, 3, 4, 5], QAOA seed = instance seed, maxiter 60, 4096 shots; yerr is the sample standard deviation over instances."
+ ],
+ "generated_at": "2026-10-09",
+ "wall_time_s": 29.8
+}
