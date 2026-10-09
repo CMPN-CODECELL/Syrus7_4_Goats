@@ -66,11 +66,11 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={topSamples} margin={{ top: 25, right: 15, left: 10, bottom: 65 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1F1F28" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" vertical={false} />
             <XAxis
               dataKey="bitstring"
-              stroke="#8E8EA0"
-              tick={{ fill: '#8E8EA0' }}
+              stroke="var(--c-muted2)"
+              tick={{ fill: 'var(--c-muted2)' }}
               fontSize={9}
               fontFamily="monospace"
               angle={-45}
@@ -78,8 +78,8 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
               interval={0}
             />
             <YAxis
-              stroke="#8E8EA0"
-              tick={{ fill: '#8E8EA0' }}
+              stroke="var(--c-muted2)"
+              tick={{ fill: 'var(--c-muted2)' }}
               fontSize={10}
               width={52}
               tickFormatter={(v: any) => formatPercent(v, 1)}

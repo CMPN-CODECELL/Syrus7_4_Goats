@@ -66,9 +66,9 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 12, right: 20, left: 15, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1F1F28" vertical={false} />
-            <XAxis dataKey="x" stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} />
-            <YAxis stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} width={52} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" vertical={false} />
+            <XAxis dataKey="x" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
+            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} width={52} tickLine={false} />
             <Tooltip
               content={({ active, payload, label }: any) => {
                 if (!active || !payload?.length) return null;

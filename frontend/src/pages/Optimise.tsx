@@ -476,7 +476,7 @@ export const Optimise: React.FC<OptimiseProps> = ({
 
             {/* Asset Selection & Screening Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              <div className="lg:col-span-7">
+              <div className="lg:col-span-7" data-tour="universe">
                 <UniversePicker
                   assets={universe?.assets || []}
                   selectedTickers={selectedTickers}
@@ -511,7 +511,7 @@ export const Optimise: React.FC<OptimiseProps> = ({
               </span>
             </div>
 
-            <ConstraintsForm
+            <div data-tour="risk"><ConstraintsForm
               k={k}
               setK={setK}
               riskAversion={riskAversion}
@@ -524,7 +524,7 @@ export const Optimise: React.FC<OptimiseProps> = ({
               setCapital={setCapital}
               holdingsText={holdingsText}
               setHoldingsText={setHoldingsText}
-            />
+            /></div>
           </section>
 
           {/* =========================================================================
@@ -632,7 +632,7 @@ export const Optimise: React.FC<OptimiseProps> = ({
               ========================================================================= */}
           <div className="bg-surface border border-line-strong p-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line pb-3">
-              <div>
+              <div data-tour="review">
                 <h3 className="text-xs font-medium text-text uppercase tracking-wider flex items-center gap-2">
                   <span className="w-2 h-2 bg-gain"></span>
                   <span>Pre-Run Configuration Summary</span>
@@ -703,9 +703,10 @@ export const Optimise: React.FC<OptimiseProps> = ({
             <div className="pt-2">
               <button
                 type="button"
+                data-tour="run"
                 onClick={handleStartRun}
                 disabled={isJobRunning}
-                className="w-full py-4 px-6 min-h-[48px] bg-text text-bg hover:bg-accent-blue hover:text-white transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 px-6 min-h-[48px] bg-text text-bg hover:opacity-80 transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isJobRunning ? (
                   <>
@@ -774,7 +775,7 @@ export const Optimise: React.FC<OptimiseProps> = ({
                 type="button"
                 onClick={handleStartRun}
                 disabled={isJobRunning}
-                className="px-4 py-2.5 bg-text text-bg hover:bg-accent-blue hover:text-white transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center space-x-1.5"
+                className="px-4 py-2.5 bg-text text-bg hover:opacity-80 transition-all text-xs font-medium uppercase tracking-wider border border-text flex items-center space-x-1.5"
                 title="Execute a fresh run with current parameters"
               >
                 <span>Rerun</span>
@@ -918,7 +919,7 @@ export const Optimise: React.FC<OptimiseProps> = ({
 
               {/* TAB 1: OVERVIEW & ALLOCATION */}
               {(resultsTab === 'overview' || resultsTab === 'all') && (
-                <div className="space-y-6">
+                <div className="space-y-6" data-tour="results">
                   {/* Executive KPI Cards */}
                   <MetricCards solver={selectedSolver} />
 
@@ -975,10 +976,10 @@ export const Optimise: React.FC<OptimiseProps> = ({
                   </div>
 
                   {/* Honesty Verdict Panel */}
-                  <HonestyPanel
+                  <div data-tour="verdict"><HonestyPanel
                     verdict={runResult.verdict}
                     qaoaResult={runResult.qaoa}
-                  />
+                  /></div>
                 </div>
               )}
             </div>
@@ -996,7 +997,7 @@ export const Optimise: React.FC<OptimiseProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveStage('configure')}
-                className="px-6 py-2.5 bg-text text-bg hover:bg-accent-blue hover:text-white font-medium text-xs uppercase transition-colors"
+                className="px-6 py-2.5 bg-text text-bg hover:opacity-80 font-medium text-xs uppercase transition-colors"
               >
                 Go to Formulation Setup
               </button>

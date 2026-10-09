@@ -17,7 +17,7 @@ export const MarkerGlyph: React.FC<{ style: SeriesStyle; cx: number; cy: number;
   if (typeof cx !== 'number' || typeof cy !== 'number' || isNaN(cx) || isNaN(cy)) return null;
   const t = `translate(${cx},${cy}) scale(${scale})`;
   if (style.shape === 'circle') {
-    return <circle cx={cx} cy={cy} r={5 * scale} fill={style.hollow ? '#000000' : style.color} stroke={style.color} strokeWidth={1.5} />;
+    return <circle cx={cx} cy={cy} r={5 * scale} fill={style.hollow ? 'var(--c-bg2)' : style.color} stroke={style.color} strokeWidth={1.5} />;
   }
   if (style.shape === 'dash') {
     return <line x1={cx - 6} x2={cx + 6} y1={cy} y2={cy} stroke={style.color} strokeWidth={2} strokeDasharray="3 2" />;
@@ -29,7 +29,7 @@ export const MarkerGlyph: React.FC<{ style: SeriesStyle; cx: number; cy: number;
     <path
       transform={t}
       d={markerPath(style.shape)}
-      fill={style.hollow ? '#000000' : style.color}
+      fill={style.hollow ? 'var(--c-bg2)' : style.color}
       stroke={style.color}
       strokeWidth={1.5}
     />

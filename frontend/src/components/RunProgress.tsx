@@ -67,9 +67,9 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
           <div className="h-44 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={convergence} margin={{ top: 8, right: 15, left: 10, bottom: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1F1F28" vertical={false} />
-                <XAxis dataKey="iter" stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} />
-                <YAxis stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} width={50} domain={['auto', 'auto']} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" vertical={false} />
+                <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
+                <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} width={50} domain={['auto', 'auto']} />
                 <Tooltip
                   content={({ active, payload, label }: any) => {
                     if (!active || !payload?.[0]) return null;
@@ -88,10 +88,10 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
                 <Line
                   type="monotone"
                   dataKey="energy"
-                  stroke="#FFFFFF"
+                  stroke="var(--c-fg)"
                   strokeWidth={2}
-                  dot={{ r: 2, fill: '#FFFFFF' }}
-                  activeDot={{ r: 5, fill: '#FFFFFF', stroke: '#000000', strokeWidth: 2 }}
+                  dot={{ r: 2, fill: 'var(--c-fg)' }}
+                  activeDot={{ r: 5, fill: 'var(--c-fg)', stroke: 'var(--c-bg2)', strokeWidth: 2 }}
                   isAnimationActive={false}
                 />
               </LineChart>

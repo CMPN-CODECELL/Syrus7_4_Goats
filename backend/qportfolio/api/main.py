@@ -37,15 +37,28 @@ app = FastAPI(
     redoc_url=None,
 )
 
-# CORS configuration per CONTRACTS.md §2: allow Vite frontend dev server
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+import os
+
+# CORS configuration per CONTRACTS.md §2: allow Vite frontend dev server, local network, and production domains
+cors_env = os.getenv("CORS_ORIGINS", "*").strip()
+if cors_env == "*" or not cors_env:
+    cors_origins = ["*"]
+    cors_credentials = False
+    origin_regex = None
+else:
+    cors_origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-    ],
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$",
-    allow_credentials=True,
+        *[o.strip() for o in cors_env.split(",") if o.strip()],
+    ]
+    cors_credentials = True
+    origin_regex = r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$"
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_origin_regex=origin_regex,
+    allow_credentials=cors_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

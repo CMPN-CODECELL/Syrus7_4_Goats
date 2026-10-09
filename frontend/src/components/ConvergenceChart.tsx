@@ -39,9 +39,9 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
       <div className="h-60 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={convergence} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1F1F28" vertical={false} />
-            <XAxis dataKey="iter" stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} />
-            <YAxis stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} width={55} domain={['auto', 'auto']} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--c-grid)" vertical={false} />
+            <XAxis dataKey="iter" stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} />
+            <YAxis stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }} fontSize={10} tickLine={false} width={55} domain={['auto', 'auto']} />
             <Tooltip
               content={({ active, payload, label }: any) => {
                 if (!active || !payload?.[0]) return null;
@@ -60,10 +60,10 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
             <Line
               type="monotone"
               dataKey="energy"
-              stroke="#FFFFFF"
+              stroke={CHART_COLORS.qaoa_standard}
               strokeWidth={2}
-              dot={{ r: 2, fill: '#FFFFFF' }}
-              activeDot={{ r: 5, fill: '#FFFFFF', stroke: '#000000', strokeWidth: 2 }}
+              dot={{ r: 2, fill: CHART_COLORS.qaoa_standard }}
+              activeDot={{ r: 5, fill: CHART_COLORS.qaoa_standard, stroke: 'var(--c-bg2)', strokeWidth: 2 }}
               isAnimationActive={false}
             />
           </LineChart>
