@@ -18,14 +18,17 @@ import {
 } from './mock';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === '1';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '');
 
 // One place for every call: a plain-language message for network failures, FastAPI errors and non-JSON replies.
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   let res: Response;
+  const fullUrl = `${API_BASE_URL}${url}`;
   try {
-    res = await fetch(url, init);
+    res = await fetch(fullUrl, init);
   } catch {
-    throw new Error('Cannot reach the server. Check that the backend is running on http://localhost:8000.');
+    const target = API_BASE_URL || 'http://localhost:8000';
+    throw new Error(`Cannot reach the server. Check that the backend is running on ${target}.`);
   }
   if (!res.ok) {
     let msg = `The server returned an error (${res.status}).`;
