@@ -6,3 +6,4 @@ backend/*.parquet
 __pycache__/
 .pytest_cache/
 dist/
+.agents/mcp_config.json
