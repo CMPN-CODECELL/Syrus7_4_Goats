@@ -45,7 +45,7 @@ function CandleChart({ title, candles, domain, same }: { title: string; candles:
             <YAxis domain={domain} tick={AXIS} stroke="var(--c-grid)" width={56} tickFormatter={(v: number) => `₹${(v / 1e5).toFixed(1)}L`} />
             <Tooltip
               contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line-strong)', fontSize: 13 }}
-              formatter={(_v, _n, item) => {
+              formatter={(_v: unknown, _n: unknown, item: { payload?: Candle }) => {
                 const c = item.payload as Candle;
                 return [`O ${formatINR(c.open)} · H ${formatINR(c.high)} · L ${formatINR(c.low)} · C ${formatINR(c.close)}`, 'Week'];
               }}
@@ -111,7 +111,7 @@ export function MethodCompare({ result }: { result: RunResult }) {
               <YAxis tick={AXIS} stroke="var(--c-grid)" width={48} tickFormatter={(v: number) => formatPct(v, { digits: 0 })} />
               <ReferenceLine y={0} stroke="var(--c-muted2)" />
               <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line-strong)', fontSize: 13 }}
-                formatter={(v) => (typeof v === 'number' ? formatPct(v, { sign: true }) : '—')} />
+                formatter={(v: unknown) => (typeof v === 'number' ? formatPct(v, { sign: true }) : '—')} />
               <Legend wrapperStyle={{ fontSize: 13 }} />
               <Bar dataKey="Expected return" fill="var(--color-accent-blue)" />
               <Bar dataKey="Test-year return" fill="var(--c-fg)" />

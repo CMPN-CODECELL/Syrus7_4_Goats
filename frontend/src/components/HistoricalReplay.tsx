@@ -92,7 +92,7 @@ export function HistoricalReplay({ result }: { result: RunResult }) {
             <CartesianGrid vertical={false} stroke="var(--c-grid)" />
             <XAxis dataKey="date" tick={AXIS} stroke="var(--c-grid)" minTickGap={40} tickFormatter={(d: string) => (d === 'start' ? 'start' : d.slice(0, 7))} />
             <YAxis tick={AXIS} stroke="var(--c-grid)" width={56} domain={['auto', 'auto']} tickFormatter={(v: number) => `₹${(v / 1e5).toFixed(1)}L`} />
-            <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line-strong)', fontSize: 13 }} formatter={(v) => formatINR(Number(v))} />
+            <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line-strong)', fontSize: 13 }} formatter={(v: unknown) => formatINR(Number(v))} />
             <Legend wrapperStyle={{ fontSize: 13 }} />
             {series.map((s, i) => (
               <Line key={s.id} type="monotone" dataKey={s.name} dot={false} isAnimationActive={false} strokeWidth={s.id === 'nifty50' ? 2 : 1.5}

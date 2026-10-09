@@ -88,7 +88,19 @@ const PRESETS: Preset[] = [
   }
 ];
 
-export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onResult }) => {
+export interface OptimiseProps {
+  runResult?: RunResult | null;
+  onRunResultChange?: (result: RunResult | null) => void;
+  onSelectSolverChange?: (solverKey: string) => void;
+  onNavigateToStress?: () => void;
+}
+
+export const Optimise: React.FC<OptimiseProps> = ({
+  runResult: externalRunResult,
+  onRunResultChange,
+  onSelectSolverChange,
+  onNavigateToStress
+}) => {
   // Stage Flow State: 'configure' = full setup screen, 'results' = full results workspace
   const [activeStage, setActiveStage] = useState<'configure' | 'results'>('configure');
   const [resultsTab, setResultsTab] = useState<'overview' | 'solvers' | 'quantum' | 'all'>('overview');
@@ -115,9 +127,21 @@ export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onRe
 
   // Job & Execution State
   const [activeJobStatus, setActiveJobStatus] = useState<JobStatus | null>(null);
-  const [runResult, setRunResult] = useState<RunResult | null>(null);
+  const [runResult, setRunResult] = useState<RunResult | null>(externalRunResult || null);
   const [selectedSolverKey, setSelectedSolverKey] = useState<string>('brute_force');
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  const handleSelectSolver = (key: string) => {
+    setSelectedSolverKey(key);
+    onSelectSolverChange?.(key);
+  };
+
+  useEffect(() => {
+    if (externalRunResult && externalRunResult !== runResult) {
+      setRunResult(externalRunResult);
+      setActiveStage('results');
+    }
+  }, [externalRunResult]);
 
   // Pending poll timer
   const pollTimerRef = useRef<number | null>(null);
@@ -220,7 +244,6 @@ export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onRe
         setActiveJobStatus(status);
         if (status.state === 'done') {
           setRunResult(status.result);
-          if (status.result) onResult?.(status.result);
           setActiveStage('results');
         }
       } catch (err: any) {
@@ -860,28 +883,43 @@ export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onRe
                 </div>
 
                 {/* Global Solver Switcher */}
-                <div data-research className="flex items-center gap-1.5 overflow-x-auto">
-                  <span className="label text-[13px] text-faint hidden lg:inline mr-1">ACTIVE SOLVER:</span>
-                  <div className="flex bg-bg p-1 border border-line gap-1">
-                    {runResult.solvers.map((s) => {
-                      const isSelected = s.solver === selectedSolverKey;
-                      const style = getSolverStyle(s.solver);
-                      return (
-                        <button
-                          key={s.solver}
-                          type="button"
-                          onClick={() => setSelectedSolverKey(s.solver)}
-                          className={`px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-all flex items-center space-x-1.5 ${isSelected
-                            ? 'bg-surface-elevated text-white border border-accent-blue/60'
-                            : 'text-muted hover:text-text'
-                            }`}
-                        >
-                          <SolverMarker style={style} size={9} />
-                          <span>{s.label}</span>
-                        </button>
-                      );
-                    })}
+                <div data-research className="flex items-center gap-2 overflow-x-auto">
+                  <div className="flex items-center gap-1.5">
+                    <span className="label text-[13px] text-faint hidden lg:inline mr-1">ACTIVE SOLVER:</span>
+                    <div className="flex bg-bg p-1 border border-line gap-1">
+                      {runResult.solvers.map((s) => {
+                        const isSelected = s.solver === selectedSolverKey;
+                        const style = getSolverStyle(s.solver);
+                        return (
+                          <button
+                            key={s.solver}
+                            type="button"
+                            onClick={() => handleSelectSolver(s.solver)}
+                            className={`px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-all flex items-center space-x-1.5 ${isSelected
+                              ? 'bg-surface-elevated text-white border border-accent-blue/60'
+                              : 'text-muted hover:text-text'
+                              }`}
+                          >
+                            <SolverMarker style={style} size={9} />
+                            <span>{s.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
+
+                  {onNavigateToStress && (
+                    <button
+                      type="button"
+                      onClick={onNavigateToStress}
+                      className="px-3 py-1.5 text-xs font-mono uppercase bg-accent-blue/15 border border-accent-blue text-accent-blue-hover hover:bg-accent-blue hover:text-white transition-all flex items-center gap-1.5 shrink-0"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Stress Test →
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -896,7 +934,7 @@ export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onRe
                     solvers={runResult.solvers}
                     recommendedSolverId={runResult.recommended}
                     selectedSolverKey={selectedSolverKey}
-                    onSelectSolver={setSelectedSolverKey}
+                    onSelectSolver={handleSelectSolver}
                   />
 
                   {/* Simple mode: the honest verdict sits with the portfolio */}
@@ -918,7 +956,7 @@ export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onRe
                     frontier={runResult.frontier}
                     solvers={runResult.solvers}
                     selectedSolverKey={selectedSolverKey}
-                    onSelectSolver={setSelectedSolverKey}
+                    onSelectSolver={handleSelectSolver}
                   /></div>
                 </div>
               )}

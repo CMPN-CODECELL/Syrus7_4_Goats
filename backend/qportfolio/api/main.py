@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from qportfolio.api.jobs import job_runner
+from qportfolio.api.stress import router as stress_router
 from qportfolio.api.studies import get_study, list_studies
 from qportfolio.contracts import (
     AssetInfo,
@@ -48,10 +49,13 @@ else:
     cors_origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        *[o.strip() for o in cors_env.split(",") if o.strip()],
+        *[o.strip().rstrip("/") for o in cors_env.split(",") if o.strip()],
     ]
     cors_credentials = True
-    origin_regex = r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$"
+    origin_regex = (
+        r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$"
+        r"|^https://.*\.vercel\.app$"
+    )
 
 app.add_middleware(
     CORSMiddleware,
@@ -208,3 +212,8 @@ def get_study_detail(study_id: str) -> Study:
     if study is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Study '{study_id}' not found")
     return study
+
+
+# --- 2.8 Stress Testing -----------------------------------------------------
+app.include_router(stress_router)
+
