@@ -38,6 +38,24 @@ def test_candles(market, solvers, capital: float) -> dict[str, list[dict]]:
     return out
 
 
+def asset_stats(market) -> list[dict]:
+    """Per stock of the requested universe (the same market the betas use): annualised expected log return and volatility, estimation window only."""
+    names = {a.ticker: a.name for a in load_universe()}
+    vol = np.sqrt(np.diag(market.sigma))
+    return [{"ticker": t, "name": names.get(t, t), "sector": sec, "exp_return": round(float(m), 6), "volatility": round(float(v), 6)}
+            for t, sec, m, v in zip(market.tickers, market.sectors, market.mu, vol)]
+
+
+def selection_correlation(market, selection: list[str]) -> dict:
+    """Correlation (corr = cov / (sd_i * sd_j)) and annualised covariance of the picked stocks, estimation window only."""
+    idx = [market.tickers.index(t) for t in selection]
+    cov = market.sigma[np.ix_(idx, idx)]
+    sd = np.sqrt(np.diag(cov))
+    corr = np.clip(cov / np.outer(sd, sd), -1.0, 1.0)
+    np.fill_diagonal(corr, 1.0)
+    return {"tickers": list(selection), "matrix": np.round(corr, 4).tolist(), "covariance": np.round(cov, 8).tolist()}
+
+
 class Cancelled(Exception):
     """Defined before the heavier imports: quantum/qaoa.py imports it from this module."""
 
@@ -58,6 +76,7 @@ from .data import (  # noqa: E402
     benchmark_oos,
     build_market,
     linear_costs,
+    load_universe,
     out_of_sample,
     prescreen,
     to_shares,
@@ -128,7 +147,8 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
             solvers[i] = r.model_copy(update={"portfolio": portfolio, "oos": oos})
 
     # Recommend the feasible solver with the lowest objective; ties go to the earlier (exact) solver.
-    recommended = min((r for r in solvers if r.feasible), key=lambda r: r.objective).solver
+    best = min((r for r in solvers if r.feasible), key=lambda r: r.objective)
+    recommended = best.solver
     w = full.windows
     result = RunResult(
         run_id=uuid.uuid4().hex[:6],
@@ -149,6 +169,8 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
         recommended=recommended,
         betas=market_betas(full),
         candles=test_candles(market, solvers, request.capital),
+        assets=asset_stats(full),
+        correlation=selection_correlation(market, best.selection),
     )
     step(1.0, "Done")
     return result

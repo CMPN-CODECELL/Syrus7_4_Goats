@@ -223,6 +223,18 @@ export interface RunResult {
   betas?: Record<string, number> | null;
   /** Weekly OHLC of each feasible portfolio's rupee value over the test window (equal-weight buy-and-hold), plus 'nifty50'. */
   candles?: Record<string, Candle[]> | null;
+  /** Portfolio report: every stock of the requested universe with its estimation-window mu (annualised log return) and volatility. */
+  assets?: AssetStat[] | null;
+  /** Portfolio report: correlation and annualised covariance (daily log returns x252) of the recommended portfolio's stocks (estimation window). */
+  correlation?: { tickers: string[]; matrix: number[][]; covariance: number[][] } | null;
+}
+
+export interface AssetStat {
+  ticker: string;
+  name: string;
+  sector: string;
+  exp_return: number;
+  volatility: number;
 }
 
 export interface Candle {

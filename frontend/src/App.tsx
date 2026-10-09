@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Optimise } from './pages/Optimise';
 import { StressTest } from './pages/StressTest';
+import { Report } from './pages/Report';
 import { Evidence } from './pages/Evidence';
 import { Method } from './pages/Method';
 import { GlossaryPage } from './pages/GlossaryPage';
@@ -11,7 +12,7 @@ import { Landing } from './pages/Landing';
 import { Tour } from './components/tour/Tour';
 import { TOUR_DONE_KEY } from './components/tour/tourSteps';
 
-type Tab = 'optimise' | 'stress' | 'method' | 'evidence' | 'glossary';
+type Tab = 'optimise' | 'stress' | 'report' | 'method' | 'evidence' | 'glossary';
 
 interface NavItem {
   id: Tab;
@@ -118,6 +119,22 @@ export const App: React.FC = () => {
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      )
+    },
+    {
+      id: 'report',
+      label: 'Portfolio Report',
+      sublabel: 'Returns, Risk & Backtest',
+      icon: (active) => (
+        <svg
+          className={`w-4 h-4 shrink-0 transition-colors ${active ? 'text-accent-blue-hover' : 'text-muted'}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
         </svg>
       )
     },
@@ -366,6 +383,7 @@ export const App: React.FC = () => {
               <span className="text-sm font-medium tracking-wider text-text uppercase">
                 {activeTab === 'optimise' && 'Portfolio Optimisation & Solvers'}
                 {activeTab === 'stress' && 'Market Crash Stress Testing & Resilience'}
+                {activeTab === 'report' && 'Portfolio Report'}
                 {activeTab === 'method' && 'Methodology & QUBO Specification'}
                 {activeTab === 'evidence' && 'Empirical Quantum Benchmarks'}
                 {activeTab === 'glossary' && 'Quantum & Quantitative Lexicon'}
@@ -412,6 +430,9 @@ export const App: React.FC = () => {
               initialSolverKey={selectedSolverKey}
               onNavigateToOptimise={() => handleTabChange('optimise')}
             />
+          </div>
+          <div hidden={activeTab !== 'report'}>
+            <Report runResult={runResult} onNavigateToOptimise={() => handleTabChange('optimise')} />
           </div>
           {activeTab === 'method' && <Method />}
           {activeTab === 'evidence' && <Evidence />}

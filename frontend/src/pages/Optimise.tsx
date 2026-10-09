@@ -136,6 +136,9 @@ export const Optimise: React.FC<OptimiseProps> = ({
     onSelectSolverChange?.(key);
   };
 
+  // Tell App about the result, so the Stress Test and Portfolio Report pages can use it.
+  useEffect(() => { onRunResultChange?.(runResult); }, [runResult]);
+
   useEffect(() => {
     if (externalRunResult && externalRunResult !== runResult) {
       setRunResult(externalRunResult);

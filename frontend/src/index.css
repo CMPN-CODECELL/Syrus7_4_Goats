@@ -185,3 +185,18 @@ button:disabled { cursor: not-allowed; }
     scroll-behavior: auto !important;
   }
 }
+
+/* Portfolio Report: "Print / Save as PDF" prints the report alone, in the white theme. */
+@media print {
+  aside, header, footer, .no-print { display: none !important; }
+  .md\:pl-64 { padding-left: 0 !important; }
+  main { max-width: none !important; padding: 0 !important; }
+  :root.dark {
+    --color-bg: #FFFFFF; --color-surface: #F4F4F4; --color-surface-elevated: #EAEAEA; --color-surface-card: #F0F0F0;
+    --color-line: #BDBDBD; --color-line-strong: #737373; --color-text: #000000; --color-muted: #3D3D3D; --color-faint: #575757;
+    --color-gain: #15803D; --color-loss: #B91C1C; --color-accent-blue: #1D4ED8; --color-accent-blue-hover: #1D4ED8;
+    --c-fg: #000000; --c-bg2: #FFFFFF; --c-surface2: #F4F4F4; --c-grid: #BDBDBD; --c-muted2: #3D3D3D; --c-gain2: #15803D; --c-loss2: #B91C1C;
+    color-scheme: light;
+  }
+  section, figure, tr { break-inside: avoid; }
+}
