@@ -262,3 +262,89 @@ def test_validation_error_returns_clean_422():
     assert res.status_code == 422
     assert "detail" in res.json()
     assert isinstance(res.json()["detail"], str)
+
+
+def test_ae6_universe_offline(monkeypatch):
+    """AE6: With network offline (yf.download failing), /api/universe reports source: snapshot and as_of."""
+    def fake_download(*args, **kwargs):
+        raise RuntimeError("No internet connection")
+
+    monkeypatch.setattr("yfinance.download", fake_download)
+
+    res = client.get("/api/universe")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["source"] == "snapshot"
+    assert data["as_of"] == "2026-10-07"
+    assert len(data["assets"]) == 50
+
+
+def test_offline_run_twice_in_a_row(monkeypatch):
+    """AE6: The default run reaches done offline, twice in a row without a restart."""
+    def fake_download(*args, **kwargs):
+        raise RuntimeError("No internet connection")
+
+    monkeypatch.setattr("yfinance.download", fake_download)
+
+    payload = {
+        "k": 3,
+        "qubit_cap": 8,
+        "qaoa": {"reps": 1, "maxiter": 10, "shots": 256},
+    }
+
+    # Run 1
+    res1 = client.post("/api/runs", json=payload)
+    assert res1.status_code == 202
+    job_id1 = res1.json()["job_id"]
+
+    start_t = time.time()
+    final1 = None
+    while time.time() - start_t < 15.0:
+        s = client.get(f"/api/runs/{job_id1}").json()
+        if s["state"] == "done":
+            final1 = s
+            break
+        time.sleep(0.05)
+
+    assert final1 is not None and final1["state"] == "done"
+    assert final1["result"]["data"]["source"] == "snapshot"
+
+    # Run 2 (immediately after, without restarting server)
+    res2 = client.post("/api/runs", json=payload)
+    assert res2.status_code == 202
+    job_id2 = res2.json()["job_id"]
+
+    start_t = time.time()
+    final2 = None
+    while time.time() - start_t < 15.0:
+        s = client.get(f"/api/runs/{job_id2}").json()
+        if s["state"] == "done":
+            final2 = s
+            break
+        time.sleep(0.05)
+
+    assert final2 is not None and final2["state"] == "done"
+    assert final2["result"]["data"]["source"] == "snapshot"
+
+
+def test_startup_with_no_cache_directory(tmp_path, monkeypatch):
+    """Startup with no cache directory present works properly."""
+    nonexistent_cache = tmp_path / "cache_missing"
+    monkeypatch.setattr("qportfolio.data.prices._CACHE_DIR", nonexistent_cache)
+    monkeypatch.setattr("qportfolio.data.prices._CACHE_FILE", nonexistent_cache / "prices.parquet")
+    assert not nonexistent_cache.exists()
+
+    # Universe call works
+    u_res = client.get("/api/universe")
+    assert u_res.status_code == 200
+    assert u_res.json()["source"] == "snapshot"
+
+    # Screen call works
+    s_res = client.post("/api/screen", json={"k": 5})
+    assert s_res.status_code == 200
+    assert "kept" in s_res.json()
+
+    # Health call works
+    h_res = client.get("/api/health")
+    assert h_res.status_code == 200
+
