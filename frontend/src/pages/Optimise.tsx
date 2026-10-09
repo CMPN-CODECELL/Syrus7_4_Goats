@@ -49,7 +49,7 @@ export const Optimise: React.FC = () => {
   const [capital, setCapital] = useState<number>(1000000);
   const [holdingsText, setHoldingsText] = useState('');
   const [qaoaSettings, setQaoaSettings] = useState<QaoaSettings>(DEFAULT_QAOA);
-  const qubitCap = 16;
+  const qubitCap = 12; // contract default: a live run stays under a minute (16 is allowed but takes ~3 min)
 
   // Pre-screen State
   const [screenInfo, setScreenInfo] = useState<ScreenInfo | null>(null);

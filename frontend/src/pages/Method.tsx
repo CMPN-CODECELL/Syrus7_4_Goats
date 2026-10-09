@@ -10,7 +10,7 @@ export const Method: React.FC = () => {
           <span className="text-peach">📜</span> Methodology, QUBO Formulation &amp; Honesty Standard
         </h1>
         <p className="text-xs text-muted leading-relaxed">
-          Quantum Portfolio Optimiser translates modern portfolio theory into a 16-qubit Quadratic Unconstrained Binary Optimization (QUBO) problem solved with Qiskit 2.5 QAOA primitives and three classical benchmark solvers.
+          Quantum Portfolio Optimiser translates modern portfolio theory into a Quadratic Unconstrained Binary Optimization (QUBO) problem of up to 16 qubits (12 by default), solved with Qiskit 2.5 QAOA primitives and three classical benchmark solvers.
         </p>
       </div>
 
