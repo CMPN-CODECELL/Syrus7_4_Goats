@@ -53,7 +53,7 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({
               <td className="py-3 px-3 text-right font-mono text-text">
                 {formatNumber(nifty50Benchmark.sharpe, 2)}
               </td>
-              <td className="py-3 px-3 text-right font-mono text-red font-bold">
+              <td className="py-3 px-3 text-right font-mono text-[#FF8A8A] font-bold">
                 {formatPercent(nifty50Benchmark.max_drawdown)}
               </td>
             </tr>
@@ -80,7 +80,7 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({
                   <td className="py-3 px-3 text-right font-mono text-text font-bold">
                     {formatNumber(s.oos.sharpe, 2)}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-red font-bold">
+                  <td className="py-3 px-3 text-right font-mono text-[#FF8A8A] font-bold">
                     {formatPercent(s.oos.max_drawdown)}
                   </td>
                 </tr>

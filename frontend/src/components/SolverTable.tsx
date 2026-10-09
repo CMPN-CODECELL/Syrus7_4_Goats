@@ -86,7 +86,7 @@ export const SolverTable: React.FC<SolverTableProps> = ({
                     {s.feasible && s.selection !== null ? (
                       <span className="text-peach">✓ Feasible</span>
                     ) : (
-                      <span className="text-red">✕ Infeasible</span>
+                      <span className="text-[#FF8A8A]">✕ Infeasible</span>
                     )}
                   </td>
 

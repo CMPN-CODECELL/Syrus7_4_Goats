@@ -14,12 +14,12 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ solver }) => {
       {/* Expected Return */}
       <div className="bg-panel border border-line rounded-2xl p-4 shadow-panel">
         <div className="text-[11px] text-muted uppercase font-bold tracking-wider mb-1">
-          Expected Return (Net)
+          Expected Return
         </div>
         <div className="text-xl font-extrabold text-peach font-mono">
           {isFeasible ? formatPercent(solver.exp_return) : '—'}
         </div>
-        <div className="text-[10px] text-muted mt-1">Annualised estimation window</div>
+        <div className="text-[10px] text-muted mt-1">Annualised, before costs</div>
       </div>
 
       {/* Volatility */}
@@ -50,9 +50,13 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ solver }) => {
           Transaction Cost
         </div>
         <div className="text-xl font-extrabold text-text font-mono">
-          {isFeasible ? formatINR(solver.portfolio?.invested ? solver.portfolio.invested * (solver.txn_cost || 0) : 0) : '—'}
+          {isFeasible ? formatPercent(solver.txn_cost, 3) : '—'}
         </div>
-        <div className="text-[10px] text-muted mt-1">Buy 0.1187% / Sell 0.1037%</div>
+        <div className="text-[10px] text-muted mt-1">
+          {isFeasible && solver.portfolio && solver.txn_cost !== null
+            ? `of capital, about ${formatINR((solver.portfolio.invested + solver.portfolio.cash_left) * solver.txn_cost)}`
+            : 'Buy 0.1187% / Sell 0.1037%'}
+        </div>
       </div>
     </div>
   );

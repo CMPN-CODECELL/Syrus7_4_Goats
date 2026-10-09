@@ -174,7 +174,7 @@ export interface Frontier {
 }
 
 export interface Verdict {
-  level: 'exact' | 'near' | 'poor' | 'infeasible';
+  level: 'matched' | 'near' | 'worse' | 'no-feasible';
   headline: string;
   details: string[];
 }

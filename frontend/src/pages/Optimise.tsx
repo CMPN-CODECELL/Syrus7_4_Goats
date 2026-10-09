@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   Universe,
   RunRequest,
@@ -47,6 +47,7 @@ export const Optimise: React.FC = () => {
   const [sectorCap, setSectorCap] = useState<number | null>(2);
   const [targetReturn, setTargetReturn] = useState<number | null>(null);
   const [capital, setCapital] = useState<number>(1000000);
+  const [holdingsText, setHoldingsText] = useState('');
   const [qaoaSettings, setQaoaSettings] = useState<QaoaSettings>(DEFAULT_QAOA);
   const qubitCap = 16;
 
@@ -60,6 +61,7 @@ export const Optimise: React.FC = () => {
   const [selectedSolverKey, setSelectedSolverKey] = useState<string>('brute_force');
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  // Pending poll timeout; null means "not polling", so a reply that lands after cancel or unmount is dropped
   const pollTimerRef = useRef<number | null>(null);
 
   const fetchUniverseData = useCallback(async () => {
@@ -79,6 +81,22 @@ export const Optimise: React.FC = () => {
     fetchUniverseData();
   }, [fetchUniverseData]);
 
+  // Holdings textarea: one "SYMBOL shares" per line -> {"TCS.NS": 52}, or an error message
+  const holdings = useMemo((): Record<string, number> | string => {
+    const known = new Set(universe?.assets.map(a => a.ticker));
+    const out: Record<string, number> = {};
+    for (const line of holdingsText.split('\n').map(l => l.trim()).filter(Boolean)) {
+      const [sym, count, ...rest] = line.toUpperCase().split(/[\s,:=]+/);
+      const ticker = sym.includes('.') ? sym : `${sym}.NS`;
+      const shares = Number(count);
+      if (rest.length || !known.has(ticker) || !Number.isInteger(shares) || shares <= 0) {
+        return `Cannot read holdings line "${line}". Use one NIFTY 50 symbol and a whole number of shares per line, e.g. "TCS 52".`;
+      }
+      out[ticker] = shares;
+    }
+    return out;
+  }, [holdingsText, universe]);
+
   // Construct current RunRequest payload
   const buildRunRequest = useCallback((): RunRequest => {
     return {
@@ -88,32 +106,33 @@ export const Optimise: React.FC = () => {
       sector_cap: sectorCap,
       target_return: targetReturn,
       capital,
-      holdings: {},
+      holdings: typeof holdings === 'string' ? {} : holdings,
       qubit_cap: qubitCap,
       qaoa: qaoaSettings
     };
-  }, [selectedTickers, k, riskAversion, sectorCap, targetReturn, capital, qubitCap, qaoaSettings]);
+  }, [selectedTickers, k, riskAversion, sectorCap, targetReturn, capital, holdings, qubitCap, qaoaSettings]);
 
-  // Trigger Pre-screen API call on form changes
+  // Pre-screen preview: debounced, and a reply for an outdated form is ignored
   useEffect(() => {
     if (!universe) return;
-
-    const req = buildRunRequest();
-    setScreenLoading(true);
-    postScreen(req)
-      .then(res => setScreenInfo(res))
-      .catch(() => setScreenInfo(null))
-      .finally(() => setScreenLoading(false));
+    let stale = false;
+    const timer = window.setTimeout(() => {
+      setScreenLoading(true);
+      postScreen(buildRunRequest())
+        .then(res => { if (!stale) setScreenInfo(res); })
+        .catch(() => { if (!stale) setScreenInfo(null); })
+        .finally(() => { if (!stale) setScreenLoading(false); });
+    }, 300);
+    return () => { stale = true; clearTimeout(timer); };
   }, [universe, buildRunRequest]);
 
+  const stopPolling = () => {
+    if (pollTimerRef.current !== null) clearTimeout(pollTimerRef.current);
+    pollTimerRef.current = null;
+  };
+
   // Clear polling timer on unmount
-  useEffect(() => {
-    return () => {
-      if (pollTimerRef.current !== null) {
-        clearInterval(pollTimerRef.current);
-      }
-    };
-  }, []);
+  useEffect(() => stopPolling, []);
 
   // Set default solver selection when result arrives
   useEffect(() => {
@@ -122,25 +141,19 @@ export const Optimise: React.FC = () => {
     }
   }, [runResult]);
 
-  // Handle Polling Loop
+  // Poll every 500 ms; the next request starts only after the previous reply, so replies never overlap
   const startPolling = (jobId: string) => {
-    if (pollTimerRef.current !== null) {
-      clearInterval(pollTimerRef.current);
-    }
-
-    pollTimerRef.current = window.setInterval(async () => {
+    pollTimerRef.current = window.setTimeout(async () => {
       try {
         const status = await getRun(jobId);
+        if (pollTimerRef.current === null) return;
         setActiveJobStatus(status);
-
-        if (status.state === 'done') {
-          if (pollTimerRef.current !== null) clearInterval(pollTimerRef.current);
-          setRunResult(status.result);
-        } else if (status.state === 'error' || status.state === 'cancelled') {
-          if (pollTimerRef.current !== null) clearInterval(pollTimerRef.current);
-        }
+        if (status.state === 'done') setRunResult(status.result);
+        if (status.state === 'queued' || status.state === 'running') startPolling(jobId);
+        else pollTimerRef.current = null;
       } catch (err: any) {
-        if (pollTimerRef.current !== null) clearInterval(pollTimerRef.current);
+        if (pollTimerRef.current === null) return;
+        pollTimerRef.current = null;
         setActiveJobStatus(prev => prev ? { ...prev, state: 'error', error: err.message } : null);
       }
     }, 500);
@@ -163,7 +176,17 @@ export const Optimise: React.FC = () => {
       setValidationError('Shots must be between 256 and 20,000.');
       return;
     }
+    const nStocks = selectedTickers?.length ?? universe?.assets.filter(a => !a.excluded_reason).length ?? 0;
+    if (k > nStocks) {
+      setValidationError(`You picked ${nStocks} stocks, so a portfolio of ${k} cannot be built. Add stocks or lower K.`);
+      return;
+    }
+    if (typeof holdings === 'string') {
+      setValidationError(holdings);
+      return;
+    }
 
+    stopPolling();
     const req = buildRunRequest();
     try {
       const { job_id } = await startRun(req);
@@ -186,7 +209,7 @@ export const Optimise: React.FC = () => {
   // Cancel Handler
   const handleCancel = async () => {
     if (!activeJobStatus) return;
-    if (pollTimerRef.current !== null) clearInterval(pollTimerRef.current);
+    stopPolling();
 
     try {
       const status = await cancelRun(activeJobStatus.job_id);
@@ -232,6 +255,8 @@ export const Optimise: React.FC = () => {
       <DataBanner
         source={universe?.source}
         asOf={universe?.as_of}
+        estWindow={runResult?.data.est_window}
+        testWindow={runResult?.data.test_window}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -254,6 +279,8 @@ export const Optimise: React.FC = () => {
             setTargetReturn={setTargetReturn}
             capital={capital}
             setCapital={setCapital}
+            holdingsText={holdingsText}
+            setHoldingsText={setHoldingsText}
           />
 
           <AdvancedQaoa
@@ -288,12 +315,12 @@ export const Optimise: React.FC = () => {
           {/* Live Qubit Pre-screen Preview */}
           <ScreenPreview
             screenInfo={screenInfo}
-            loading={screenLoading}
+            loading={screenLoading && !screenInfo}
             qubitCap={qubitCap}
           />
 
           {/* Active Job Progress Panel */}
-          {activeJobStatus && activeJobStatus.state !== 'done' && (
+          {(activeJobStatus?.state === 'queued' || activeJobStatus?.state === 'running') && (
             <RunProgress
               jobStatus={activeJobStatus}
               onCancel={handleCancel}

@@ -5,7 +5,7 @@ import { StudyChart } from '../components/StudyChart';
 
 export const Evidence: React.FC = () => {
   const [studiesIndex, setStudiesIndex] = useState<StudySummary[]>([]);
-  const [activeStudyId, setActiveStudyId] = useState<string>('depth');
+  const [activeStudyId, setActiveStudyId] = useState<string>('');
   const [currentStudy, setCurrentStudy] = useState<Study | null>(null);
   const [loadingList, setLoadingList] = useState(true);
   const [loadingStudy, setLoadingStudy] = useState(false);
@@ -32,14 +32,16 @@ export const Evidence: React.FC = () => {
 
   useEffect(() => {
     if (!activeStudyId) return;
+    let stale = false; // a slow reply for a study the user already left is ignored
     setLoadingStudy(true);
     setStudyError(null);
     getStudy(activeStudyId)
-      .then(res => setCurrentStudy(res))
+      .then(res => { if (!stale) setCurrentStudy(res); })
       .catch(err => {
-        setStudyError(err.message || `Unable to load study data for ${activeStudyId}.`);
+        if (!stale) setStudyError(err.message || `Unable to load study data for ${activeStudyId}.`);
       })
-      .finally(() => setLoadingStudy(false));
+      .finally(() => { if (!stale) setLoadingStudy(false); });
+    return () => { stale = true; };
   }, [activeStudyId]);
 
   return (

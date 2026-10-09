@@ -90,7 +90,8 @@ export const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-        {activeTab === 'optimise' && <Optimise />}
+        {/* Kept mounted so a running job and its results survive a tab switch */}
+        <div hidden={activeTab !== 'optimise'}><Optimise /></div>
         {activeTab === 'evidence' && <Evidence />}
         {activeTab === 'method' && <Method />}
       </main>

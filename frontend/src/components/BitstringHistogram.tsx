@@ -16,7 +16,6 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
     .slice(0, 20)
     .map(s => ({
       ...s,
-      displayLabel: s.bitstring.length > 10 ? `${s.bitstring.substring(0, 10)}...` : s.bitstring,
       stateType: s.optimal ? 'Optimal' : s.feasible ? 'Feasible' : 'Infeasible',
       color: s.optimal ? CHART_COLORS.optimal : s.feasible ? CHART_COLORS.feasible : CHART_COLORS.infeasible
     }));
@@ -41,18 +40,18 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
           <span className="flex items-center gap-1.5 text-slate font-medium">
             <span className="w-3 h-3 rounded bg-slate"></span> Feasible
           </span>
-          <span className="flex items-center gap-1.5 text-red font-medium">
+          <span className="flex items-center gap-1.5 text-[#FF8A8A] font-medium">
             <span className="w-3 h-3 rounded bg-red"></span> Infeasible
           </span>
         </div>
       </div>
 
-      <div className="h-64 w-full">
+      <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={topSamples} margin={{ top: 10, right: 10, left: -10, bottom: 40 }}>
+          <BarChart data={topSamples} margin={{ top: 10, right: 10, left: -10, bottom: 70 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#384358" opacity={0.5} />
             <XAxis
-              dataKey="displayLabel"
+              dataKey="bitstring"
               stroke="#A9B3C9"
               fontSize={9}
               fontFamily="monospace"

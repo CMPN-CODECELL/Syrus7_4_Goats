@@ -94,7 +94,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
                 : 'text-muted hover:text-text'
             }`}
           >
-            Full NIFTY 50 (50)
+            Full NIFTY 50 ({availableTickers.length})
           </button>
           <button
             type="button"
@@ -150,10 +150,9 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
           const selected = isSelected(asset.ticker);
 
           return (
-            <div
+            <label
               key={asset.ticker}
-              onClick={() => !disabled && toggleTicker(asset.ticker)}
-              className={`p-2.5 rounded-xl border text-left transition-all ${
+              className={`block p-2.5 rounded-xl border text-left transition-all ${
                 disabled
                   ? 'bg-ink/30 border-line/40 opacity-50 cursor-not-allowed'
                   : selected
@@ -167,7 +166,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
                     type="checkbox"
                     checked={selected}
                     disabled={disabled || mode === 'all'}
-                    onChange={() => {}}
+                    onChange={() => toggleTicker(asset.ticker)}
                     className="accent-peach rounded cursor-pointer"
                   />
                   {asset.symbol}
@@ -181,11 +180,11 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
               </div>
 
               {disabled && (
-                <div className="mt-1 text-[10px] text-red font-medium flex items-center gap-1">
+                <div className="mt-1 text-[10px] text-[#FF8A8A] font-medium flex items-center gap-1">
                   <span>⚠️</span> {asset.excluded_reason}
                 </div>
               )}
-            </div>
+            </label>
           );
         })}
       </div>
