@@ -38,22 +38,32 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
 
       <div className="h-60 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={convergence} margin={{ top: 5, right: 15, left: -15, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
-            <XAxis dataKey="iter" stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={10} tickLine={false} />
-            <YAxis stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={10} tickLine={false} domain={['auto', 'auto']} />
+          <LineChart data={convergence} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#1F1F28" vertical={false} />
+            <XAxis dataKey="iter" stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} />
+            <YAxis stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} width={55} domain={['auto', 'auto']} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#0A0A0A', borderColor: '#6B6B6B', borderRadius: 0, fontSize: '11px', color: '#FFFFFF' }}
-              labelFormatter={(iter: any) => `Iteration ${iter}`}
-              formatter={(val: any) => [formatNumber(Number(val), 5), 'Energy ⟨H⟩']}
+              content={({ active, payload, label }: any) => {
+                if (!active || !payload?.[0]) return null;
+                const val = payload[0].value;
+                return (
+                  <div className="bg-surface-elevated/95 border border-line-strong backdrop-blur-md px-3 py-2 text-xs text-text shadow-xl">
+                    <div className="text-muted font-mono text-[10px] mb-1">Iteration #{label}</div>
+                    <div className="flex items-center gap-2 font-mono text-[11px]">
+                      <span className="text-muted">Energy ⟨H⟩:</span>
+                      <span className={`font-medium ${negativeClass(val)}`}>{formatNumber(Number(val), 5)}</span>
+                    </div>
+                  </div>
+                );
+              }}
             />
             <Line
               type="monotone"
               dataKey="energy"
-              stroke={CHART_COLORS.qaoa_standard}
+              stroke="#FFFFFF"
               strokeWidth={2}
-              dot={{ r: 2, fill: CHART_COLORS.qaoa_standard }}
-              activeDot={{ r: 5, fill: CHART_COLORS.qaoa_standard, stroke: '#000000', strokeWidth: 2 }}
+              dot={{ r: 2, fill: '#FFFFFF' }}
+              activeDot={{ r: 5, fill: '#FFFFFF', stroke: '#000000', strokeWidth: 2 }}
               isAnimationActive={false}
             />
           </LineChart>

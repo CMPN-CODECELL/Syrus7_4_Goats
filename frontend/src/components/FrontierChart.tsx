@@ -67,39 +67,48 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
       {/* Recharts Wrapper */}
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+          <ComposedChart margin={{ top: 15, right: 25, left: 15, bottom: 25 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#1F1F28" vertical={false} />
             <XAxis
               dataKey="risk"
               type="number"
               domain={['auto', 'auto']}
-              stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }}
-              fontSize={11}
-              tickFormatter={(v: any) => formatPercent(v, 0)}
-              label={{ value: 'Annualised Volatility (Risk)', position: 'insideBottom', offset: -12, fill: '#A3A3A3', fontSize: 11 }}
+              stroke="#8E8EA0"
+              tick={{ fill: '#8E8EA0', fontSize: 10 }}
+              fontSize={10}
+              tickLine={false}
+              tickFormatter={(v: any) => formatPercent(v, 1)}
+              label={{ value: 'Annualised Volatility (Risk)', position: 'insideBottom', offset: -14, fill: '#8E8EA0', fontSize: 11 }}
             />
             <YAxis
               dataKey="ret"
               type="number"
               domain={['auto', 'auto']}
-              stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }}
-              fontSize={11}
-              tickFormatter={(v: any) => formatPercent(v, 0)}
-              label={{ value: 'Expected Return', angle: -90, position: 'insideLeft', offset: 10, fill: '#A3A3A3', fontSize: 11 }}
+              width={52}
+              stroke="#8E8EA0"
+              tick={{ fill: '#8E8EA0', fontSize: 10 }}
+              fontSize={10}
+              tickLine={false}
+              tickFormatter={(v: any) => formatPercent(v, 1)}
+              label={{ value: 'Expected Return', angle: -90, position: 'insideLeft', offset: -5, fill: '#8E8EA0', fontSize: 11 }}
             />
             <Tooltip
               shared={false}
               cursor={false}
-              content={({ active, payload }) => {
+              content={({ active, payload }: any) => {
                 const p = active ? payload?.[0]?.payload : null;
                 if (!p) return null;
                 return (
-                  <div className="bg-surface border border-line px-3 py-2 text-[11px] text-text max-w-64">
-                    <div className="font-medium mb-0.5">{p.name}</div>
-                    <div className="text-muted">
-                      Volatility {formatPercent(p.risk)} · Return{' '}
-                      <span className={`font-medium ${gainLossClass(p.ret)}`}>
-                        {formatSignedPercent(p.ret)}
+                  <div className="bg-surface-elevated/95 border border-line-strong backdrop-blur-md px-3.5 py-2.5 text-xs text-text shadow-xl">
+                    <div className="font-medium text-text border-b border-line pb-1 mb-1.5">
+                      {p.name}
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[11px]">
+                      <span className="text-muted">Volatility:</span>
+                      <span className="text-right text-text">{formatPercent(p.risk, 1)}</span>
+                      <span className="text-muted">Expected Return:</span>
+                      <span className={`text-right font-medium ${gainLossClass(p.ret)}`}>
+                        {formatSignedPercent(p.ret, 1)}
                       </span>
                     </div>
                   </div>

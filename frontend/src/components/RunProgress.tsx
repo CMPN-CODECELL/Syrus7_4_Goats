@@ -66,14 +66,24 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
           {/* Recharts container with explicit height wrapper */}
           <div className="h-44 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={convergence} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
-                <XAxis dataKey="iter" stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={10} tickLine={false} />
-                <YAxis stroke="#A3A3A3" tick={{ fill: '#A3A3A3' }} fontSize={10} tickLine={false} domain={['auto', 'auto']} />
+              <LineChart data={convergence} margin={{ top: 8, right: 15, left: 10, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F1F28" vertical={false} />
+                <XAxis dataKey="iter" stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} />
+                <YAxis stroke="#8E8EA0" tick={{ fill: '#8E8EA0' }} fontSize={10} tickLine={false} width={50} domain={['auto', 'auto']} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0A0A0A', borderColor: '#6B6B6B', borderRadius: 0, fontSize: '11px', color: '#FFFFFF' }}
-                  labelFormatter={(label: any) => `Iteration ${label}`}
-                  formatter={(val: any) => [Number(val).toFixed(5), 'Energy F(x)']}
+                  content={({ active, payload, label }: any) => {
+                    if (!active || !payload?.[0]) return null;
+                    const val = payload[0].value;
+                    return (
+                      <div className="bg-surface-elevated/95 border border-line-strong backdrop-blur-md px-3 py-2 text-xs text-text shadow-xl">
+                        <div className="text-muted font-mono text-[10px] mb-1">Iteration #{label}</div>
+                        <div className="flex items-center gap-2 font-mono text-[11px]">
+                          <span className="text-muted">Energy F(x):</span>
+                          <span className={`font-medium ${negativeClass(val)}`}>{Number(val).toFixed(5)}</span>
+                        </div>
+                      </div>
+                    );
+                  }}
                 />
                 <Line
                   type="monotone"
