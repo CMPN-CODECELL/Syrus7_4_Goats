@@ -14,10 +14,10 @@
   --color-faint: #565666;
   --color-gain: #22C55E;
   --color-loss: #EF4444;
-  --color-accent-blue: #2563EB;
-  --color-accent-blue-hover: #3B82F6;
-  --color-accent-blue-subtle: rgba(37, 99, 235, 0.12);
-  --color-accent-blue-border: rgba(59, 130, 246, 0.35);
+  --color-accent-blue: #FFFFFF; /* black-and-white theme: the old blue accent is now white */
+  --color-accent-blue-hover: #FFFFFF;
+  --color-accent-blue-subtle: rgba(255, 255, 255, 0.08);
+  --color-accent-blue-border: rgba(255, 255, 255, 0.35);
 
   --font-sans: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;

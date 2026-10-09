@@ -5,6 +5,9 @@ import { Method } from './pages/Method';
 import { GlossaryPage } from './pages/GlossaryPage';
 import { GlossaryDrawer } from './components/Glossary';
 import { getHealth } from './api/client';
+import { Landing } from './pages/Landing';
+import { Tour } from './components/tour/Tour';
+import { TOUR_DONE_KEY } from './components/tour/tourSteps';
 
 type Tab = 'optimise' | 'method' | 'evidence' | 'glossary';
 
@@ -20,6 +23,8 @@ export const App: React.FC = () => {
   const [glossaryDrawerOpen, setGlossaryDrawerOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
+  const [home, setHome] = useState(true);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Poll backend health status periodically
   useEffect(() => {
@@ -112,8 +117,26 @@ export const App: React.FC = () => {
     setMobileMenuOpen(false);
   };
 
+  // Leave the landing page for Optimise; the tour opens on request, or on a first visit.
+  const start = (tour: boolean) => {
+    setHome(false);
+    handleTabChange('optimise');
+    window.scrollTo({ top: 0 });
+    let seen = false;
+    try { seen = localStorage.getItem(TOUR_DONE_KEY) === '1'; } catch { /* storage blocked */ }
+    if (tour || !seen) setTourOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-bg text-text flex selection:bg-accent-blue selection:text-white">
+    <>
+    {home && (
+      <div className="min-h-screen bg-bg text-text px-4 sm:px-6 py-10">
+        <div className="max-w-5xl mx-auto">
+          <Landing onStart={() => start(false)} onTour={() => start(true)} />
+        </div>
+      </div>
+    )}
+    <div hidden={home} className="min-h-screen bg-bg text-text flex selection:bg-text selection:text-bg">
       {/* =========================================================================
           LEFT SIDEBAR (Fixed Desktop, Collapsible Drawer Mobile)
           ========================================================================= */}
@@ -177,6 +200,7 @@ export const App: React.FC = () => {
                     key={item.id}
                     type="button"
                     onClick={() => handleTabChange(item.id)}
+                    data-tour={item.id === 'evidence' ? 'evidence-tab' : undefined}
                     aria-current={isActive ? 'page' : undefined}
                     className={`w-full text-left px-3.5 py-3 transition-all flex items-center space-x-3 border-l-2 focus-visible:outline-white ${
                       isActive
@@ -289,6 +313,12 @@ export const App: React.FC = () => {
 
           {/* Right Status Tags */}
           <div className="flex items-center space-x-2 shrink-0">
+            <button type="button" onClick={() => { setHome(true); window.scrollTo({ top: 0 }); }} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[10px] font-mono uppercase text-muted hover:text-text">
+              Home
+            </button>
+            <button type="button" onClick={() => start(true)} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[10px] font-mono uppercase text-muted hover:text-text">
+              Tour
+            </button>
             <span className="hidden sm:inline-flex items-center px-2 py-0.5 bg-surface text-muted border border-line text-[10px] font-mono">
               UNIVERSE: NIFTY 50
             </span>
@@ -332,6 +362,8 @@ export const App: React.FC = () => {
         onClose={() => setGlossaryDrawerOpen(false)}
       />
     </div>
+    <Tour open={tourOpen} onClose={() => setTourOpen(false)} />
+    </>
   );
 };
 
