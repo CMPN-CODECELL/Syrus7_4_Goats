@@ -1,0 +1,10 @@
+{
+  "job_id": "d4e5f6",
+  "state": "error",
+  "progress": 0.18,
+  "stage": "Building the QUBO",
+  "convergence": [],
+  "elapsed_s": 0.9,
+  "result": null,
+  "error": "Only 4 of the 6 chosen stocks have enough price history in the estimation window, so a portfolio of 5 cannot be built. Add more stocks or lower the number of picks."
+}

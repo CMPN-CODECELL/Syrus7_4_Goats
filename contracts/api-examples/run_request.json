@@ -1,0 +1,11 @@
+{
+  "tickers": null,
+  "k": 5,
+  "risk_aversion": 0.5,
+  "sector_cap": 2,
+  "target_return": null,
+  "capital": 1000000,
+  "holdings": {},
+  "qubit_cap": 16,
+  "qaoa": {"variant": "standard", "reps": 2, "optimizer": "COBYLA", "init": "ramp", "shots": 4096, "maxiter": 150, "noise": false, "seed": 7}
+}

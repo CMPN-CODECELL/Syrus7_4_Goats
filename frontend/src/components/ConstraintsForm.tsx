@@ -99,10 +99,10 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
               <button
                 type="button"
                 onClick={() => setSectorCap(sectorCap === null ? 2 : null)}
-                className={`text-[11px] px-2 py-0.5 rounded font-medium transition-colors ${
+                className={`text-xs px-3 py-1.5 min-h-[44px] rounded-xl font-medium transition-colors flex items-center justify-center ${
                   sectorCap === null
                     ? 'bg-line text-muted'
-                    : 'bg-peach text-ink font-bold'
+                    : 'bg-peach text-ink font-bold shadow'
                 }`}
               >
                 {sectorCap === null ? 'OFF' : `ON (${sectorCap})`}
@@ -117,7 +117,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                 max={5}
                 value={sectorCap}
                 onChange={(e) => setSectorCap(Math.max(1, Math.min(5, Number(e.target.value))))}
-                className="w-24 bg-ink border border-line rounded-xl px-3 py-1.5 text-xs text-text focus:outline-none focus:border-peach"
+                className="w-24 min-h-[44px] bg-ink border border-line rounded-xl px-3 py-1.5 text-xs text-text focus:outline-none focus:border-peach"
               />
               <span className="text-xs text-muted">Max stocks per individual industry sector</span>
             </div>
@@ -135,10 +135,10 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             <button
               type="button"
               onClick={() => setTargetReturn(targetReturn === null ? 0.12 : null)}
-              className={`text-[11px] px-2 py-0.5 rounded font-medium transition-colors ${
+              className={`text-xs px-3 py-1.5 min-h-[44px] rounded-xl font-medium transition-colors flex items-center justify-center ${
                 targetReturn === null
                   ? 'bg-line text-muted'
-                  : 'bg-peach text-ink font-bold'
+                  : 'bg-peach text-ink font-bold shadow'
               }`}
             >
               {targetReturn === null ? 'OFF' : `ON (${(targetReturn * 100).toFixed(1)}%)`}
@@ -153,7 +153,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                 step={0.5}
                 value={(targetReturn * 100).toFixed(1)}
                 onChange={(e) => setTargetReturn(Number(e.target.value) / 100)}
-                className="w-24 bg-ink border border-line rounded-xl px-3 py-1.5 text-xs text-text focus:outline-none focus:border-peach"
+                className="w-24 min-h-[44px] bg-ink border border-line rounded-xl px-3 py-1.5 text-xs text-text focus:outline-none focus:border-peach"
               />
               <span className="text-xs text-muted">Min required net annual return after transaction costs</span>
             </div>
@@ -178,7 +178,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                 key={val}
                 type="button"
                 onClick={() => setCapital(val)}
-                className={`py-1.5 px-3 text-xs font-medium rounded-xl border transition-all ${
+                className={`py-2 px-3 min-h-[44px] text-xs font-medium rounded-xl border transition-all flex items-center justify-center ${
                   capital === val
                     ? 'bg-peach/15 border-peach text-peach font-bold'
                     : 'bg-ink/50 border-line text-muted hover:text-text'

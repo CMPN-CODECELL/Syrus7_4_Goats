@@ -88,7 +88,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
           <button
             type="button"
             onClick={() => handleModeChange('all')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+            className={`px-3 py-2 min-h-[44px] text-xs font-medium rounded-lg transition-all flex items-center justify-center ${
               mode === 'all'
                 ? 'bg-peach text-ink font-bold shadow'
                 : 'text-muted hover:text-text'
@@ -99,7 +99,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
           <button
             type="button"
             onClick={() => handleModeChange('custom')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+            className={`px-3 py-2 min-h-[44px] text-xs font-medium rounded-lg transition-all flex items-center justify-center ${
               mode === 'custom'
                 ? 'bg-peach text-ink font-bold shadow'
                 : 'text-muted hover:text-text'
@@ -118,12 +118,12 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
             placeholder="Search stock by name, symbol, or ticker..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-ink/80 border border-line rounded-xl px-3.5 py-2 text-xs text-text placeholder-muted focus:outline-none focus:border-peach focus:ring-1 focus:ring-peach transition-colors"
+            className="w-full min-h-[44px] bg-ink/80 border border-line rounded-xl px-3.5 py-2 text-xs text-text placeholder-muted focus:outline-none focus:border-peach focus:ring-1 focus:ring-peach transition-colors"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text text-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text text-xs min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               ✕
             </button>
@@ -133,7 +133,7 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
         <select
           value={selectedSector}
           onChange={(e) => setSelectedSector(e.target.value)}
-          className="bg-ink/80 border border-line rounded-xl px-3 py-2 text-xs text-text focus:outline-none focus:border-peach focus:ring-1 focus:ring-peach"
+          className="bg-ink/80 border border-line rounded-xl px-3 py-2 min-h-[44px] text-xs text-text focus:outline-none focus:border-peach focus:ring-1 focus:ring-peach"
         >
           {sectors.map(sec => (
             <option key={sec} value={sec} className="bg-panel text-text">

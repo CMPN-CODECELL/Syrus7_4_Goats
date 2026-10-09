@@ -63,15 +63,15 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
             <YAxis
               stroke="#A9B3C9"
               fontSize={10}
-              tickFormatter={(v) => formatPercent(v, 0)}
+              tickFormatter={(v: any) => formatPercent(v, 0)}
             />
             <Tooltip
               contentStyle={{ backgroundColor: '#242F49', borderColor: '#384358', borderRadius: '8px', fontSize: '11px', color: '#F4EFEA' }}
-              formatter={(val: any, _, item: any) => [
+              formatter={(val: any, _: any, item: any) => [
                 `${formatPercent(Number(val))} (${item.payload.stateType})`,
                 'Probability'
               ]}
-              labelFormatter={(label) => `Bitstring: ${label}`}
+              labelFormatter={(label: any) => `Bitstring: ${label}`}
             />
             <Bar dataKey="prob" radius={[4, 4, 0, 0]}>
               {topSamples.map((entry, index) => (

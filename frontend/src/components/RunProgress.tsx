@@ -29,7 +29,7 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 bg-red/20 text-red border border-red/40 hover:bg-wine hover:text-text text-xs font-bold rounded-xl transition-all self-start sm:self-auto"
+          className="px-4 py-2 min-h-[44px] bg-red/20 text-[#FF8A8A] border border-red/40 hover:bg-wine hover:text-text text-xs font-bold rounded-xl transition-all self-start sm:self-auto flex items-center justify-center"
         >
           Cancel Optimization
         </button>
@@ -70,7 +70,7 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
                 <YAxis stroke="#A9B3C9" fontSize={10} tickLine={false} domain={['auto', 'auto']} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#242F49', borderColor: '#384358', borderRadius: '8px', fontSize: '11px', color: '#F4EFEA' }}
-                  labelFormatter={(label) => `Iteration ${label}`}
+                  labelFormatter={(label: any) => `Iteration ${label}`}
                   formatter={(val: any) => [Number(val).toFixed(5), 'Energy F(x)']}
                 />
                 <Line

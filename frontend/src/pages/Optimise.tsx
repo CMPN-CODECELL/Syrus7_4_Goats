@@ -209,14 +209,14 @@ export const Optimise: React.FC = () => {
     return (
       <div className="max-w-2xl mx-auto p-6 bg-wine/30 border border-wine rounded-2xl text-center space-y-4 shadow-panel">
         <div className="text-2xl">⚠️</div>
-        <h2 className="text-base font-bold text-red">Backend Connection Offline</h2>
+        <h2 className="text-base font-bold text-[#FF8A8A]">Backend Connection Offline</h2>
         <p className="text-xs text-muted font-mono">{apiError}</p>
         <p className="text-xs text-text">
           Ensure FastAPI backend is running on <code className="text-peach font-mono">http://localhost:8000</code> or launch with <code className="text-peach font-mono">VITE_USE_MOCKS=1</code> for offline mock mode.
         </p>
         <button
           onClick={fetchUniverseData}
-          className="px-5 py-2.5 bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
+          className="px-5 py-2.5 min-h-[44px] bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
         >
           Retry Connection
         </button>
@@ -263,7 +263,7 @@ export const Optimise: React.FC = () => {
 
           {/* Validation Error Banner */}
           {validationError && (
-            <div className="p-4 bg-wine/40 border border-wine rounded-2xl text-xs text-red font-medium flex items-center gap-2">
+            <div className="p-4 bg-wine/40 border border-wine rounded-2xl text-xs text-[#FF8A8A] font-medium flex items-center gap-2">
               <span>🛑</span> {validationError}
             </div>
           )}
@@ -273,7 +273,7 @@ export const Optimise: React.FC = () => {
             type="button"
             onClick={handleStartRun}
             disabled={activeJobStatus?.state === 'running' || activeJobStatus?.state === 'queued'}
-            className={`w-full py-4 px-6 text-sm font-extrabold rounded-2xl shadow-panel transition-all transform active:scale-[0.99] flex items-center justify-center space-x-2 ${
+            className={`w-full py-4 px-6 min-h-[48px] text-sm font-extrabold rounded-2xl shadow-panel transition-all transform active:scale-[0.99] flex items-center justify-center space-x-2 ${
               activeJobStatus?.state === 'running' || activeJobStatus?.state === 'queued'
                 ? 'bg-line text-muted cursor-not-allowed opacity-60'
                 : 'bg-hero-bar text-ink hover:opacity-95 text-text font-bold border border-peach/40 cursor-pointer'
@@ -303,7 +303,7 @@ export const Optimise: React.FC = () => {
           {/* Job Error State */}
           {activeJobStatus?.state === 'error' && (
             <div className="p-5 bg-wine/40 border border-wine rounded-2xl text-xs space-y-2">
-              <h3 className="font-bold text-red flex items-center gap-2">
+              <h3 className="font-bold text-[#FF8A8A] flex items-center gap-2">
                 <span>❌</span> Optimization Failed
               </h3>
               <p className="text-text font-mono text-[11px] leading-relaxed">
@@ -318,7 +318,7 @@ export const Optimise: React.FC = () => {
               <span>Run was cancelled. Input form is ready for a new optimization run.</span>
               <button
                 onClick={() => setActiveJobStatus(null)}
-                className="text-peach font-bold underline"
+                className="text-peach font-bold underline min-h-[44px] flex items-center px-2"
               >
                 Reset
               </button>
@@ -389,6 +389,25 @@ export const Optimise: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Sticky Mobile Cancel Banner during active run (U15) */}
+      {activeJobStatus && (activeJobStatus.state === 'running' || activeJobStatus.state === 'queued') && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-panel/95 backdrop-blur-md border-t border-peach/40 p-3 px-4 shadow-panel flex items-center justify-between sm:hidden animate-in slide-in-from-bottom duration-200">
+          <div className="flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-peach animate-ping"></span>
+            <span className="text-xs font-bold text-text truncate max-w-[190px]">
+              {activeJobStatus.stage || 'Optimizing...'}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="px-4 py-2 min-h-[44px] bg-red/20 text-[#FF8A8A] border border-red/40 hover:bg-wine text-xs font-bold rounded-xl transition-all flex items-center justify-center"
+          >
+            Cancel Run
+          </button>
+        </div>
+      )}
     </div>
   );
 };
