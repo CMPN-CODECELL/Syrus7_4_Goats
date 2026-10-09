@@ -221,6 +221,16 @@ export interface RunResult {
   recommended: string;
   /** Beta of each stock to the equal-weight market of the requested universe (estimation window). Used by the stress tests. */
   betas?: Record<string, number> | null;
+  /** Weekly OHLC of each feasible portfolio's rupee value over the test window (equal-weight buy-and-hold), plus 'nifty50'. */
+  candles?: Record<string, Candle[]> | null;
+}
+
+export interface Candle {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
 }
 
 export interface JobStatus {

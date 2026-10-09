@@ -22,6 +22,7 @@ import { ConvergenceChart } from '../components/ConvergenceChart';
 import { BitstringHistogram } from '../components/BitstringHistogram';
 import { HonestyPanel } from '../components/HonestyPanel';
 import { StressTest } from '../components/StressTest';
+import { MethodCompare } from '../components/MethodCompare';
 import { OutOfSample } from '../components/OutOfSample';
 import { getSolverStyle } from '../lib/chartColors';
 import { SolverMarker } from '../components/SolverMarker';
@@ -904,6 +905,9 @@ export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onRe
                   /></div>
 
                   {/* Market crash stress tests on the selected portfolio */}
+                  {/* Visual comparison of the four methods */}
+                  <MethodCompare result={runResult} />
+
                   <StressTest key={selectedSolver.solver} solver={selectedSolver} betas={runResult.betas} />
 
                   {/* Markowitz Efficient Frontier */}

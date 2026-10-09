@@ -229,7 +229,8 @@ class RunResult(BaseModel):
     benchmarks: dict[str, OOS]
     verdict: Verdict
     recommended: SolverId
-    betas: dict[str, float] | None = None  # stress tests: beta to the equal-weight market of the requested universe, estimation window only
+    betas: dict[str, float] | None = None
+    candles: dict[str, list[dict]] | None = None  # weekly OHLC of each portfolio's rupee value over the test window, plus nifty50  # stress tests: beta to the equal-weight market of the requested universe, estimation window only
 
 
 # --- 2.5 JobStatus ----------------------------------------------------------

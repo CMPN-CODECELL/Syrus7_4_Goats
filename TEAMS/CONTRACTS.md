@@ -219,7 +219,8 @@ Base path is `/api`. Every response is JSON. An error body looks like `{"detail"
               "details": ["It sampled the exact optimum with probability 8.3%, 17x more often than a random guess (0.48%).",
                           "Brute force solved this 10-stock instance exactly in 0.04 s; no speed benefit is claimed at this size."]},
   "recommended": "brute_force",
-  "betas": {"TCS.NS": 0.82, "...": 1.0}
+  "betas": {"TCS.NS": 0.82, "...": 1.0},
+  "candles": {"brute_force": [{"date": "2025-10-03", "open": 1000000, "high": 1004100, "low": 998200, "close": 1002300}], "nifty50": ["..."]}
 }
 ```
 - **Solver ids:** `brute_force`, `relaxation`, `annealing`, `qaoa_standard`, `qaoa_xy`.
