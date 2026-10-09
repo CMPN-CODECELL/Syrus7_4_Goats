@@ -575,7 +575,9 @@
     },
     "recommended": "brute_force",
     "betas": null,
-    "candles": null
+    "candles": null,
+    "assets": null,
+    "correlation": null
   },
   "error": null
 }
