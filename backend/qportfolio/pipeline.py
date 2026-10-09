@@ -1,21 +1,121 @@
-"""Pipeline entry point (CONTRACTS.md 1.5). Stub until U10: returns the example result."""
+"""Pipeline orchestrator (CONTRACTS.md 1.5, U10): one RunRequest in, one RunResult out."""
 from __future__ import annotations
 
 import threading
+import uuid
 from collections.abc import Callable
-from pathlib import Path
-
-from .contracts import JobStatus, RunRequest, RunResult
-
-EXAMPLE = Path(__file__).resolve().parents[2] / "contracts" / "api-examples" / "job_done.json"
+from dataclasses import asdict
 
 
 class Cancelled(Exception):
-    pass
+    """Defined before the heavier imports: quantum/qaoa.py imports it from this module."""
+
+
+from .classical import annealing, brute_force, relaxation  # noqa: E402
+from .contracts import (  # noqa: E402
+    OOS,
+    DataInfo,
+    LandscapeSummary,
+    PortfolioOut,
+    QaoaBlock,
+    QuboInfo,
+    RunRequest,
+    RunResult,
+    ScreenInfo,
+)
+from .data import (  # noqa: E402
+    benchmark_oos,
+    build_market,
+    linear_costs,
+    out_of_sample,
+    prescreen,
+    to_shares,
+)
+from .frontier import frontier  # noqa: E402
+from .problem import Problem  # noqa: E402
+from .qubo.builder import build_qubo  # noqa: E402
+from .verdict import verdict  # noqa: E402
+
+SURVIVORSHIP_NOTE = "Survivorship bias: today's NIFTY 50 list is used for past dates."
 
 
 def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], None] | None = None,
         cancel: threading.Event | None = None) -> RunResult:
-    if cancel is not None and cancel.is_set():
-        raise Cancelled
-    return JobStatus.model_validate_json(EXAMPLE.read_text(encoding="utf-8")).result
+    from .quantum.qaoa import qaoa_solve  # late: qaoa imports Cancelled from this module
+
+    def step(fraction: float, stage: str) -> None:
+        """Report a finished stage; the cancel check between stages lives here."""
+        if cancel is not None and cancel.is_set():
+            raise Cancelled
+        if on_progress is not None:
+            on_progress(fraction, stage, None)
+
+    step(0.0, "Starting")
+    full = build_market(request.tickers)
+    step(0.05, "Market data loaded")
+
+    # prescreen returns applied=False when the universe already fits; target_return adds 3 slack bits it cannot see.
+    budget = request.qubit_cap - 3 if request.target_return is not None else request.qubit_cap
+    s = prescreen(full, request.k, budget, request.sector_cap)
+    screen = ScreenInfo(applied=s.applied, rule=s.rule, kept=s.kept, dropped=s.dropped, qubits=asdict(s.qubits))
+    market = full.subset(screen.kept) if screen.applied else full
+    step(0.1, "Universe screened")
+
+    # Holdings are share counts; weights use estimation-end prices of the full market (a dropped holding still costs a sale).
+    prices = dict(zip(full.tickers, full.est_end_prices))
+    weights = {t: n * float(prices[t]) / request.capital for t, n in request.holdings.items() if t in prices}
+    notes = [SURVIVORSHIP_NOTE]
+    if len(weights) < len(request.holdings):
+        unpriced = ", ".join(sorted(set(request.holdings) - set(weights)))
+        notes.append(f"Holdings without a price in the market were ignored in transaction costs: {unpriced}.")
+    lin, const = linear_costs(market.tickers, request.k, weights)
+    problem = Problem(tickers=market.tickers, sectors=market.sectors, mu=market.mu, sigma=market.sigma, k=request.k,
+                      q=request.risk_aversion, cost_lin=lin, cost_const=const, sector_cap=request.sector_cap,
+                      target_return=request.target_return)
+    qubo = build_qubo(problem)  # tunes the penalties
+    step(0.15, "QUBO built")
+
+    exact, landscape = brute_force(problem)
+    solvers = [exact, relaxation(problem), annealing(problem, qubo, seed=request.qaoa.seed)]
+    step(0.3, "Classical baselines solved")
+
+    def qaoa_progress(fraction: float, stage: str, point: dict | None) -> None:
+        on_progress(0.3 + 0.6 * fraction, stage, point)
+
+    qaoa_result, block = qaoa_solve(problem, qubo, request.qaoa, qaoa_progress if on_progress else None, cancel,
+                                    landscape)
+    solvers.append(qaoa_result)
+    qaoa = QaoaBlock.model_validate(block)
+    step(0.9, "QAOA sampled")
+
+    # Allocation and out-of-sample score for every solver that picked something (feasible or not).
+    for i, r in enumerate(solvers):
+        if r.selection is not None:
+            portfolio = PortfolioOut(**asdict(to_shares(market.tickers, market.est_end_prices, request.capital,
+                                                        r.selection)))
+            oos = OOS(**asdict(out_of_sample(market, r.selection)))
+            solvers[i] = r.model_copy(update={"portfolio": portfolio, "oos": oos})
+
+    # Recommend the feasible solver with the lowest objective; ties go to the earlier (exact) solver.
+    recommended = min((r for r in solvers if r.feasible), key=lambda r: r.objective).solver
+    w = full.windows
+    result = RunResult(
+        run_id=uuid.uuid4().hex[:6],
+        request=request,
+        data=DataInfo(source=full.source, as_of=full.as_of, est_window=(w.est_start, w.est_end),
+                      test_window=(w.test_start, w.test_end), excluded=full.excluded, filled=full.filled,
+                      notes=notes),
+        screen=screen,
+        qubo=QuboInfo(n_vars=qubo.n_assets + qubo.n_slack, n_assets=qubo.n_assets, n_slack=qubo.n_slack,
+                      terms=["objective", *qubo.penalties, "transaction_cost"], penalties=qubo.penalties),
+        landscape=LandscapeSummary(n_feasible=len(landscape.selections), f_min=landscape.f_min,
+                                   f_max=landscape.f_max, f_mean=landscape.f_mean),
+        solvers=solvers,
+        qaoa=qaoa,
+        frontier=frontier(market, landscape),
+        benchmarks={"nifty50": OOS(**asdict(benchmark_oos(market)))},
+        verdict=verdict(solvers, landscape, qaoa.metrics),
+        recommended=recommended,
+    )
+    step(1.0, "Done")
+    return result

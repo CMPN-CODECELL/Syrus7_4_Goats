@@ -48,7 +48,7 @@ class RunRequest(BaseModel):
     target_return: float | None = None
     capital: float = 1_000_000
     holdings: dict[str, int] = {}  # ticker -> share count
-    qubit_cap: int = 16
+    qubit_cap: int = 12  # 16 allowed (FakeGuadalupeV2 size) but ~3 min per live run; 12 keeps it under a minute
     qaoa: QaoaSettings = QaoaSettings()
 
 
