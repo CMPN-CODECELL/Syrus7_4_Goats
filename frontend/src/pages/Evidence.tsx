@@ -11,6 +11,7 @@ export const Evidence: React.FC = () => {
   const [loadingStudy, setLoadingStudy] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
   const [studyError, setStudyError] = useState<string | null>(null);
+  const [studyReload, setStudyReload] = useState(0); // bump to re-fetch the open study
 
   const fetchStudiesIndex = () => {
     setLoadingList(true);
@@ -42,7 +43,7 @@ export const Evidence: React.FC = () => {
       })
       .finally(() => { if (!stale) setLoadingStudy(false); });
     return () => { stale = true; };
-  }, [activeStudyId]);
+  }, [activeStudyId, studyReload]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -78,7 +79,7 @@ export const Evidence: React.FC = () => {
           <div className="text-xl text-peach">📁</div>
           <h2 className="text-sm font-bold text-text">No Studies Available Yet</h2>
           <p className="text-xs text-muted max-w-md mx-auto">
-            Benchmark studies are generated offline by <code className="text-peach font-mono">scripts/run_studies.py</code>. Launch with <code className="text-peach font-mono">VITE_USE_MOCKS=1</code> to explore pre-computed benchmark study artifacts.
+            Benchmark studies are generated offline by <code className="text-peach font-mono">scripts/run_studies.py</code>. Run it, then reload this page.
           </p>
         </div>
       ) : (
@@ -110,7 +111,14 @@ export const Evidence: React.FC = () => {
           ) : studyError ? (
             <div className="bg-wine/30 border border-wine rounded-2xl p-6 shadow-panel text-center space-y-3">
               <h3 className="text-xs font-bold text-[#FF8A8A]">Study Unavailable</h3>
-              <p className="text-xs text-text">{studyError}</p>
+              <p className="text-xs text-text break-words">{studyError}</p>
+              <button
+                type="button"
+                onClick={() => setStudyReload(n => n + 1)}
+                className="px-5 py-2.5 min-h-[44px] bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
+              >
+                Retry
+              </button>
             </div>
           ) : currentStudy ? (
             <StudyChart study={currentStudy} />

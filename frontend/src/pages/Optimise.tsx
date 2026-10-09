@@ -61,8 +61,10 @@ export const Optimise: React.FC = () => {
   const [selectedSolverKey, setSelectedSolverKey] = useState<string>('brute_force');
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Pending poll timeout; null means "not polling", so a reply that lands after cancel or unmount is dropped
+  // Pending poll timeout, and the one job we are polling. A reply for any other job (after cancel, a new run or unmount) is dropped.
   const pollTimerRef = useRef<number | null>(null);
+  const activeJobRef = useRef<string | null>(null);
+  const rightPanelRef = useRef<HTMLDivElement | null>(null);
 
   const fetchUniverseData = useCallback(async () => {
     setLoadingUniverse(true);
@@ -129,6 +131,7 @@ export const Optimise: React.FC = () => {
   const stopPolling = () => {
     if (pollTimerRef.current !== null) clearTimeout(pollTimerRef.current);
     pollTimerRef.current = null;
+    activeJobRef.current = null;
   };
 
   // Clear polling timer on unmount
@@ -142,18 +145,32 @@ export const Optimise: React.FC = () => {
   }, [runResult]);
 
   // Poll every 500 ms; the next request starts only after the previous reply, so replies never overlap
-  const startPolling = (jobId: string) => {
+  // A single failed poll is retried; three in a row end the run with the error message.
+  const startPolling = (jobId: string, failures = 0) => {
+    activeJobRef.current = jobId;
     pollTimerRef.current = window.setTimeout(async () => {
       try {
         const status = await getRun(jobId);
-        if (pollTimerRef.current === null) return;
+        if (activeJobRef.current !== jobId) return;
+        if (status.state === 'queued' || status.state === 'running') {
+          setActiveJobStatus(status);
+          startPolling(jobId);
+          return;
+        }
+        stopPolling();
+        if (status.state === 'done' && !status.result) {
+          setActiveJobStatus({ ...status, state: 'error', error: 'The run finished but the server sent no result.' });
+          return;
+        }
         setActiveJobStatus(status);
         if (status.state === 'done') setRunResult(status.result);
-        if (status.state === 'queued' || status.state === 'running') startPolling(jobId);
-        else pollTimerRef.current = null;
       } catch (err: any) {
-        if (pollTimerRef.current === null) return;
-        pollTimerRef.current = null;
+        if (activeJobRef.current !== jobId) return;
+        if (failures < 2) {
+          startPolling(jobId, failures + 1);
+          return;
+        }
+        stopPolling();
         setActiveJobStatus(prev => prev ? { ...prev, state: 'error', error: err.message } : null);
       }
     }, 500);
@@ -163,6 +180,7 @@ export const Optimise: React.FC = () => {
   const handleStartRun = async () => {
     setValidationError(null);
     setRunResult(null);
+    setActiveJobStatus(null);
 
     if (k < 2 || k > 15) {
       setValidationError('Cardinality (K) must be between 2 and 15 stocks.');
@@ -201,8 +219,12 @@ export const Optimise: React.FC = () => {
         error: null
       });
       startPolling(job_id);
+      // On a phone the progress panel sits below the form: bring it into view
+      if (window.matchMedia('(max-width: 1023px)').matches) {
+        rightPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     } catch (err: any) {
-      setValidationError(`Failed to submit job: ${err.message}`);
+      setValidationError(`Could not start the run: ${err.message}`);
     }
   };
 
@@ -232,16 +254,14 @@ export const Optimise: React.FC = () => {
     return (
       <div className="max-w-2xl mx-auto p-6 bg-wine/30 border border-wine rounded-2xl text-center space-y-4 shadow-panel">
         <div className="text-2xl">⚠️</div>
-        <h2 className="text-base font-bold text-[#FF8A8A]">Backend Connection Offline</h2>
-        <p className="text-xs text-muted font-mono">{apiError}</p>
-        <p className="text-xs text-text">
-          Ensure FastAPI backend is running on <code className="text-peach font-mono">http://localhost:8000</code> or launch with <code className="text-peach font-mono">VITE_USE_MOCKS=1</code> for offline mock mode.
-        </p>
+        <h2 className="text-base font-bold text-[#FF8A8A]">Could not load the stock list</h2>
+        <p className="text-xs text-text break-words">{apiError}</p>
         <button
+          type="button"
           onClick={fetchUniverseData}
           className="px-5 py-2.5 min-h-[44px] bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
         >
-          Retry Connection
+          Retry
         </button>
       </div>
     );
@@ -257,11 +277,12 @@ export const Optimise: React.FC = () => {
         asOf={universe?.as_of}
         estWindow={runResult?.data.est_window}
         testWindow={runResult?.data.test_window}
+        notes={runResult?.data.notes}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Panel: Inputs & Form */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-6 min-w-0">
           <UniversePicker
             assets={universe?.assets || []}
             selectedTickers={selectedTickers}
@@ -311,7 +332,7 @@ export const Optimise: React.FC = () => {
         </div>
 
         {/* Right Panel: Pre-screen, Execution State & U13 Full Results */}
-        <div className="lg:col-span-6 space-y-6">
+        <div ref={rightPanelRef} className="lg:col-span-6 space-y-6 scroll-mt-4 min-w-0">
           {/* Live Qubit Pre-screen Preview */}
           <ScreenPreview
             screenInfo={screenInfo}
@@ -331,11 +352,23 @@ export const Optimise: React.FC = () => {
           {activeJobStatus?.state === 'error' && (
             <div className="p-5 bg-wine/40 border border-wine rounded-2xl text-xs space-y-2">
               <h3 className="font-bold text-[#FF8A8A] flex items-center gap-2">
-                <span>❌</span> Optimization Failed
+                <span>❌</span> The run failed
               </h3>
-              <p className="text-text font-mono text-[11px] leading-relaxed">
-                {activeJobStatus.error}
+              <p className="text-text text-xs leading-relaxed break-words">
+                {activeJobStatus.error || 'The server reported an error.'}
               </p>
+              {/feasible/i.test(activeJobStatus.error || '') && (
+                <p className="text-muted text-[11px]">
+                  Try more stocks, a lower number of picks (K) or a looser sector limit.
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={handleStartRun}
+                className="px-4 py-2 min-h-[44px] bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
+              >
+                Retry
+              </button>
             </div>
           )}
 
@@ -401,7 +434,7 @@ export const Optimise: React.FC = () => {
               {/* Out of Sample Backtest Table */}
               <OutOfSample
                 solvers={runResult.solvers}
-                nifty50Benchmark={runResult.benchmarks.nifty50}
+                nifty50Benchmark={runResult.benchmarks?.nifty50}
                 testWindow={runResult.data.test_window}
               />
             </div>
@@ -411,7 +444,7 @@ export const Optimise: React.FC = () => {
             <div className="p-8 bg-panel/40 border border-dashed border-line rounded-2xl text-center text-xs text-muted space-y-2">
               <div className="text-xl text-slate">📊</div>
               <div className="font-bold text-text">No Active Optimization Run</div>
-              <p>Configure parameters on the left and click "Run Quantum Portfolio Optimization" to launch QAOA and classical benchmarks.</p>
+              <p>Pick your stocks and settings, then press "Run Quantum Portfolio Optimization" to run QAOA and the classical solvers side by side.</p>
             </div>
           )}
         </div>

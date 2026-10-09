@@ -71,7 +71,7 @@ export const SolverTable: React.FC<SolverTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono font-bold text-text">
-                    {s.objective !== null ? formatNumber(s.objective, 4) : '—'}
+                    {s.objective != null ? formatNumber(s.objective, 4) : '—'}
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono text-peach font-bold">
@@ -91,19 +91,19 @@ export const SolverTable: React.FC<SolverTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono text-text">
-                    {s.approx_ratio !== null ? formatNumber(s.approx_ratio, 2) : '—'}
+                    {s.approx_ratio != null ? formatNumber(s.approx_ratio, 2) : '—'}
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono text-peach">
-                    {s.p_opt !== null ? formatPercent(s.p_opt) : '—'}
+                    {s.p_opt != null ? formatPercent(s.p_opt) : '—'}
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono text-muted">
-                    {s.feasible_rate !== null ? formatPercent(s.feasible_rate) : '—'}
+                    {s.feasible_rate != null ? formatPercent(s.feasible_rate) : '—'}
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono text-muted">
-                    {s.runtime_s.toFixed(2)} s
+                    {formatNumber(s.runtime_s, 2)} s
                   </td>
                 </tr>
               );

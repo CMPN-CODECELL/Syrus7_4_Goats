@@ -17,7 +17,10 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
     'no-feasible': { text: 'NO FEASIBLE SAMPLE', bg: 'bg-wine/40 text-[#FF8A8A] border-wine' }
   };
   const badge = badges[verdict.level] ?? { text: verdict.level.toUpperCase(), bg: 'bg-line/60 text-muted border-line' };
-  const pOptMultiplier = metrics.p_random > 0 ? (metrics.p_opt / metrics.p_random).toFixed(1) : '—';
+  const pOptMultiplier =
+    metrics.p_random != null && metrics.p_random > 0 && metrics.p_opt != null
+      ? (metrics.p_opt / metrics.p_random).toFixed(1)
+      : '—';
 
   return (
     <div className="bg-panel border border-line rounded-2xl p-6 shadow-panel mb-6 space-y-5">
@@ -41,7 +44,7 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
       <div className="bg-ink/60 border border-line rounded-xl p-4 space-y-2">
         <h3 className="font-extrabold text-sm text-peach">{verdict.headline}</h3>
         <ul className="space-y-1.5 text-xs text-text/90 list-disc list-inside">
-          {verdict.details.map((detail, idx) => (
+          {(verdict.details ?? []).map((detail, idx) => (
             <li key={idx} className="leading-relaxed">{detail}</li>
           ))}
         </ul>
@@ -60,9 +63,9 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
         <div className="bg-ink/40 p-3 rounded-xl border border-line/60">
           <span className="text-[10px] text-muted font-bold uppercase block mb-1">P(opt) Probability</span>
           <span className="text-base font-extrabold text-peach font-mono">
-            {formatPercent(metrics.p_opt)}
+            {formatPercent(metrics.p_opt, 2)}
           </span>
-          <span className="text-[10px] text-muted block mt-0.5">{pOptMultiplier}x random guess ({formatPercent(metrics.p_random)})</span>
+          <span className="text-[10px] text-muted block mt-0.5">{pOptMultiplier}x random guess ({formatPercent(metrics.p_random, 2)})</span>
         </div>
 
         <div className="bg-ink/40 p-3 rounded-xl border border-line/60">
@@ -76,9 +79,9 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
         <div className="bg-ink/40 p-3 rounded-xl border border-line/60">
           <span className="text-[10px] text-muted font-bold uppercase block mb-1">Circuit Complexity</span>
           <span className="text-base font-extrabold text-text font-mono">
-            {circuit.depth} d / {circuit.two_qubit_gates} 2q
+            {circuit?.depth ?? '—'} d / {circuit?.two_qubit_gates ?? '—'} 2q
           </span>
-          <span className="text-[10px] text-muted block mt-0.5">{circuit.qubits} Qubits (p={circuit.reps})</span>
+          <span className="text-[10px] text-muted block mt-0.5">{circuit?.qubits ?? '—'} Qubits (p={circuit?.reps ?? '—'})</span>
         </div>
       </div>
 
@@ -89,21 +92,21 @@ export const HonestyPanel: React.FC<HonestyPanelProps> = ({ verdict, qaoaResult 
             <h4 className="text-xs font-bold text-peach flex items-center gap-1.5">
               <span>⚠️</span> Hardware Noise Simulation ({noise.backend})
             </h4>
-            <span className="text-[10px] font-mono text-muted">Transpiled Depth: {noise.transpiled.depth} | 2-Qubit Gates: {noise.transpiled.two_qubit_gates}</span>
+            <span className="text-[10px] font-mono text-muted">Transpiled depth: {noise.transpiled?.depth ?? '—'} | 2-qubit gates: {noise.transpiled?.two_qubit_gates ?? '—'}</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 text-xs font-mono">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
             <div className="p-2.5 bg-ink/70 rounded-lg border border-line">
-              <span className="text-[10px] text-muted block">Ideal Statevector</span>
-              <span className="text-peach font-bold">Ratio: {noise.ideal.approx_ratio.toFixed(2)}</span>
+              <span className="text-[10px] text-muted block">Ideal (no noise)</span>
+              <span className="text-peach font-bold">Ratio: {formatNumber(noise.ideal?.approx_ratio, 2)}</span>
             </div>
             <div className="p-2.5 bg-ink/70 rounded-lg border border-line">
-              <span className="text-[10px] text-muted block">Noisy Backend</span>
-              <span className="text-[#FF8A8A] font-bold">Ratio: {noise.noisy.approx_ratio.toFixed(2)}</span>
+              <span className="text-[10px] text-muted block">Noisy backend</span>
+              <span className="text-[#FF8A8A] font-bold">Ratio: {formatNumber(noise.noisy?.approx_ratio, 2)}</span>
             </div>
             <div className="p-2.5 bg-ink/70 rounded-lg border border-line">
-              <span className="text-[10px] text-muted block">P(opt) Drop</span>
-              <span className="text-text font-bold">{formatPercent(noise.ideal.p_opt)} → {formatPercent(noise.noisy.p_opt)}</span>
+              <span className="text-[10px] text-muted block">P(opt), ideal to noisy</span>
+              <span className="text-text font-bold">{formatPercent(noise.ideal?.p_opt, 2)} → {formatPercent(noise.noisy?.p_opt, 2)}</span>
             </div>
           </div>
         </div>

@@ -4,15 +4,11 @@ import { formatPercent, formatNumber, getSolverColor } from '../lib/chartColors'
 
 interface OutOfSampleProps {
   solvers: SolverResult[];
-  nifty50Benchmark: BenchmarkMetrics;
+  nifty50Benchmark?: BenchmarkMetrics | null;
   testWindow?: [string, string];
 }
 
-export const OutOfSample: React.FC<OutOfSampleProps> = ({
-  solvers,
-  nifty50Benchmark,
-  testWindow = ['2025-10-01', '2026-09-30']
-}) => {
+export const OutOfSample: React.FC<OutOfSampleProps> = ({ solvers, nifty50Benchmark, testWindow }) => {
   return (
     <div className="bg-panel border border-line rounded-2xl p-5 shadow-panel mb-6">
       <div className="pb-3 border-b border-line mb-4">
@@ -20,7 +16,9 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({
           <span>📅 Out-of-Sample Test Window Backtest</span>
         </h2>
         <p className="text-xs text-muted mt-0.5">
-          Realised holding returns over test window (<strong className="text-text">{testWindow[0]}</strong> to <strong className="text-text">{testWindow[1]}</strong>) vs NIFTY 50 benchmark (^NSEI).
+          Realised holding returns over the test window
+          {testWindow && (<> (<strong className="text-text">{testWindow[0]}</strong> to <strong className="text-text">{testWindow[1]}</strong>)</>)}
+          {' '}vs the NIFTY 50 benchmark (^NSEI).
         </p>
       </div>
 
@@ -37,26 +35,28 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({
           </thead>
           <tbody className="divide-y divide-line/40">
             {/* NIFTY 50 Benchmark Row */}
-            <tr className="bg-ink/60 font-medium">
-              <td className="py-3 px-3">
-                <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-0.5 bg-muted border-t border-dashed border-muted shrink-0"></span>
-                  <span className="font-bold text-text">NIFTY 50 Index Benchmark (^NSEI)</span>
-                </div>
-              </td>
-              <td className="py-3 px-3 text-right font-mono font-bold text-peach">
-                {formatPercent(nifty50Benchmark.ann_return)}
-              </td>
-              <td className="py-3 px-3 text-right font-mono text-slate">
-                {formatPercent(nifty50Benchmark.ann_vol)}
-              </td>
-              <td className="py-3 px-3 text-right font-mono text-text">
-                {formatNumber(nifty50Benchmark.sharpe, 2)}
-              </td>
-              <td className="py-3 px-3 text-right font-mono text-[#FF8A8A] font-bold">
-                {formatPercent(nifty50Benchmark.max_drawdown)}
-              </td>
-            </tr>
+            {nifty50Benchmark && (
+              <tr className="bg-ink/60 font-medium">
+                <td className="py-3 px-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2.5 h-0.5 bg-muted border-t border-dashed border-muted shrink-0"></span>
+                    <span className="font-bold text-text">NIFTY 50 Index Benchmark (^NSEI)</span>
+                  </div>
+                </td>
+                <td className="py-3 px-3 text-right font-mono font-bold text-peach">
+                  {formatPercent(nifty50Benchmark.ann_return)}
+                </td>
+                <td className="py-3 px-3 text-right font-mono text-slate">
+                  {formatPercent(nifty50Benchmark.ann_vol)}
+                </td>
+                <td className="py-3 px-3 text-right font-mono text-text">
+                  {formatNumber(nifty50Benchmark.sharpe, 2)}
+                </td>
+                <td className="py-3 px-3 text-right font-mono text-[#FF8A8A] font-bold">
+                  {formatPercent(nifty50Benchmark.max_drawdown)}
+                </td>
+              </tr>
+            )}
 
             {/* Solvers OOS Rows */}
             {solvers.map(s => {

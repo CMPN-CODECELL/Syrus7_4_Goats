@@ -26,12 +26,12 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
   onSelectSolver
 }) => {
   // Sort continuous frontier by risk for smooth line rendering
-  const continuousData = [...frontier.continuous]
+  const continuousData = [...(frontier?.continuous ?? [])]
     .sort((a, b) => a.risk - b.risk)
     .map(p => ({ ...p, name: 'Continuous frontier' }));
-  const discreteData = frontier.discrete.map(p => ({
+  const discreteData = (frontier?.discrete ?? []).map(p => ({
     ...p,
-    name: `Discrete frontier: ${p.selection.map(t => t.replace('.NS', '')).join(', ')}`
+    name: `Discrete frontier: ${(p.selection ?? []).map(t => t.replace('.NS', '')).join(', ')}`
   }));
 
   // Plottable solver points (filtering null volatility/return)

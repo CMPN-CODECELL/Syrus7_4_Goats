@@ -16,7 +16,7 @@ export const App: React.FC = () => {
       <div className="h-1.5 w-full bg-hero-bar"></div>
 
       {/* Main App Header */}
-      <header className="bg-panel border-b border-line shadow-panel sticky top-0 z-40">
+      <header className="bg-panel border-b border-line shadow-panel sm:sticky sm:top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-hero-gradient flex items-center justify-center text-text font-black text-xl shadow border border-peach/30">
@@ -38,12 +38,12 @@ export const App: React.FC = () => {
           </div>
 
           {/* Navigation Tabs & Glossary Button */}
-          <div className="flex items-center justify-between sm:justify-end space-x-2">
-            <nav className="flex bg-ink/70 p-1 rounded-xl border border-line">
+          <div className="flex items-center justify-between sm:justify-end gap-2 min-w-0">
+            <nav className="flex flex-1 sm:flex-none min-w-0 bg-ink/70 p-1 rounded-xl border border-line">
               <button
                 type="button"
                 onClick={() => setActiveTab('optimise')}
-                className={`px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
+                className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
                   activeTab === 'optimise'
                     ? 'bg-peach text-ink shadow'
                     : 'text-muted hover:text-text'
@@ -54,7 +54,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('evidence')}
-                className={`px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
+                className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
                   activeTab === 'evidence'
                     ? 'bg-peach text-ink shadow'
                     : 'text-muted hover:text-text'
@@ -65,7 +65,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('method')}
-                className={`px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
+                className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
                   activeTab === 'method'
                     ? 'bg-peach text-ink shadow'
                     : 'text-muted hover:text-text'
@@ -78,7 +78,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setGlossaryOpen(true)}
-              className="p-2 min-h-[44px] min-w-[44px] bg-panel hover:bg-line text-peach border border-line rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
+              className="p-2 min-h-[44px] min-w-[44px] shrink-0 bg-panel hover:bg-line text-peach border border-line rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
               title="Quantum Glossary"
             >
               <span>📖</span>

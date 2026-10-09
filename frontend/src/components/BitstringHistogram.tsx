@@ -33,7 +33,7 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
         </div>
 
         {/* Legend */}
-        <div className="flex items-center space-x-3 text-xs">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
           <span className="flex items-center gap-1.5 text-peach font-medium">
             <span className="w-3 h-3 rounded bg-peach"></span> Optimal
           </span>
@@ -62,12 +62,12 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
             <YAxis
               stroke="#A9B3C9"
               fontSize={10}
-              tickFormatter={(v: any) => formatPercent(v, 0)}
+              tickFormatter={(v: any) => formatPercent(v, 2)}
             />
             <Tooltip
               contentStyle={{ backgroundColor: '#242F49', borderColor: '#384358', borderRadius: '8px', fontSize: '11px', color: '#F4EFEA' }}
               formatter={(val: any, _: any, item: any) => [
-                `${formatPercent(Number(val))} (${item.payload.stateType})`,
+                `${formatPercent(Number(val), 2)} (${item.payload.stateType})`,
                 'Probability'
               ]}
               labelFormatter={(label: any) => `Bitstring: ${label}`}
@@ -80,6 +80,12 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {!topSamples.some(s => s.optimal) && (
+        <p className="mt-2 text-[11px] text-muted">
+          The exact optimum is not among these {topSamples.length} most probable bitstrings, so no bar is marked Optimal.
+        </p>
+      )}
     </div>
   );
 };
