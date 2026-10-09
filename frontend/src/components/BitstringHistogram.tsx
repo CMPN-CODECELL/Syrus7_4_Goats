@@ -29,7 +29,7 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
         x={index > topSamples.length / 2 ? Number(x) + Number(width) : Number(x)}
         y={Number(y) - 6}
         fill={CHART_COLORS.optimal}
-        fontSize={11}
+        fontSize={13}
         textAnchor={index > topSamples.length / 2 ? 'end' : 'start'}
       >
         ★ optimal
@@ -70,7 +70,7 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
             <XAxis
               dataKey="bitstring"
               stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }}
-              fontSize={9}
+              fontSize={11}
               fontFamily="monospace"
               angle={-45}
               textAnchor="end"
@@ -78,7 +78,7 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
             />
             <YAxis
               stroke="var(--c-muted2)" tick={{ fill: 'var(--c-muted2)' }}
-              fontSize={10}
+              fontSize={12}
               tickFormatter={(v: any) => formatPercent(v, 2)}
             />
             <Tooltip
@@ -104,7 +104,7 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
       </div>
 
       {!topSamples.some(s => s.optimal) && (
-        <p className="mt-2 text-[11px] text-muted">
+        <p className="mt-2 text-[14px] text-muted">
           The exact optimum is not among these {topSamples.length} most probable bitstrings, so no bar is marked Optimal.
         </p>
       )}

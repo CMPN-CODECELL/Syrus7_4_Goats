@@ -31,8 +31,24 @@ export const App: React.FC = () => {
     document.documentElement.classList.toggle('dark', dark);
     try { localStorage.setItem('qp_theme', dark ? 'dark' : 'light'); } catch { /* storage blocked */ }
   }, [dark]);
+  // Simple mode hides research-only detail ([data-research]); Research mode shows everything.
+  const [research, setResearch] = useState(() => { try { return localStorage.getItem('qp_mode') === 'research'; } catch { return false; } });
+  useEffect(() => {
+    document.documentElement.classList.toggle('simple', !research);
+    try { localStorage.setItem('qp_mode', research ? 'research' : 'simple'); } catch { /* storage blocked */ }
+  }, [research]);
+  const modeButton = (
+    <div role="group" aria-label="Detail level" className="inline-flex border border-accent-blue">
+      {([false, true] as const).map((r) => (
+        <button key={String(r)} type="button" onClick={() => setResearch(r)} aria-pressed={research === r}
+          className={`px-2 py-0.5 text-xs font-mono uppercase ${research === r ? 'bg-accent-blue text-bg' : 'text-accent-blue-hover'}`}>
+          {r ? 'Quantum research' : 'Simple'}
+        </button>
+      ))}
+    </div>
+  );
   const themeButton = (
-    <button type="button" onClick={() => setDark(!dark)} aria-pressed={dark} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[10px] font-mono uppercase text-muted hover:text-text">
+    <button type="button" onClick={() => setDark(!dark)} aria-pressed={dark} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[13px] font-mono uppercase text-muted hover:text-text">
       {dark ? 'White mode' : 'Black mode'}
     </button>
   );
@@ -143,7 +159,7 @@ export const App: React.FC = () => {
     {home && (
       <div className="min-h-screen bg-bg text-text px-4 sm:px-6 py-10">
         <div className="max-w-5xl mx-auto">
-          <div className="flex justify-end mb-4">{themeButton}</div>
+          <div className="flex justify-end gap-2 mb-4">{modeButton}{themeButton}</div>
           <Landing onStart={() => start(false)} onTour={() => start(true)} />
         </div>
       </div>
@@ -181,7 +197,7 @@ export const App: React.FC = () => {
                   Portfolio-Pulse
                 </h1>
                 <div className="flex items-center space-x-1.5 mt-1">
-                  <span className="label text-[10px] text-muted tracking-widest">
+                  <span className="label text-[13px] text-muted tracking-widest">
                     Quantum Portfolio · PS-03
                   </span>
                 </div>
@@ -201,7 +217,7 @@ export const App: React.FC = () => {
 
           {/* Navigation Section */}
           <div className="p-3">
-            <div className="label px-3 py-2 text-[10px] text-faint tracking-widest">
+            <div className="label px-3 py-2 text-[13px] text-faint tracking-widest">
               Navigation
             </div>
             <nav className="space-y-1" aria-label="Main Navigation">
@@ -213,6 +229,7 @@ export const App: React.FC = () => {
                     type="button"
                     onClick={() => handleTabChange(item.id)}
                     data-tour={item.id === 'evidence' ? 'evidence-tab' : undefined}
+                    data-research={item.id === 'method' ? true : undefined}
                     aria-current={isActive ? 'page' : undefined}
                     className={`w-full text-left px-3.5 py-3 transition-all flex items-center space-x-3 border-l-2 focus-visible:outline-white ${
                       isActive
@@ -225,7 +242,7 @@ export const App: React.FC = () => {
                       <div className="text-xs uppercase tracking-wider leading-none">
                         {item.label}
                       </div>
-                      <div className="text-[10px] text-faint truncate mt-1">
+                      <div data-research className="text-[13px] text-faint truncate mt-1">
                         {item.sublabel}
                       </div>
                     </div>
@@ -244,18 +261,18 @@ export const App: React.FC = () => {
               title="Open quick glossary drawer without changing view"
             >
               <span className="flex items-center space-x-2">
-                <span className="text-[11px]">Quick Reference</span>
+                <span className="text-[14px]">Quick Reference</span>
               </span>
-              <span className="text-[10px] font-mono text-faint">DRAWER →</span>
+              <span className="text-[13px] font-mono text-faint">DRAWER →</span>
             </button>
           </div>
         </div>
 
         {/* Sidebar Status Footer */}
-        <div className="p-4 border-t border-line bg-surface-card space-y-3">
+        <div data-research className="p-4 border-t border-line bg-surface-card space-y-3">
           {/* Backend Status Dot */}
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted text-[11px] flex items-center space-x-2">
+            <span className="text-muted text-[14px] flex items-center space-x-2">
               <span
                 className={`w-2 h-2 rounded-full ${
                   backendOnline === true
@@ -265,7 +282,7 @@ export const App: React.FC = () => {
                     : 'bg-muted'
                 }`}
               ></span>
-              <span className="font-mono text-[10px]">
+              <span className="font-mono text-[13px]">
                 {backendOnline === true
                   ? 'API ONLINE (8000)'
                   : backendOnline === false
@@ -273,10 +290,10 @@ export const App: React.FC = () => {
                   : 'CONNECTING...'}
               </span>
             </span>
-            <span className="text-[10px] font-mono text-faint">Portfolio-Pulse v0.1.0</span>
+            <span className="text-[13px] font-mono text-faint">Portfolio-Pulse v0.1.0</span>
           </div>
 
-          <div className="text-[10px] text-muted space-y-0.5 pt-2 border-t border-line/40">
+          <div className="text-[13px] text-muted space-y-0.5 pt-2 border-t border-line/40">
             <div>Qiskit 2.5 · Aer Simulator</div>
             <div>NIFTY 50 (Cached 2026-10-07)</div>
             <div className="text-faint">Team 4 GOATS · Fall Fest 2026</div>
@@ -313,7 +330,7 @@ export const App: React.FC = () => {
 
             {/* Breadcrumb / Title */}
             <div className="flex items-baseline space-x-2 truncate">
-              <span className="label text-[11px] text-muted hidden sm:inline">PORTFOLIO-PULSE //</span>
+              <span className="label text-[14px] text-muted hidden sm:inline">PORTFOLIO-PULSE //</span>
               <span className="text-sm font-medium tracking-wider text-text uppercase">
                 {activeTab === 'optimise' && 'Portfolio Optimisation & Solvers'}
                 {activeTab === 'method' && 'Methodology & QUBO Specification'}
@@ -325,20 +342,21 @@ export const App: React.FC = () => {
 
           {/* Right Status Tags */}
           <div className="flex items-center space-x-2 shrink-0">
-            <button type="button" onClick={() => { setHome(true); window.scrollTo({ top: 0 }); }} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[10px] font-mono uppercase text-muted hover:text-text">
+            <button type="button" onClick={() => { setHome(true); window.scrollTo({ top: 0 }); }} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[13px] font-mono uppercase text-muted hover:text-text">
               Home
             </button>
-            <button type="button" onClick={() => start(true)} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[10px] font-mono uppercase text-muted hover:text-text">
+            <button type="button" onClick={() => start(true)} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[13px] font-mono uppercase text-muted hover:text-text">
               Tour
             </button>
+            {modeButton}
             {themeButton}
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 bg-surface text-muted border border-line text-[10px] font-mono">
+            <span data-research className="hidden sm:inline-flex items-center px-2 py-0.5 bg-surface text-muted border border-line text-[13px] font-mono">
               UNIVERSE: NIFTY 50
             </span>
-            <span className="hidden md:inline-flex items-center px-2 py-0.5 bg-surface text-muted border border-line text-[10px] font-mono">
+            <span data-research className="hidden md:inline-flex items-center px-2 py-0.5 bg-surface text-muted border border-line text-[13px] font-mono">
               QUBITS: MAX 16
             </span>
-            <span className="inline-flex items-center px-2 py-0.5 bg-surface-elevated text-text border border-line-strong text-[10px] font-mono">
+            <span data-research className="inline-flex items-center px-2 py-0.5 bg-surface-elevated text-text border border-line-strong text-[13px] font-mono">
               RF: 5.57%
             </span>
           </div>
@@ -357,13 +375,13 @@ export const App: React.FC = () => {
 
         {/* Footer */}
         <footer className="border-t border-line py-6 px-4 sm:px-8 text-center mt-12 space-y-2 bg-surface/50">
-          <p className="label text-[11px]">
+          <p className="label text-[14px]">
             Portfolio-Pulse · Qiskit Fall Fest 2026 · Team 4 GOATS · Qiskit 2.5 V2 Primitives &amp; Aer Simulator
           </p>
-          <p className="label text-[10px] text-muted">
+          <p className="label text-[13px] text-muted">
             Data: Yahoo Finance via yfinance (adjusted close), cached snapshot (2023-09-01 to 2026-10-07)
           </p>
-          <p className="text-[11px] text-faint">
+          <p className="text-[14px] text-faint">
             Educational tool, not investment advice. Past performance does not guarantee future returns.
           </p>
         </footer>

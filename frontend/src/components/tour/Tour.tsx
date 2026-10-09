@@ -6,10 +6,8 @@ import { TOUR_DONE_KEY, TOUR_STEPS } from './tourSteps';
 const PAD = 8;
 const MARGIN = 16;
 const CARD_W = 340;
-const find = (target: string) => {
-  const el = document.querySelector<HTMLElement>(`[data-tour="${target}"]`);
-  return el && el.offsetParent !== null ? el : null;
-};
+const find = (target: string) =>
+  [...document.querySelectorAll<HTMLElement>(`[data-tour="${target}"]`)].find((el) => el.offsetParent !== null) ?? null;
 const btn = 'min-h-[44px] px-4 border font-mono text-xs uppercase tracking-[0.08em] disabled:opacity-40';
 
 export function Tour({ open, onClose }: { open: boolean; onClose: () => void }) {

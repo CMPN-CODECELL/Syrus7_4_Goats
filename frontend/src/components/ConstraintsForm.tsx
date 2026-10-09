@@ -40,7 +40,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
   return (
     <div className="bg-surface border border-line p-5 space-y-5">
       {/* Section Header */}
-      <div className="pb-3 border-b border-line flex items-center justify-between">
+      <div data-research className="pb-3 border-b border-line flex items-center justify-between">
         <div>
           <h3 className="text-sm font-medium text-text uppercase tracking-wide">
             Portfolio &amp; Risk Parameters
@@ -49,7 +49,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             Configure cardinality K, Markowitz risk penalty q, and inequality slack terms.
           </p>
         </div>
-        <span className="text-[10px] font-mono text-muted px-2 py-0.5 bg-bg border border-line">
+        <span className="text-[13px] font-mono text-muted px-2 py-0.5 bg-bg border border-line">
           QUBO &amp; SLACK
         </span>
       </div>
@@ -62,7 +62,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             <label htmlFor="k" className="text-xs font-medium text-text flex items-center gap-1.5">
               <span>Exact Stock Picks (K)</span>
               <GlossaryTermTooltip termKey="qubo">
-                <span className="text-muted hover:text-text cursor-help text-[11px]">[?]</span>
+                <span className="text-muted hover:text-text cursor-help text-[14px]">[?]</span>
               </GlossaryTermTooltip>
             </label>
             <span className="text-xs font-mono font-medium text-text bg-surface-elevated px-2.5 py-0.5 border border-line-strong">
@@ -80,11 +80,11 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             className="w-full accent-white bg-surface h-2 cursor-pointer"
           />
 
-          <div className="flex justify-between text-[10px] font-mono text-muted">
+          <div className="flex justify-between text-[13px] font-mono text-muted">
             <span>2 (Concentrated)</span>
             <span>{maxKLimit} (Broad Market)</span>
           </div>
-          <p className="text-[11px] text-faint">
+          <p className="text-[14px] text-faint">
             Strict equality constraint: exactly {k} stocks must be selected.
           </p>
         </div>
@@ -111,19 +111,19 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             className="w-full accent-white bg-surface h-2 cursor-pointer"
           />
 
-          <div className="flex justify-between text-[10px] font-mono text-muted">
+          <div className="flex justify-between text-[13px] font-mono text-muted">
             <span>0.0 (Max Return)</span>
             <span>0.5 (Balanced)</span>
             <span>1.0 (Min Variance)</span>
           </div>
-          <p className="text-[11px] text-faint">
+          <p className="text-[14px] text-faint">
             Objective trade-off: higher q prioritizes low covariance risk over expected return.
           </p>
         </div>
       </div>
 
       {/* Collapsible Additional Constraints Section */}
-      <div className="border border-line bg-surface-card">
+      <div data-research className="border border-line bg-surface-card">
         <button
           type="button"
           onClick={() => setShowAdditional(!showAdditional)}
@@ -134,11 +134,11 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
               Additional Constraints &amp; Capital
             </span>
             {activeAdditionalCount > 0 ? (
-              <span className="text-[10px] font-mono px-2 py-0.5 bg-accent-blue/15 text-accent-blue-hover border border-accent-blue/40">
+              <span className="text-[13px] font-mono px-2 py-0.5 bg-accent-blue/15 text-accent-blue-hover border border-accent-blue/40">
                 {activeAdditionalCount} ACTIVE
               </span>
             ) : (
-              <span className="text-[10px] font-mono text-faint">
+              <span className="text-[13px] font-mono text-faint">
                 OPTIONAL
               </span>
             )}
@@ -181,10 +181,10 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                       onChange={(e) => setSectorCap(Math.max(1, Math.min(5, Number(e.target.value))))}
                       className="w-20 min-h-[36px] bg-bg border border-line px-2.5 py-1 text-xs text-text font-mono focus:border-text"
                     />
-                    <span className="text-[11px] text-muted">Max stocks allowed from any single industry</span>
+                    <span className="text-[14px] text-muted">Max stocks allowed from any single industry</span>
                   </div>
                 ) : (
-                  <p className="text-[11px] text-faint">
+                  <p className="text-[14px] text-faint">
                     No sector concentration ceiling applied.
                   </p>
                 )}
@@ -221,10 +221,10 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                       onChange={(e) => setTargetReturn(Number(e.target.value) / 100)}
                       className="w-20 min-h-[36px] bg-bg border border-line px-2.5 py-1 text-xs text-text font-mono focus:border-text"
                     />
-                    <span className="text-[11px] text-muted">Min required net annual return after costs (%)</span>
+                    <span className="text-[14px] text-muted">Min required net annual return after costs (%)</span>
                   </div>
                 ) : (
-                  <p className="text-[11px] text-faint">
+                  <p className="text-[14px] text-faint">
                     No minimum annual return floor applied.
                   </p>
                 )}
@@ -263,7 +263,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
             <div className="p-3.5 bg-surface border border-line space-y-2">
               <label htmlFor="holdings" className="text-xs font-medium text-text flex items-center justify-between">
                 <span>Current Holdings Portfolio <span className="font-medium text-muted">(Optional)</span></span>
-                <span className="text-[10px] text-faint">Rebalancing Friction Baseline</span>
+                <span className="text-[13px] text-faint">Rebalancing Friction Baseline</span>
               </label>
               <textarea
                 id="holdings"
@@ -273,7 +273,7 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
                 placeholder={'One per line: symbol and shares, e.g.\nTCS 52\nINFY 120'}
                 className="w-full bg-bg border border-line px-3 py-2 text-xs text-text font-mono placeholder-muted focus:border-text"
               />
-              <p className="text-[11px] text-muted">
+              <p className="text-[14px] text-muted">
                 Transaction costs are charged relative to these shares (liquidating an unselected holding costs 0.1037%). Leave blank to start from 100% cash.
               </p>
             </div>
