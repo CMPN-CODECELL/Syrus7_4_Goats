@@ -42,11 +42,11 @@ export function Landing({ onStart, onTour }: { onStart: () => void; onTour: () =
 
       <section aria-labelledby="how-title">
         <Eyebrow>How it works</Eyebrow>
-        <h2 id="how-title" className="font-display text-2xl uppercase font-light leading-none mt-1 mb-4">Three steps</h2>
+        <h2 id="how-title" className="font-display text-2xl uppercase font-medium leading-none mt-1 mb-4">Three steps</h2>
         <ol className="grid gap-3 md:grid-cols-3">
           {STEPS.map((text, n) => (
             <li key={n} className="border border-line bg-surface p-4">
-              <span className="font-display text-5xl font-light leading-none text-faint" aria-hidden="true">{n + 1}</span>
+              <span className="font-display text-5xl font-medium leading-none text-faint" aria-hidden="true">{n + 1}</span>
               <p className="mt-2 text-sm text-text"><span className="sr-only">Step {n + 1}: </span>{text}</p>
             </li>
           ))}
@@ -55,7 +55,7 @@ export function Landing({ onStart, onTour }: { onStart: () => void; onTour: () =
 
       <section aria-labelledby="honest-title" className="border border-line-strong bg-surface p-5 md:p-8">
         <Eyebrow>Our main promise</Eyebrow>
-        <h2 id="honest-title" className="font-display text-4xl md:text-5xl uppercase font-light leading-none mt-2">The honest verdict</h2>
+        <h2 id="honest-title" className="font-display text-4xl md:text-5xl uppercase font-medium leading-none mt-2">The honest verdict</h2>
         <p className="mt-3 max-w-prose text-base text-text">
           Most tools only show good news. Ours gives every run a scorecard, and a poor score stays on it.
         </p>
@@ -71,7 +71,7 @@ export function Landing({ onStart, onTour }: { onStart: () => void; onTour: () =
 
       <section aria-labelledby="gets-title">
         <Eyebrow>What you get</Eyebrow>
-        <h2 id="gets-title" className="font-display text-2xl uppercase font-light leading-none mt-1 mb-4">After each run</h2>
+        <h2 id="gets-title" className="font-display text-2xl uppercase font-medium leading-none mt-1 mb-4">After each run</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {GETS.map((g) => (
             <Card key={g.title}>

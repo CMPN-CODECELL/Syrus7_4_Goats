@@ -19,9 +19,9 @@
   --color-accent-blue-subtle: rgba(255, 255, 255, 0.08);
   --color-accent-blue-border: rgba(255, 255, 255, 0.35);
 
-  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --font-sans: 'Times New Roman', Times, serif;
+  --font-display: 'Times New Roman', Times, serif;
+  --font-mono: 'Times New Roman', Times, serif;
 }
 
 /* Theme: white by default. <html class="dark"> switches to the black theme (toggle in the header). */
@@ -87,6 +87,7 @@
     color: var(--color-text);
     font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;
+    font-weight: 500;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -100,19 +101,19 @@
 /* Headings: Barlow Condensed 300, uppercase (unlayered so utilities cannot override) */
 h1, h2, h3, h4 {
   font-family: var(--font-display);
-  font-weight: 300;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
-strong, b { font-weight: 500; }
+strong, b { font-weight: 700; }
 
 /* Small labels: Geist Mono 11px, uppercase, tracked, muted */
 .label,
 thead th {
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-muted);

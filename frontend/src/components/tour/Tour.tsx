@@ -95,7 +95,7 @@ export function Tour({ open, onClose }: { open: boolean; onClose: () => void }) 
         style={{ top, left, width: w, maxHeight: vh - 2 * MARGIN, overflowY: 'auto' }}
       >
         {step && <p className="font-mono text-xs uppercase tracking-[0.08em] text-muted">Step {i + 1} of {steps.length}</p>}
-        <h2 id="tour-title" className="font-display text-2xl uppercase font-light leading-none mt-1">
+        <h2 id="tour-title" className="font-display text-2xl uppercase font-medium leading-none mt-1">
           {step ? step.title : 'Start on the Optimize page to see the tour'}
         </h2>
         {step && <p className="text-sm text-muted mt-2">{step.body}</p>}

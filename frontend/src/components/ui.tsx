@@ -12,7 +12,7 @@ export function Section({ id, eyebrow, title, lead, children }: {
   return (
     <section id={id} aria-labelledby={id ? `${id}-title` : undefined} className="border-t border-dotted border-line-strong pt-6 mt-10 first:mt-0 first:border-0 first:pt-0">
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h2 id={id ? `${id}-title` : undefined} className="font-display text-2xl uppercase font-light leading-none mt-1 mb-2">{title}</h2>
+      <h2 id={id ? `${id}-title` : undefined} className="font-display text-2xl uppercase font-medium leading-none mt-1 mb-2">{title}</h2>
       {lead && <p className="text-muted text-sm mb-4 max-w-prose">{lead}</p>}
       {children}
     </section>
