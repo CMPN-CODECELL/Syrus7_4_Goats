@@ -22,14 +22,14 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
   const isNoFeasible = !currentSolver.feasible || currentSolver.selection === null || !currentSolver.portfolio;
 
   return (
-    <div className="bg-panel border border-line rounded-2xl p-5 shadow-panel mb-6">
+    <div className="bg-surface border border-line p-5 mb-6">
       {/* Header & Solver Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-line mb-4">
         <div>
-          <h2 className="text-base font-bold text-text flex items-center gap-2">
+          <h2 className="text-base font-medium text-text flex items-center gap-2">
             <span>Portfolio Asset Allocation &amp; Shares</span>
             {currentSolver.solver === recommendedSolverId && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-peach/20 text-peach border border-peach/30">
+              <span className="text-[10px] font-medium px-2 py-0.5 bg-surface text-text border border-line-strong">
                 Recommended Choice
               </span>
             )}
@@ -40,7 +40,7 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
         </div>
 
         {/* Solver Selector Tabs */}
-        <div className="flex bg-ink/70 p-1 rounded-xl border border-line overflow-x-auto max-w-full">
+        <div className="flex bg-bg p-1 border border-line overflow-x-auto max-w-full">
           {solvers.map(s => {
             const isSel = s.solver === currentSolver.solver;
             return (
@@ -48,9 +48,9 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
                 key={s.solver}
                 type="button"
                 onClick={() => onSelectSolver(s.solver)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all ${
                   isSel
-                    ? 'bg-peach text-ink font-bold shadow'
+                    ? 'bg-text text-bg font-medium'
                     : 'text-muted hover:text-text'
                 }`}
               >
@@ -63,15 +63,14 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
 
       {/* No Feasible State Handling */}
       {isNoFeasible ? (
-        <div className="p-8 bg-wine/30 border border-wine rounded-xl text-center space-y-2">
-          <div className="text-xl">⚠️</div>
-          <h3 className="font-bold text-[#FF8A8A] text-sm">
-            {currentSolver.label} found no feasible portfolio
+        <div className="p-8 bg-surface border border-line-strong text-center space-y-2">
+          <h3 className="font-medium text-text text-sm">
+            ⚠ {currentSolver.label} found no feasible portfolio
           </h3>
           {currentSolver.kind === 'quantum' ? (
             <p className="text-xs text-text max-w-md mx-auto">
               No sampled bitstring met every constraint, so no portfolio is shown. Feasible sample rate was{' '}
-              <strong className="text-peach">{formatPercent(currentSolver.feasible_rate)}</strong>.
+              <strong className="text-text">{formatPercent(currentSolver.feasible_rate)}</strong>.
             </p>
           ) : (
             <p className="text-xs text-text max-w-md mx-auto">
@@ -85,7 +84,7 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-text">
               <thead>
-                <tr className="border-b border-line/60 text-[11px] text-muted uppercase font-bold tracking-wider">
+                <tr className="border-b border-line/60 label">
                   <th className="py-2.5 px-3">Stock Ticker</th>
                   <th className="py-2.5 px-3">Sector</th>
                   <th className="py-2.5 px-3 text-right">Weight</th>
@@ -96,28 +95,28 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
               </thead>
               <tbody className="divide-y divide-line/40">
                 {currentSolver.portfolio!.rows.map((row) => (
-                  <tr key={row.ticker} className="hover:bg-ink/40 transition-colors">
+                  <tr key={row.ticker} className="hover:bg-bg transition-colors">
                     <td className="py-3 px-3">
-                      <div className="font-bold text-text flex items-center gap-1.5">
-                        <span className="text-peach">{row.symbol || row.ticker.replace('.NS', '')}</span>
+                      <div className="font-medium text-text flex items-center gap-1.5">
+                        <span className="text-text">{row.symbol || row.ticker.replace('.NS', '')}</span>
                       </div>
                       <div className="text-[10px] text-muted truncate max-w-[180px]">{row.name}</div>
                     </td>
                     <td className="py-3 px-3">
-                      <span className="px-2 py-0.5 rounded bg-line/50 text-muted font-mono text-[10px]">
+                      <span className="px-2 py-0.5 bg-line/50 text-muted text-[10px]">
                         {row.sector}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-right font-mono font-bold text-peach">
+                    <td className="py-3 px-3 text-right font-medium text-text">
                       {formatPercent(row.weight)}
                     </td>
-                    <td className="py-3 px-3 text-right font-mono text-text font-bold">
+                    <td className="py-3 px-3 text-right text-text font-medium">
                       {row.shares.toLocaleString()}
                     </td>
-                    <td className="py-3 px-3 text-right font-mono text-muted">
+                    <td className="py-3 px-3 text-right text-muted">
                       {formatINR(row.price)}
                     </td>
-                    <td className="py-3 px-3 text-right font-mono text-text font-bold">
+                    <td className="py-3 px-3 text-right text-text font-medium">
                       {formatINR(row.value)}
                     </td>
                   </tr>
@@ -130,11 +129,11 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
           <div className="mt-4 pt-3 border-t border-line flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
             <div className="flex items-center space-x-4">
               <span className="text-muted">
-                Invested Capital: <strong className="text-text font-mono font-bold">{formatINR(currentSolver.portfolio!.invested)}</strong>
+                Invested Capital: <strong className="text-text font-medium">{formatINR(currentSolver.portfolio!.invested)}</strong>
               </span>
-              <span className="text-line">|</span>
+              <span className="text-faint">|</span>
               <span className="text-muted">
-                Uninvested Cash: <strong className="text-peach font-mono font-bold">{formatINR(currentSolver.portfolio!.cash_left)}</strong>
+                Uninvested Cash: <strong className="text-text font-medium">{formatINR(currentSolver.portfolio!.cash_left)}</strong>
               </span>
             </div>
 

@@ -14,13 +14,14 @@ export const DataBanner: React.FC<DataBannerProps> = ({ source, asOf, estWindow,
   const shownNotes = notes && notes.length > 0 ? notes : DEFAULT_NOTES;
 
   return (
-    <div className="bg-panel border border-line rounded-2xl p-4 shadow-panel mb-6">
+    <div className="bg-surface border border-line p-4 mb-6">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-peach/10 text-peach border border-peach/30 font-medium">
-          <span className="w-1.5 h-1.5 rounded-full bg-peach mr-1.5"></span>
-          Data source: {source ? source.toUpperCase() : 'unknown'}
+        <span className="inline-flex items-center px-2.5 py-1 bg-surface text-text border border-line-strong font-medium">
+          <span className="w-1.5 h-1.5 bg-text mr-1.5 shrink-0"></span>
+          Data source: Yahoo Finance via yfinance (adjusted close), cached snapshot
         </span>
-        <span className="text-muted">As of: <strong className="text-text font-semibold">{asOf ?? 'unknown'}</strong></span>
+        <span className="text-muted">As of: <strong className="text-text font-medium">{asOf ?? 'unknown'}</strong></span>
+        {source && <span className="label">Feed: {source}</span>}
         {estWindow && (
           <span className="text-muted">
             Estimation window: <strong className="text-text">{estWindow[0]}</strong> to <strong className="text-text">{estWindow[1]}</strong>
@@ -36,7 +37,7 @@ export const DataBanner: React.FC<DataBannerProps> = ({ source, asOf, estWindow,
       <div className="mt-2 pt-2 border-t border-line/50 text-[11px] text-muted space-y-1">
         <p>Returns and volatility are annualised (252 trading days). Risk-free rate 5.57%. Transaction costs: buy 0.1187%, sell 0.1037%.</p>
         {shownNotes.map((n, i) => (
-          <p key={i} className="italic text-slate font-medium break-words">{n}</p>
+          <p key={i} className="italic text-muted font-medium break-words">{n}</p>
         ))}
         {!estWindow && <p>The estimation and test windows appear here after a run.</p>}
       </div>

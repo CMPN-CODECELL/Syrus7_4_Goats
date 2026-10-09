@@ -1,6 +1,7 @@
 import React from 'react';
 import { SolverResult, BenchmarkMetrics } from '../api/types';
-import { formatPercent, formatNumber, getSolverColor } from '../lib/chartColors';
+import { formatPercent, formatSignedPercent, gainLossClass, formatDrawdown, drawdownClass, formatNumber, getSolverStyle, SOLVER_STYLES } from '../lib/chartColors';
+import { SolverMarker } from './SolverMarker';
 
 interface OutOfSampleProps {
   solvers: SolverResult[];
@@ -10,10 +11,10 @@ interface OutOfSampleProps {
 
 export const OutOfSample: React.FC<OutOfSampleProps> = ({ solvers, nifty50Benchmark, testWindow }) => {
   return (
-    <div className="bg-panel border border-line rounded-2xl p-5 shadow-panel mb-6">
+    <div className="bg-surface border border-line p-5 mb-6">
       <div className="pb-3 border-b border-line mb-4">
-        <h2 className="text-base font-bold text-text flex items-center gap-2">
-          <span>📅 Out-of-Sample Test Window Backtest</span>
+        <h2 className="text-base font-medium text-text flex items-center gap-2">
+          <span>Out-of-Sample Test Window Backtest</span>
         </h2>
         <p className="text-xs text-muted mt-0.5">
           Realised holding returns over the test window
@@ -25,7 +26,7 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({ solvers, nifty50Benchm
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs text-text">
           <thead>
-            <tr className="border-b border-line/60 text-[11px] text-muted uppercase font-bold tracking-wider">
+            <tr className="border-b border-line/60 label">
               <th className="py-2.5 px-3">Strategy / Solver</th>
               <th className="py-2.5 px-3 text-right">OOS Annualised Return</th>
               <th className="py-2.5 px-3 text-right">OOS Volatility</th>
@@ -36,24 +37,24 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({ solvers, nifty50Benchm
           <tbody className="divide-y divide-line/40">
             {/* NIFTY 50 Benchmark Row */}
             {nifty50Benchmark && (
-              <tr className="bg-ink/60 font-medium">
+              <tr className="bg-bg font-medium">
                 <td className="py-3 px-3">
                   <div className="flex items-center space-x-2">
-                    <span className="w-2.5 h-0.5 bg-muted border-t border-dashed border-muted shrink-0"></span>
-                    <span className="font-bold text-text">NIFTY 50 Index Benchmark (^NSEI)</span>
+                    <SolverMarker style={SOLVER_STYLES.nifty50} />
+                    <span className="font-medium text-text">NIFTY 50 Index Benchmark (^NSEI)</span>
                   </div>
                 </td>
-                <td className="py-3 px-3 text-right font-mono font-bold text-peach">
-                  {formatPercent(nifty50Benchmark.ann_return)}
+                <td className={`py-3 px-3 text-right font-medium ${gainLossClass(nifty50Benchmark.ann_return)}`}>
+                  {formatSignedPercent(nifty50Benchmark.ann_return)}
                 </td>
-                <td className="py-3 px-3 text-right font-mono text-slate">
+                <td className="py-3 px-3 text-right text-muted">
                   {formatPercent(nifty50Benchmark.ann_vol)}
                 </td>
-                <td className="py-3 px-3 text-right font-mono text-text">
+                <td className="py-3 px-3 text-right text-text">
                   {formatNumber(nifty50Benchmark.sharpe, 2)}
                 </td>
-                <td className="py-3 px-3 text-right font-mono text-[#FF8A8A] font-bold">
-                  {formatPercent(nifty50Benchmark.max_drawdown)}
+                <td className={`py-3 px-3 text-right font-medium ${drawdownClass(nifty50Benchmark.max_drawdown)}`}>
+                  {formatDrawdown(nifty50Benchmark.max_drawdown)}
                 </td>
               </tr>
             )}
@@ -61,27 +62,27 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({ solvers, nifty50Benchm
             {/* Solvers OOS Rows */}
             {solvers.map(s => {
               if (!s.oos || !s.feasible || s.selection === null) return null;
-              const color = getSolverColor(s.solver);
+              const style = getSolverStyle(s.solver);
 
               return (
-                <tr key={s.solver} className="hover:bg-ink/40 transition-colors">
+                <tr key={s.solver} className="hover:bg-bg transition-colors">
                   <td className="py-3 px-3">
                     <div className="flex items-center space-x-2">
-                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }}></span>
-                      <span className="font-bold text-text">{s.label}</span>
+                      <SolverMarker style={style} />
+                      <span className="font-medium text-text">{s.label}</span>
                     </div>
                   </td>
-                  <td className="py-3 px-3 text-right font-mono font-bold text-peach">
-                    {formatPercent(s.oos.ann_return)}
+                  <td className={`py-3 px-3 text-right font-medium ${gainLossClass(s.oos.ann_return)}`}>
+                    {formatSignedPercent(s.oos.ann_return)}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-slate">
+                  <td className="py-3 px-3 text-right text-muted">
                     {formatPercent(s.oos.ann_vol)}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-text font-bold">
+                  <td className="py-3 px-3 text-right text-text font-medium">
                     {formatNumber(s.oos.sharpe, 2)}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-[#FF8A8A] font-bold">
-                    {formatPercent(s.oos.max_drawdown)}
+                  <td className={`py-3 px-3 text-right font-medium ${drawdownClass(s.oos.max_drawdown)}`}>
+                    {formatDrawdown(s.oos.max_drawdown)}
                   </td>
                 </tr>
               );

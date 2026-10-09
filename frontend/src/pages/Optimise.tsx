@@ -24,12 +24,12 @@ import { HonestyPanel } from '../components/HonestyPanel';
 import { OutOfSample } from '../components/OutOfSample';
 
 const DEFAULT_QAOA: QaoaSettings = {
-  variant: 'standard',
+  variant: 'xy',
   reps: 2,
   optimizer: 'COBYLA',
   init: 'ramp',
-  shots: 4096,
-  maxiter: 150,
+  shots: 2048,
+  maxiter: 80,
   noise: false,
   seed: 7
 };
@@ -244,7 +244,6 @@ export const Optimise: React.FC = () => {
   if (loadingUniverse) {
     return (
       <div className="p-12 text-center text-xs text-muted space-y-3">
-        <div className="w-8 h-8 border-2 border-peach border-t-transparent rounded-full animate-spin mx-auto"></div>
         <p>Connecting to Quantum Portfolio Backend...</p>
       </div>
     );
@@ -252,14 +251,13 @@ export const Optimise: React.FC = () => {
 
   if (apiError) {
     return (
-      <div className="max-w-2xl mx-auto p-6 bg-wine/30 border border-wine rounded-2xl text-center space-y-4 shadow-panel">
-        <div className="text-2xl">⚠️</div>
-        <h2 className="text-base font-bold text-[#FF8A8A]">Could not load the stock list</h2>
+      <div className="max-w-2xl mx-auto p-6 bg-surface border border-line-strong text-center space-y-4">
+        <h2 className="text-base font-medium text-text">⚠ Could not load the stock list</h2>
         <p className="text-xs text-text break-words">{apiError}</p>
         <button
           type="button"
           onClick={fetchUniverseData}
-          className="px-5 py-2.5 min-h-[44px] bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
+          className="px-5 py-2.5 min-h-[44px] bg-text text-bg font-medium text-xs hover:bg-muted transition-all"
         >
           Retry
         </button>
@@ -311,8 +309,8 @@ export const Optimise: React.FC = () => {
 
           {/* Validation Error Banner */}
           {validationError && (
-            <div className="p-4 bg-wine/40 border border-wine rounded-2xl text-xs text-[#FF8A8A] font-medium flex items-center gap-2">
-              <span>🛑</span> {validationError}
+            <div className="p-4 bg-surface border border-line-strong text-xs text-text font-medium flex items-center gap-2">
+              <span>⚠</span> {validationError}
             </div>
           )}
 
@@ -321,13 +319,13 @@ export const Optimise: React.FC = () => {
             type="button"
             onClick={handleStartRun}
             disabled={activeJobStatus?.state === 'running' || activeJobStatus?.state === 'queued'}
-            className={`w-full py-4 px-6 min-h-[48px] text-sm font-extrabold rounded-2xl shadow-panel transition-all transform active:scale-[0.99] flex items-center justify-center space-x-2 ${
+            className={`w-full py-4 px-6 min-h-[48px] text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
               activeJobStatus?.state === 'running' || activeJobStatus?.state === 'queued'
-                ? 'bg-line text-muted cursor-not-allowed opacity-60'
-                : 'bg-hero-bar text-ink hover:opacity-95 text-text font-bold border border-peach/40 cursor-pointer'
+                ? 'bg-line text-faint cursor-not-allowed'
+                : 'bg-text text-bg hover:bg-muted font-medium border border-text cursor-pointer'
             }`}
           >
-            <span>🚀 Run Quantum Portfolio Optimization</span>
+            <span>Run Quantum Portfolio Optimization</span>
           </button>
         </div>
 
@@ -350,9 +348,9 @@ export const Optimise: React.FC = () => {
 
           {/* Job Error State */}
           {activeJobStatus?.state === 'error' && (
-            <div className="p-5 bg-wine/40 border border-wine rounded-2xl text-xs space-y-2">
-              <h3 className="font-bold text-[#FF8A8A] flex items-center gap-2">
-                <span>❌</span> The run failed
+            <div className="p-5 bg-surface border border-line-strong text-xs space-y-2">
+              <h3 className="font-medium text-text flex items-center gap-2">
+                ⚠ The run failed
               </h3>
               <p className="text-text text-xs leading-relaxed break-words">
                 {activeJobStatus.error || 'The server reported an error.'}
@@ -365,7 +363,7 @@ export const Optimise: React.FC = () => {
               <button
                 type="button"
                 onClick={handleStartRun}
-                className="px-4 py-2 min-h-[44px] bg-peach text-ink font-bold text-xs rounded-xl hover:bg-peach/90 transition-all shadow"
+                className="px-4 py-2 min-h-[44px] bg-text text-bg font-medium text-xs hover:bg-muted transition-all"
               >
                 Retry
               </button>
@@ -374,11 +372,11 @@ export const Optimise: React.FC = () => {
 
           {/* Job Cancelled State */}
           {activeJobStatus?.state === 'cancelled' && (
-            <div className="p-4 bg-line/30 border border-line rounded-2xl text-xs text-muted flex items-center justify-between">
+            <div className="p-4 bg-line/30 border border-line text-xs text-muted flex items-center justify-between">
               <span>Run was cancelled. Input form is ready for a new optimization run.</span>
               <button
                 onClick={() => setActiveJobStatus(null)}
-                className="text-peach font-bold underline min-h-[44px] flex items-center px-2"
+                className="text-text font-medium underline min-h-[44px] flex items-center px-2"
               >
                 Reset
               </button>
@@ -441,9 +439,8 @@ export const Optimise: React.FC = () => {
           )}
 
           {!runResult && !activeJobStatus && (
-            <div className="p-8 bg-panel/40 border border-dashed border-line rounded-2xl text-center text-xs text-muted space-y-2">
-              <div className="text-xl text-slate">📊</div>
-              <div className="font-bold text-text">No Active Optimization Run</div>
+            <div className="p-8 bg-surface border border-dashed border-line text-center text-xs text-muted space-y-2">
+              <div className="font-medium text-text">No Active Optimization Run</div>
               <p>Pick your stocks and settings, then press "Run Quantum Portfolio Optimization" to run QAOA and the classical solvers side by side.</p>
             </div>
           )}
@@ -452,17 +449,17 @@ export const Optimise: React.FC = () => {
 
       {/* Sticky Mobile Cancel Banner during active run (U15) */}
       {activeJobStatus && (activeJobStatus.state === 'running' || activeJobStatus.state === 'queued') && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-panel/95 backdrop-blur-md border-t border-peach/40 p-3 px-4 shadow-panel flex items-center justify-between sm:hidden animate-in slide-in-from-bottom duration-200">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-line-strong p-3 px-4 flex items-center justify-between sm:hidden">
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-peach animate-ping"></span>
-            <span className="text-xs font-bold text-text truncate max-w-[190px]">
+            <span className="w-2 h-2 bg-text"></span>
+            <span className="text-xs font-medium text-text truncate max-w-[190px]">
               {activeJobStatus.stage || 'Optimizing...'}
             </span>
           </div>
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 min-h-[44px] bg-red/20 text-[#FF8A8A] border border-red/40 hover:bg-wine text-xs font-bold rounded-xl transition-all flex items-center justify-center"
+            className="px-4 py-2 min-h-[44px] bg-surface text-text border border-line-strong hover:bg-line text-xs font-medium transition-all flex items-center justify-center"
           >
             Cancel Run
           </button>

@@ -10,81 +10,49 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('optimise');
   const [glossaryOpen, setGlossaryOpen] = useState(false);
 
-  return (
-    <div className="min-h-screen bg-ink text-text flex flex-col selection:bg-peach selection:text-ink">
-      {/* Top Hero Band Gradient Bar */}
-      <div className="h-1.5 w-full bg-hero-bar"></div>
+  const tabs: { id: Tab; label: string }[] = [
+    { id: 'optimise', label: 'Optimise' },
+    { id: 'evidence', label: 'Evidence' },
+    { id: 'method', label: 'Method' }
+  ];
 
-      {/* Main App Header */}
-      <header className="bg-panel border-b border-line shadow-panel sm:sticky sm:top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-hero-gradient flex items-center justify-center text-text font-black text-xl shadow border border-peach/30">
-              Q
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h1 className="text-lg font-extrabold text-text tracking-tight">
-                  Quantum Portfolio Optimiser
-                </h1>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-peach/20 text-peach border border-peach/30">
-                  PS-03
-                </span>
-              </div>
-              <p className="text-xs text-muted">
-                Qiskit Fall Fest 2026 — NIFTY 50 QAOA &amp; Classical Solvers
-              </p>
-            </div>
+  return (
+    <div className="min-h-screen bg-bg text-text flex flex-col selection:bg-text selection:text-bg">
+      {/* Header: one compact row */}
+      <header className="bg-bg border-b border-line sm:sticky sm:top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0 pt-3 sm:py-3">
+            <h1 className="text-2xl leading-none whitespace-nowrap">Quantum Portfolio</h1>
+            <span className="label whitespace-nowrap">PS-03 · NIFTY 50</span>
           </div>
 
-          {/* Navigation Tabs & Glossary Button */}
-          <div className="flex items-center justify-between sm:justify-end gap-2 min-w-0">
-            <nav className="flex flex-1 sm:flex-none min-w-0 bg-ink/70 p-1 rounded-xl border border-line">
+          <nav className="flex items-stretch gap-4 sm:gap-5 w-full sm:w-auto" aria-label="Sections">
+            {tabs.map(t => (
               <button
+                key={t.id}
                 type="button"
-                onClick={() => setActiveTab('optimise')}
-                className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
-                  activeTab === 'optimise'
-                    ? 'bg-peach text-ink shadow'
-                    : 'text-muted hover:text-text'
+                onClick={() => setActiveTab(t.id)}
+                aria-current={activeTab === t.id ? 'page' : undefined}
+                className={`label min-h-[44px] px-0 border-0 border-b-2 flex items-center ${
+                  activeTab === t.id
+                    ? 'border-text text-text'
+                    : 'border-transparent text-muted hover:text-text'
                 }`}
+                style={{ borderColor: activeTab === t.id ? '#FFFFFF' : 'transparent' }}
               >
-                ⚡ Optimise
+                {t.label}
               </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('evidence')}
-                className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
-                  activeTab === 'evidence'
-                    ? 'bg-peach text-ink shadow'
-                    : 'text-muted hover:text-text'
-                }`}
-              >
-                📊 Evidence Studies
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('method')}
-                className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] text-xs font-bold rounded-lg transition-all flex items-center justify-center ${
-                  activeTab === 'method'
-                    ? 'bg-peach text-ink shadow'
-                    : 'text-muted hover:text-text'
-                }`}
-              >
-                📜 Methodology
-              </button>
-            </nav>
-
+            ))}
             <button
               type="button"
               onClick={() => setGlossaryOpen(true)}
-              className="p-2 min-h-[44px] min-w-[44px] shrink-0 bg-panel hover:bg-line text-peach border border-line rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
+              className="label min-h-[44px] px-0 border-0 border-b-2 border-transparent text-muted hover:text-text flex items-center"
+              style={{ borderColor: 'transparent' }}
               title="Quantum Glossary"
             >
-              <span>📖</span>
-              <span className="hidden md:inline">Glossary</span>
+              Glossary
             </button>
-          </div>
+          </nav>
         </div>
       </header>
 
@@ -97,16 +65,11 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-panel border-t border-line py-6 px-4 text-center text-xs text-muted space-y-2 mt-12">
-        <div className="flex flex-wrap items-center justify-center gap-4 text-[11px]">
-          <span>Qiskit Fall Fest 2026 (Team 4 GOATS)</span>
-          <span className="text-line">•</span>
-          <span>Powered by Qiskit 2.5 V2 Primitives &amp; Aer Simulator</span>
-          <span className="text-line">•</span>
-          <span className="text-peach">Strict PS-03 Honesty Protocol</span>
-        </div>
-        <p className="text-[10px] text-muted/70 max-w-2xl mx-auto">
-          No quantum superiority is claimed. Classical brute force evaluates exact solutions on small instances. QAOA solutions represent the best feasible bitstrings sampled from quantum state measurements.
+      <footer className="border-t border-line py-6 px-4 text-center mt-12 space-y-2">
+        <p className="label">Qiskit Fall Fest 2026 · Team 4 GOATS · Qiskit 2.5 V2 Primitives &amp; Aer Simulator</p>
+        <p className="label">Data: Yahoo Finance via yfinance (adjusted close), cached snapshot</p>
+        <p className="text-xs text-muted">
+          Educational tool, not investment advice. Past performance does not guarantee future returns.
         </p>
       </footer>
 
