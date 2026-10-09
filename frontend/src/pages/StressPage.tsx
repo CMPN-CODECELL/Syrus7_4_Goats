@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import type { RunResult } from '../api/types';
 import { StressTest } from '../components/StressTest';
+import { HistoricalReplay } from '../components/HistoricalReplay';
 
 export function StressPage({ result, onGo }: { result: RunResult | null; onGo: () => void }) {
   const options = result?.solvers.filter((s) => s.feasible && s.portfolio?.rows.length) ?? [];
@@ -34,6 +35,7 @@ export function StressPage({ result, onGo }: { result: RunResult | null; onGo: (
         <span className="text-muted">· {solver.portfolio?.rows.map((r) => r.symbol ?? r.ticker).join(', ')}</span>
       </label>
       <StressTest key={`${result.run_id}-${solver.solver}`} solver={solver} betas={result.betas} />
+      <HistoricalReplay result={result} />
     </div>
   );
 }

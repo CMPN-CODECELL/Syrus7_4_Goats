@@ -23,6 +23,7 @@ import { BitstringHistogram } from '../components/BitstringHistogram';
 import { HonestyPanel } from '../components/HonestyPanel';
 import { StressTest } from '../components/StressTest';
 import { MethodCompare } from '../components/MethodCompare';
+import { HistoricalReplay } from '../components/HistoricalReplay';
 import { OutOfSample } from '../components/OutOfSample';
 import { getSolverStyle } from '../lib/chartColors';
 import { SolverMarker } from '../components/SolverMarker';
@@ -909,6 +910,8 @@ export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onRe
                   <MethodCompare result={runResult} />
 
                   <StressTest key={selectedSolver.solver} solver={selectedSolver} betas={runResult.betas} />
+
+                  <div data-research><HistoricalReplay result={runResult} /></div>
 
                   {/* Markowitz Efficient Frontier */}
                   <div data-research><FrontierChart

@@ -1,10 +1,12 @@
 // Market crash stress tests: three what-if scenarios on the chosen portfolio, computed from this run's own numbers.
 // Betas and volatility come from the estimation window only. These are estimates, not predictions.
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import type { SolverResult } from '../api/types';
 import { formatINR, formatPct } from '../lib/format';
 
-const Z95 = 1.645; // one-sided 95% normal quantile
+// One-month normal model at 95%: VaR = 1.645·σ·√(1/12); Expected Shortfall = σ·√(1/12)·φ(1.645)/0.05 = 2.063·σ·√(1/12).
+const Z95 = 1.645;
+const ES95 = 2.063;
 
 function Slider({ label, value, min, max, step, onChange, show }: {
   label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; show: string;
@@ -25,6 +27,15 @@ function Loss({ pct, amount }: { pct: number; amount: number }) {
   );
 }
 
+function How({ children }: { children: ReactNode }) {
+  return (
+    <details className="text-xs text-muted mt-2">
+      <summary className="cursor-pointer">How is this calculated?</summary>
+      <div className="mt-1">{children}</div>
+    </details>
+  );
+}
+
 export function StressTest({ solver, betas }: { solver: SolverResult; betas?: Record<string, number> | null }) {
   const rows = solver.portfolio?.rows ?? [];
   const invested = solver.portfolio?.invested ?? 0;
@@ -40,14 +51,23 @@ export function StressTest({ solver, betas }: { solver: SolverResult; betas?: Re
 
   if (!rows.length || invested <= 0) return null;
 
-  // 1. Market-wide crash: portfolio beta times the market fall.
-  const known = rows.filter((r) => betas?.[r.ticker] !== undefined);
-  const beta = rows.reduce((s, r) => s + (r.value / invested) * (betas?.[r.ticker] ?? 1), 0);
-  const crash = Math.max(0, beta * drop / 100);
+  // 1. Market-wide crash: each stock falls beta x the market fall; the portfolio loss is the weighted sum.
+  const stocks = rows
+    .map((r) => {
+      const w = r.value / invested;
+      const b = betas?.[r.ticker] ?? 1;
+      const ret = -Math.min(1, b * drop / 100);
+      return { ...r, w, b, ret, contrib: w * ret, rupees: r.value * ret, missing: betas?.[r.ticker] === undefined };
+    })
+    .sort((a, b) => a.contrib - b.contrib);
+  const crash = -stocks.reduce((s, x) => s + x.contrib, 0);
+  const beta = stocks.reduce((s, x) => s + x.w * x.b, 0);
 
-  // 2. Volatility spike: 95% one-month loss bound, normal vs stressed volatility.
+  // 2. Volatility spike: tail-loss thresholds for one month, at normal and stressed volatility.
   const vol = solver.volatility ?? 0;
-  const monthLoss = (k: number) => Math.min(1, Z95 * vol * k / Math.sqrt(12));
+  const m = (k: number) => (vol * k) / Math.sqrt(12);
+  const varAt = (k: number) => Math.min(1, Z95 * m(k));
+  const esAt = (k: number) => Math.min(1, ES95 * m(k));
 
   // 3. Sector shock: one sector falls, the rest is unchanged.
   const [topName, topW] = sectors[0];
@@ -60,7 +80,7 @@ export function StressTest({ solver, betas }: { solver: SolverResult; betas?: Re
       <div>
         <h3 id="stress-title" className="text-base text-text">Market crash stress test</h3>
         <p className="text-sm text-muted mt-1">
-          How this portfolio of {formatINR(invested)} might hold up in a bad market, before you invest real money.
+          How this portfolio of {formatINR(invested)} ({solver.label}) might hold up in a bad market, before you invest real money.
           What-if estimates from historical data, not predictions.
         </p>
       </div>
@@ -73,34 +93,43 @@ export function StressTest({ solver, betas }: { solver: SolverResult; betas?: Re
           <p className="text-sm text-muted mt-2">
             Value after the fall: {formatINR(invested * (1 - crash))}. Your portfolio moves about {beta.toFixed(2)}× the market
             {beta > 1.05 ? ', so it would fall more than the market' : beta < 0.95 ? ', so it would fall less than the market' : ', about the same as the market'}.
+            See which stocks drive it below.
           </p>
-          <details className="text-xs text-muted mt-2">
-            <summary className="cursor-pointer">How this is worked out</summary>
-            Loss = portfolio beta × market fall. Beta is each stock's sensitivity to the equal-weight average of your stock list,
-            from the estimation window only{known.length < rows.length ? '; stocks without a beta count as 1.0' : ''}. In real crashes,
-            stocks tend to fall together, so actual losses can be larger.
-          </details>
+          <How>
+            Each stock falls by its beta × the market fall; the portfolio loss is the sum of weight × that fall. Beta is each stock's
+            sensitivity to the equal-weight average of your stock list, from the estimation window only
+            {stocks.some((x) => x.missing) ? '; stocks without a beta count as 1.0' : ''}. In real crashes stocks tend to fall together, so actual losses can be larger.
+          </How>
         </div>
 
         <div className="bg-bg border border-line p-4">
           <h4 className="text-sm">2. Volatility spike</h4>
-          <div className="mt-1 flex gap-2" role="group" aria-label="How much more prices swing">
-            {[1.5, 2, 3].map((k) => (
+          <div className="mt-1 flex flex-wrap gap-2" role="group" aria-label="How much more prices swing">
+            {[1, 1.5, 2, 3].map((k) => (
               <button key={k} type="button" onClick={() => setVolX(k)} aria-pressed={volX === k}
                 className={`px-3 py-1 border text-sm ${volX === k ? 'border-accent-blue text-accent-blue-hover' : 'border-line-strong text-muted'}`}>
-                {k}× swings
+                {k === 1 ? 'Normal' : `${k}× swings`}
               </button>
             ))}
           </div>
-          <Loss pct={monthLoss(volX)} amount={invested * monthLoss(volX)} />
-          <p className="text-sm text-muted mt-2">
-            Bad month (1 in 20) if prices swing {volX}× more than usual. In a normal market it is {formatPct(monthLoss(1))} ({formatINR(invested * monthLoss(1))}).
-            Yearly volatility rises from {formatPct(vol)} to {formatPct(vol * volX)}.
+          <p className="text-sm text-muted mt-3">
+            Bigger swings do not mean prices must fall; they widen the range of outcomes both ways. Over one month at {volX === 1 ? 'normal' : `${volX}×`} swings:
           </p>
-          <details className="text-xs text-muted mt-2">
-            <summary className="cursor-pointer">How this is worked out</summary>
-            95% one-month loss bound = 1.645 × yearly volatility × multiplier ÷ √12, assuming normal returns. Real markets have fatter tails.
-          </details>
+          <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
+            <div className="border border-line p-2">
+              <dt className="text-muted">1-in-20 bad month (VaR 95%)</dt>
+              <dd className="text-loss font-medium">▼ {formatPct(varAt(volX))} · {formatINR(invested * varAt(volX))}</dd>
+            </div>
+            <div className="border border-line p-2">
+              <dt className="text-muted">Average of those bad months (ES 95%)</dt>
+              <dd className="text-loss font-medium">▼ {formatPct(esAt(volX))} · {formatINR(invested * esAt(volX))}</dd>
+            </div>
+          </dl>
+          <p className="text-sm text-muted mt-2">Yearly volatility: {formatPct(vol)} normally, {formatPct(vol * volX)} in this scenario.</p>
+          <How>
+            Normal-returns model, one-month horizon, zero mean. VaR 95% = 1.645 × yearly volatility × multiplier ÷ √12: the loss exceeded in 1 month out of 20.
+            Expected Shortfall 95% = 2.063 × yearly volatility × multiplier ÷ √12: the average loss in those worst months. Real markets have fatter tails than this model.
+          </How>
         </div>
 
         <div className="bg-bg border border-line p-4">
@@ -114,10 +143,57 @@ export function StressTest({ solver, betas }: { solver: SolverResult; betas?: Re
           <Slider label="It falls by" value={sectorDrop} min={5} max={50} step={5} onChange={setSectorDrop} show={`${sectorDrop}%`} />
           <Loss pct={sectorLoss} amount={invested * sectorLoss} />
           <p className="text-sm text-muted mt-2">
-            {formatPct(chosenW, { digits: 0 })} of your money is in {chosen}; the rest is assumed unchanged.
-            {topW > 0.4 ? ` Warning: ${formatPct(topW, { digits: 0 })} sits in one sector (${topName}), which is a large concentration.` : ` Your largest sector is ${formatPct(topW, { digits: 0 })} (${topName}).`}
+            {formatPct(chosenW, { digits: 0 })} of your money is in {chosen}; the other sectors are assumed unchanged.
+            {topW > 0.4 ? ` Warning: ${formatPct(topW, { digits: 0 })} sits in one sector (${topName}), a large concentration.` : ` Your largest sector is ${formatPct(topW, { digits: 0 })} (${topName}).`}
           </p>
+          <table className="w-full text-xs mt-2">
+            <caption className="text-left text-muted mb-1">The same {sectorDrop}% fall in each of your sectors</caption>
+            <tbody>
+              {sectors.map(([s, w]) => (
+                <tr key={s} className={s === chosen ? 'text-text' : 'text-muted'}>
+                  <td className="py-0.5">{s}</td>
+                  <td className="py-0.5 text-right text-loss">▼ {formatPct(w * sectorDrop / 100)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <How>Portfolio loss = sector weight × sector fall. Other sectors are held flat, so this isolates concentration risk.</How>
         </div>
+      </div>
+
+      <div>
+        <h4 className="text-sm text-text">What is driving the loss? (market falls {drop}%)</h4>
+        <div className="overflow-x-auto mt-2">
+          <table className="w-full text-sm min-w-[560px]">
+            <thead>
+              <tr className="text-left text-muted border-b border-line">
+                <th className="py-1 pr-2 font-normal">Stock</th>
+                <th className="py-1 pr-2 font-normal">Sector</th>
+                <th className="py-1 pr-2 font-normal text-right">Weight</th>
+                <th className="py-1 pr-2 font-normal text-right">Beta</th>
+                <th className="py-1 pr-2 font-normal text-right">Stock falls</th>
+                <th className="py-1 pr-2 font-normal text-right">Share of portfolio loss</th>
+                <th className="py-1 font-normal text-right">₹ loss</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stocks.map((x) => (
+                <tr key={x.ticker} className="border-b border-line">
+                  <td className="py-1 pr-2">{x.symbol ?? x.ticker}</td>
+                  <td className="py-1 pr-2 text-muted">{x.sector}</td>
+                  <td className="py-1 pr-2 text-right">{formatPct(x.w)}</td>
+                  <td className="py-1 pr-2 text-right">{x.missing ? '1.00*' : x.b.toFixed(2)}</td>
+                  <td className="py-1 pr-2 text-right text-loss">▼ {formatPct(-x.ret)}</td>
+                  <td className="py-1 pr-2 text-right">{formatPct(crash > 0 ? x.contrib / -crash : 0, { digits: 0 })}</td>
+                  <td className="py-1 text-right text-loss">−{formatINR(-x.rupees)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs text-muted mt-1">
+          Stocks with beta above 1 add more than their weight to the loss; below 1 they soften it. Contribution = weight × the stock's fall; fixed starting weights, no cash flows.
+        </p>
       </div>
     </section>
   );
