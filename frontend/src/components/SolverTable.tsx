@@ -1,6 +1,6 @@
 import React from 'react';
 import { SolverResult } from '../api/types';
-import { formatPercent, formatSignedPercent, gainLossClass, formatNumber, getSolverStyle } from '../lib/chartColors';
+import { formatPercent, formatSignedPercent, gainLossClass, negativeClass, formatNumber, getSolverStyle } from '../lib/chartColors';
 import { SolverMarker } from './SolverMarker';
 
 interface SolverTableProps {
@@ -17,11 +17,11 @@ export const SolverTable: React.FC<SolverTableProps> = ({
   onSelectSolver
 }) => {
   return (
-    <div className="bg-surface border border-line p-5 mb-6">
+    <div className="bg-surface border border-line p-5">
       <div className="pb-3 border-b border-line mb-4">
-        <h2 className="text-base font-medium text-text flex items-center gap-2">
+        <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
           <span>Solver Benchmark Comparison</span>
-          <span className="text-xs text-muted font-normal">(Quantum vs Classical Solvers)</span>
+          <span className="text-[10px] font-mono text-muted font-normal lowercase">(Quantum vs Classical Solvers)</span>
         </h2>
         <p className="text-xs text-muted mt-0.5">
           Side-by-side objective evaluation, risk metrics, feasibility rates, and execution runtimes.
@@ -55,7 +55,7 @@ export const SolverTable: React.FC<SolverTableProps> = ({
                   onClick={() => onSelectSolver(s.solver)}
                   className={`cursor-pointer transition-colors ${
                     isSelected
-                      ? 'bg-line font-medium'
+                      ? 'bg-surface-elevated font-medium text-white'
                       : 'hover:bg-bg'
                   }`}
                 >
@@ -71,7 +71,7 @@ export const SolverTable: React.FC<SolverTableProps> = ({
                     </div>
                   </td>
 
-                  <td className="py-3 px-3 text-right font-medium text-text">
+                  <td className={`py-3 px-3 text-right font-medium ${negativeClass(s.objective)}`}>
                     {s.objective != null ? formatNumber(s.objective, 4) : '—'}
                   </td>
 
@@ -85,13 +85,13 @@ export const SolverTable: React.FC<SolverTableProps> = ({
 
                   <td className="py-3 px-3 text-center font-medium">
                     {s.feasible && s.selection !== null ? (
-                      <span className="text-text">✓ Feasible</span>
+                      <span className="text-gain">✓ Feasible</span>
                     ) : (
-                      <span className="text-text">⚠ Infeasible</span>
+                      <span className="text-loss">⚠ Infeasible</span>
                     )}
                   </td>
 
-                  <td className="py-3 px-3 text-right text-text">
+                  <td className={`py-3 px-3 text-right ${negativeClass(s.approx_ratio)}`}>
                     {s.approx_ratio != null ? formatNumber(s.approx_ratio, 2) : '—'}
                   </td>
 

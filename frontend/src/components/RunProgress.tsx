@@ -1,6 +1,7 @@
 import React from 'react';
 import { JobStatus } from '../api/types';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { negativeClass } from '../lib/chartColors';
 
 interface RunProgressProps {
   jobStatus: JobStatus;
@@ -10,19 +11,20 @@ interface RunProgressProps {
 export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel }) => {
   const percent = Math.round((jobStatus.progress || 0) * 100);
   const convergence = jobStatus.convergence || [];
+  const latestEnergy = convergence.length > 0 ? convergence[convergence.length - 1].energy : null;
 
   return (
-    <div className="bg-surface border border-line-strong p-6 mb-6">
+    <div className="bg-surface border border-accent-blue/40 p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-line mb-4">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 bg-text"></span>
-            <h2 className="text-base font-medium text-text">
+            <span className="w-2.5 h-2.5 bg-accent-blue animate-pulse"></span>
+            <h2 className="text-sm font-medium text-text uppercase tracking-wide">
               Executing QAOA &amp; Classical Solvers
             </h2>
           </div>
           <p className="text-xs text-muted mt-1">
-            Job ID: <code className=" text-text">{jobStatus.job_id}</code> | Elapsed: <strong className="text-text">{jobStatus.elapsed_s.toFixed(1)} s</strong>
+            Job ID: <code className="text-text font-mono text-[11px]">{jobStatus.job_id}</code> | Elapsed: <strong className="text-text font-mono">{jobStatus.elapsed_s.toFixed(1)} s</strong>
           </p>
         </div>
 
@@ -57,7 +59,7 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
               Live Energy Convergence
             </h3>
             <span className="text-[10px] text-muted">
-              Latest Energy: <strong className="text-text">{convergence[convergence.length - 1].energy.toFixed(4)}</strong>
+              Latest Energy: <strong className={negativeClass(latestEnergy)}>{latestEnergy?.toFixed(4)}</strong>
             </span>
           </div>
 

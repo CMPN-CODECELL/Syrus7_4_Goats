@@ -33,10 +33,12 @@ export const ConstraintsForm: React.FC<ConstraintsFormProps> = ({
   maxKLimit = 15
 }) => {
   return (
-    <div className="bg-surface border border-line p-5 mb-6">
-      <h2 className="text-base font-medium text-text mb-4 pb-3 border-b border-line flex items-center gap-2">
-        <span>Portfolio &amp; Risk Constraints</span>
-        <span className="text-xs text-muted font-normal">(QUBO Objective &amp; Slack Terms)</span>
+    <div className="bg-surface border border-line p-5">
+      <h2 className="text-sm font-medium text-text mb-4 pb-3 border-b border-line flex items-center justify-between uppercase tracking-wide">
+        <div className="flex items-center gap-2">
+          <span>Portfolio &amp; Risk Constraints</span>
+        </div>
+        <span className="text-[10px] font-mono text-muted font-normal lowercase">(QUBO &amp; Slack Terms)</span>
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

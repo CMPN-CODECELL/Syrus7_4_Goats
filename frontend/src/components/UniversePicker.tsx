@@ -69,12 +69,12 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
     : (selectedTickers ? selectedTickers.length : availableTickers.length);
 
   return (
-    <div className="bg-surface border border-line p-5 mb-6">
+    <div className="bg-surface border border-line p-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-line mb-4">
         <div>
-          <h2 className="text-base font-medium text-text flex items-center gap-2">
+          <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
             <span>Asset Universe</span>
-            <span className="text-xs px-2 py-0.5 bg-surface text-text border border-line-strong">
+            <span className="text-[10px] font-mono px-2 py-0.5 bg-surface-elevated text-text border border-line-strong">
               {activeCount} selected
             </span>
           </h2>
@@ -84,14 +84,14 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
         </div>
 
         {/* Mode Toggle */}
-        <div className="flex bg-bg p-1 border border-line self-start sm:self-auto">
+        <div className="flex bg-bg p-1 border border-line self-start sm:self-auto gap-0.5">
           <button
             type="button"
             onClick={() => handleModeChange('all')}
-            className={`px-3 py-2 min-h-[44px] text-xs font-medium transition-all flex items-center justify-center ${
+            className={`px-3 py-1.5 min-h-[36px] text-xs font-medium transition-all flex items-center justify-center border ${
               mode === 'all'
-                ? 'bg-text text-bg font-medium'
-                : 'text-muted hover:text-text'
+                ? 'bg-surface-elevated text-white border-accent-blue/60'
+                : 'border-transparent text-muted hover:text-text'
             }`}
           >
             Full NIFTY 50 ({availableTickers.length})
@@ -99,10 +99,10 @@ export const UniversePicker: React.FC<UniversePickerProps> = ({
           <button
             type="button"
             onClick={() => handleModeChange('custom')}
-            className={`px-3 py-2 min-h-[44px] text-xs font-medium transition-all flex items-center justify-center ${
+            className={`px-3 py-1.5 min-h-[36px] text-xs font-medium transition-all flex items-center justify-center border ${
               mode === 'custom'
-                ? 'bg-text text-bg font-medium'
-                : 'text-muted hover:text-text'
+                ? 'bg-surface-elevated text-white border-accent-blue/60'
+                : 'border-transparent text-muted hover:text-text'
             }`}
           >
             Custom Sub-Universe

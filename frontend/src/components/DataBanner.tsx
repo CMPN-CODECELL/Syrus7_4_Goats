@@ -14,10 +14,10 @@ export const DataBanner: React.FC<DataBannerProps> = ({ source, asOf, estWindow,
   const shownNotes = notes && notes.length > 0 ? notes : DEFAULT_NOTES;
 
   return (
-    <div className="bg-surface border border-line p-4 mb-6">
+    <div className="bg-surface border border-line p-4">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
-        <span className="inline-flex items-center px-2.5 py-1 bg-surface text-text border border-line-strong font-medium">
-          <span className="w-1.5 h-1.5 bg-text mr-1.5 shrink-0"></span>
+        <span className="inline-flex items-center px-2.5 py-1 bg-surface-elevated text-text border border-line-strong font-medium">
+          <span className="w-1.5 h-1.5 bg-accent-blue mr-1.5 shrink-0"></span>
           Data source: Yahoo Finance via yfinance (adjusted close), cached snapshot
         </span>
         <span className="text-muted">As of: <strong className="text-text font-medium">{asOf ?? 'unknown'}</strong></span>

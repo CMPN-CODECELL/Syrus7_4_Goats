@@ -15,7 +15,7 @@ export const AdvancedQaoa: React.FC<AdvancedQaoaProps> = ({ settings, onChange }
   };
 
   return (
-    <div className="bg-surface border border-line mb-6 overflow-hidden">
+    <div className="bg-surface border border-line overflow-hidden">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}

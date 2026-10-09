@@ -32,7 +32,7 @@ export const StudyChart: React.FC<StudyChartProps> = ({ study }) => {
   const fmt = (v: any) => (typeof v === 'number' ? v.toFixed(4) : String(v));
 
   return (
-    <div className="bg-surface border border-line p-4 sm:p-6 mb-6 space-y-5">
+    <div className="bg-surface border border-line p-4 sm:p-6 space-y-5">
       {/* Study Header */}
       <div className="border-b border-line pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>

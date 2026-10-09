@@ -20,7 +20,7 @@ export const ScreenPreview: React.FC<ScreenPreviewProps> = ({ screenInfo, loadin
   if (!screenInfo) return null;
 
   return (
-    <div className={`border p-4 mb-6 transition-all ${
+    <div className={`border p-4 transition-all ${
       screenInfo.applied
         ? 'bg-surface border-line-strong'
         : 'bg-surface border-line'

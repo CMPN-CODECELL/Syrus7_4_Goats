@@ -10,7 +10,7 @@ import {
   Tooltip,
   CartesianGrid
 } from 'recharts';
-import { CHART_COLORS, getSolverStyle, formatPercent } from '../lib/chartColors';
+import { CHART_COLORS, getSolverStyle, formatPercent, formatSignedPercent, gainLossClass } from '../lib/chartColors';
 import { MarkerGlyph, SolverMarker } from './SolverMarker';
 
 interface FrontierChartProps {
@@ -52,10 +52,10 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
   );
 
   return (
-    <div className="bg-surface border border-line p-5 mb-6">
+    <div className="bg-surface border border-line p-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-line mb-4">
         <div>
-          <h2 className="text-base font-medium text-text flex items-center gap-2">
+          <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
             <span>Risk-Return Efficient Frontier</span>
           </h2>
           <p className="text-xs text-muted mt-0.5">
@@ -96,7 +96,12 @@ export const FrontierChart: React.FC<FrontierChartProps> = ({
                 return (
                   <div className="bg-surface border border-line px-3 py-2 text-[11px] text-text max-w-64">
                     <div className="font-medium mb-0.5">{p.name}</div>
-                    <div className="text-muted">Volatility {formatPercent(p.risk)} · Return {formatPercent(p.ret)}</div>
+                    <div className="text-muted">
+                      Volatility {formatPercent(p.risk)} · Return{' '}
+                      <span className={`font-medium ${gainLossClass(p.ret)}`}>
+                        {formatSignedPercent(p.ret)}
+                      </span>
+                    </div>
                   </div>
                 );
               }}

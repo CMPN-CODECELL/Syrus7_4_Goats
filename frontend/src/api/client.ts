@@ -52,6 +52,11 @@ const postJson = (body: unknown): RequestInit => ({
   body: JSON.stringify(body)
 });
 
+export async function getHealth(): Promise<{ ok: boolean; version: string }> {
+  if (USE_MOCKS) return { ok: true, version: '0.1.0' };
+  return request<{ ok: boolean; version: string }>('/api/health');
+}
+
 export async function getUniverse(): Promise<Universe> {
   if (USE_MOCKS) return mockGetUniverse();
   return request<Universe>('/api/universe');

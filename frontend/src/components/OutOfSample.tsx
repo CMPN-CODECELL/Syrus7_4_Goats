@@ -11,9 +11,9 @@ interface OutOfSampleProps {
 
 export const OutOfSample: React.FC<OutOfSampleProps> = ({ solvers, nifty50Benchmark, testWindow }) => {
   return (
-    <div className="bg-surface border border-line p-5 mb-6">
+    <div className="bg-surface border border-line p-5">
       <div className="pb-3 border-b border-line mb-4">
-        <h2 className="text-base font-medium text-text flex items-center gap-2">
+        <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
           <span>Out-of-Sample Test Window Backtest</span>
         </h2>
         <p className="text-xs text-muted mt-0.5">
@@ -50,7 +50,7 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({ solvers, nifty50Benchm
                 <td className="py-3 px-3 text-right text-muted">
                   {formatPercent(nifty50Benchmark.ann_vol)}
                 </td>
-                <td className="py-3 px-3 text-right text-text">
+                <td className={`py-3 px-3 text-right font-medium ${gainLossClass(nifty50Benchmark.sharpe)}`}>
                   {formatNumber(nifty50Benchmark.sharpe, 2)}
                 </td>
                 <td className={`py-3 px-3 text-right font-medium ${drawdownClass(nifty50Benchmark.max_drawdown)}`}>
@@ -78,7 +78,7 @@ export const OutOfSample: React.FC<OutOfSampleProps> = ({ solvers, nifty50Benchm
                   <td className="py-3 px-3 text-right text-muted">
                     {formatPercent(s.oos.ann_vol)}
                   </td>
-                  <td className="py-3 px-3 text-right text-text font-medium">
+                  <td className={`py-3 px-3 text-right font-medium ${gainLossClass(s.oos.sharpe)}`}>
                     {formatNumber(s.oos.sharpe, 2)}
                   </td>
                   <td className={`py-3 px-3 text-right font-medium ${drawdownClass(s.oos.max_drawdown)}`}>

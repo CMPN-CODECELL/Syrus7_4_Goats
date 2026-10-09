@@ -93,6 +93,12 @@ export function gainLossClass(val: number | null | undefined): string {
   return val > 0 ? 'text-gain' : 'text-loss';
 }
 
+// Any value lower than 0 / negative returns text-loss (red)
+export function negativeClass(val: number | null | undefined): string {
+  if (val === null || val === undefined || isNaN(val)) return 'text-text';
+  return val < 0 ? 'text-loss' : 'text-text';
+}
+
 // A drawdown is a loss by definition, whichever sign the server uses
 export function formatDrawdown(val: number | null | undefined, decimals = 1): string {
   if (val === null || val === undefined || isNaN(val)) return '—';

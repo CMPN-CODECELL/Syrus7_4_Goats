@@ -1,20 +1,47 @@
 @import "tailwindcss";
 
-/* Monochrome palette. Green and red are reserved for gain and loss only. */
 @theme {
   --color-bg: #000000;
-  --color-surface: #0A0A0A;
-  --color-line: #262626;
-  --color-line-strong: #6B6B6B;
+  --color-surface: #0A0A0D;
+  --color-surface-elevated: #111117;
+  --color-surface-card: #0E0E14;
+  --color-line: #1F1F28;
+  --color-line-strong: #404052;
+  --color-line-subtle: #161620;
   --color-text: #FFFFFF;
-  --color-muted: #A3A3A3;
-  --color-faint: #737373;
+  --color-text-dim: #E2E8F0;
+  --color-muted: #8E8EA0;
+  --color-faint: #565666;
   --color-gain: #22C55E;
   --color-loss: #EF4444;
+  --color-accent-blue: #2563EB;
+  --color-accent-blue-hover: #3B82F6;
+  --color-accent-blue-subtle: rgba(37, 99, 235, 0.12);
+  --color-accent-blue-border: rgba(59, 130, 246, 0.35);
 
   --font-sans: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
+/* Explicit Gain (Growth/Green) and Loss (Red) Utility Overrides */
+.text-gain {
+  color: #22C55E !important;
+}
+.text-loss {
+  color: #EF4444 !important;
+}
+.bg-gain {
+  background-color: #22C55E !important;
+}
+.bg-loss {
+  background-color: #EF4444 !important;
+}
+.border-gain {
+  border-color: #22C55E !important;
+}
+.border-loss {
+  border-color: #EF4444 !important;
 }
 
 @layer base {

@@ -7,10 +7,10 @@ export const Method: React.FC = () => {
       {/* Hero Header */}
       <div className="bg-surface border border-line p-6">
         <h1 className="text-xl font-medium text-text mb-2 flex items-center gap-2">
-          Methodology, QUBO Formulation &amp; Honesty Standard
+          Portfolio-Pulse — Methodology, QUBO Formulation &amp; Honesty Standard
         </h1>
         <p className="text-xs text-muted leading-relaxed">
-          Quantum Portfolio Optimiser translates modern portfolio theory into a Quadratic Unconstrained Binary Optimization (QUBO) problem of up to 16 qubits (12 by default), solved with Qiskit 2.5 QAOA primitives and three classical benchmark solvers.
+          Portfolio-Pulse translates modern portfolio theory into a Quadratic Unconstrained Binary Optimization (QUBO) problem of up to 16 qubits (12 by default), solved with Qiskit 2.5 QAOA primitives and three classical benchmark solvers.
         </p>
       </div>
 

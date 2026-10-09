@@ -1,7 +1,7 @@
 import React from 'react';
 import { ConvergencePoint } from '../api/types';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { CHART_COLORS, formatNumber } from '../lib/chartColors';
+import { CHART_COLORS, formatNumber, negativeClass } from '../lib/chartColors';
 
 interface ConvergenceChartProps {
   convergence: ConvergencePoint[];
@@ -17,10 +17,10 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
   const finalEnergy = convergence[convergence.length - 1]?.energy;
 
   return (
-    <div className="bg-surface border border-line p-5 mb-6">
+    <div className="bg-surface border border-line p-5">
       <div className="flex items-center justify-between pb-3 border-b border-line mb-4">
         <div>
-          <h2 className="text-base font-medium text-text flex items-center gap-2">
+          <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
             <span>{title}</span>
           </h2>
           <p className="text-xs text-muted mt-0.5">
@@ -30,7 +30,7 @@ export const ConvergenceChart: React.FC<ConvergenceChartProps> = ({
 
         <div className="text-right">
           <span className="label block">Final Energy</span>
-          <span className="text-sm font-medium text-text">
+          <span className={`text-sm font-medium ${negativeClass(finalEnergy)}`}>
             {formatNumber(finalEnergy, 5)}
           </span>
         </div>

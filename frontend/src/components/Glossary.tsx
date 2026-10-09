@@ -115,7 +115,7 @@ export const GlossaryDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> 
         <div>
           <div className="flex items-center justify-between pb-4 border-b border-line mb-4">
             <h2 className="text-lg font-medium text-text flex items-center gap-2">
-              Quantum Investor Glossary
+              Portfolio-Pulse Investor Glossary
             </h2>
             <button
               onClick={onClose}

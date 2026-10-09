@@ -50,7 +50,7 @@ export const Evidence: React.FC = () => {
       {/* Header */}
       <div className="bg-surface border border-line p-6">
         <h1 className="text-xl font-medium text-text mb-2 flex items-center gap-2">
-          Empirical Quantum Evidence &amp; Benchmark Studies
+          Portfolio-Pulse — Empirical Quantum Evidence &amp; Benchmark Studies
         </h1>
         <p className="text-xs text-muted leading-relaxed">
           Systematic benchmark study runs evaluating QAOA circuit depth (p), classical optimizer convergence, parameter initialization (warm-start interp), XY ring mixers, and physical hardware noise simulation.
@@ -84,20 +84,26 @@ export const Evidence: React.FC = () => {
         <div className="space-y-6">
           {/* Study Selector Tabs */}
           <div className="flex bg-surface p-1.5 border border-line overflow-x-auto gap-1">
-            {studiesIndex.map(s => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setActiveStudyId(s.id)}
-                className={`px-4 py-2 min-h-[44px] text-xs font-medium whitespace-nowrap transition-all flex items-center justify-center ${
-                  activeStudyId === s.id
-                    ? 'bg-text text-bg'
-                    : 'text-muted hover:text-text hover:bg-line/40'
-                }`}
-              >
-                {s.title}
-              </button>
-            ))}
+            {studiesIndex.map(s => {
+              const isSelected = activeStudyId === s.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setActiveStudyId(s.id)}
+                  className={`px-4 py-2 min-h-[44px] text-xs font-medium whitespace-nowrap transition-all flex items-center justify-center border ${
+                    isSelected
+                      ? 'bg-surface-elevated text-white border-accent-blue/60 shadow-xs'
+                      : 'border-transparent text-muted hover:text-text hover:bg-surface-elevated'
+                  }`}
+                >
+                  <span className="flex items-center space-x-2">
+                    {isSelected && <span className="w-1.5 h-1.5 bg-accent-blue shrink-0"></span>}
+                    <span>{s.title}</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Active Study View */}

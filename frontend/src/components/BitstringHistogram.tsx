@@ -38,10 +38,10 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
   };
 
   return (
-    <div className="bg-surface border border-line p-5 mb-6">
+    <div className="bg-surface border border-line p-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-line mb-4">
         <div>
-          <h2 className="text-base font-medium text-text flex items-center gap-2">
+          <h2 className="text-sm font-medium text-text flex items-center gap-2 uppercase tracking-wide">
             <span>QAOA Bitstring Sample Probability Distribution</span>
           </h2>
           <p className="text-xs text-muted mt-0.5">
@@ -54,10 +54,10 @@ export const BitstringHistogram: React.FC<BitstringHistogramProps> = ({ samples 
           <span className="flex items-center gap-1.5 text-text">
             <span className="w-3 h-3 bg-text"></span> ★ Optimal
           </span>
-          <span className="flex items-center gap-1.5 text-muted">
+          <span className="flex items-center gap-1.5 text-gain">
             <span className="w-3 h-3" style={{ backgroundColor: CHART_COLORS.feasible }}></span> Feasible
           </span>
-          <span className="flex items-center gap-1.5 text-muted">
+          <span className="flex items-center gap-1.5 text-loss">
             <span className="w-3 h-3 border" style={{ backgroundColor: CHART_COLORS.infeasible, borderColor: CHART_COLORS.infeasibleStroke }}></span> Infeasible
           </span>
         </div>
