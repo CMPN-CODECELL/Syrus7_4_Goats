@@ -65,7 +65,7 @@ export const PortfolioTable: React.FC<PortfolioTableProps> = ({
       {isNoFeasible ? (
         <div className="p-8 bg-wine/30 border border-wine rounded-xl text-center space-y-2">
           <div className="text-xl">⚠️</div>
-          <h3 className="font-bold text-red text-sm">
+          <h3 className="font-bold text-[#FF8A8A] text-sm">
             QAOA Found No Feasible Portfolio
           </h3>
           <p className="text-xs text-text max-w-md mx-auto">

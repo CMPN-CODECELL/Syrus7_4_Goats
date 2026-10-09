@@ -29,7 +29,7 @@ export const RunProgress: React.FC<RunProgressProps> = ({ jobStatus, onCancel })
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 bg-red/20 text-red border border-red/40 hover:bg-wine hover:text-text text-xs font-bold rounded-xl transition-all self-start sm:self-auto"
+          className="px-4 py-2 min-h-[44px] bg-red/20 text-[#FF8A8A] border border-red/40 hover:bg-wine hover:text-text text-xs font-bold rounded-xl transition-all self-start sm:self-auto flex items-center justify-center"
         >
           Cancel Optimization
         </button>
