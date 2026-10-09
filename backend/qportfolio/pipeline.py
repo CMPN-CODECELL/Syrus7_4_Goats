@@ -6,6 +6,37 @@ import uuid
 from collections.abc import Callable
 from dataclasses import asdict
 
+import numpy as np
+import pandas as pd
+
+
+def market_betas(market) -> dict[str, float]:
+    """Beta of each stock to the equal-weight market of `market`, from the estimation-window covariance only."""
+    w = np.full(len(market.tickers), 1.0 / len(market.tickers))
+    cov_with_market = market.sigma @ w
+    return {t: round(float(b), 4) for t, b in zip(market.tickers, cov_with_market / float(w @ cov_with_market))}
+
+
+def weekly_candles(wealth, start: float) -> list[dict]:
+    """Weekly open/high/low/close of a growth path (DatetimeIndex, starts at 1.0), in rupees from `start`."""
+    out, prev = [], start
+    for _, w in (wealth * start).groupby(pd.Grouper(freq="W-FRI")):
+        if w.empty:
+            continue
+        close = float(w.iloc[-1])
+        out.append({"date": w.index[-1].date().isoformat(), "open": round(prev), "high": round(max(prev, float(w.max()))),
+                    "low": round(min(prev, float(w.min()))), "close": round(close)})
+        prev = close
+    return out
+
+
+def test_candles(market, solvers, capital: float) -> dict[str, list[dict]]:
+    """Test-window candles for each feasible portfolio (equal-weight buy-and-hold, as in out_of_sample) and NIFTY 50."""
+    out = {r.solver: weekly_candles((1.0 + market.test_returns[r.selection]).cumprod().mean(axis=1), capital)
+           for r in solvers if r.feasible and r.selection}
+    out["nifty50"] = weekly_candles((1.0 + market.benchmark_test_returns).cumprod(), capital)
+    return out
+
 
 class Cancelled(Exception):
     """Defined before the heavier imports: quantum/qaoa.py imports it from this module."""
@@ -116,6 +147,8 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
         benchmarks={"nifty50": OOS(**asdict(benchmark_oos(market)))},
         verdict=verdict(solvers, landscape, qaoa.metrics),
         recommended=recommended,
+        betas=market_betas(full),
+        candles=test_candles(market, solvers, request.capital),
     )
     step(1.0, "Done")
     return result

@@ -52,8 +52,20 @@ export const App: React.FC = () => {
     </div>
   );
   const themeButton = (
-    <button type="button" onClick={() => setDark(!dark)} aria-pressed={dark} className="inline-flex items-center px-2 py-0.5 border border-line-strong text-[13px] font-mono uppercase text-muted hover:text-text">
-      {dark ? 'White mode' : 'Black mode'}
+    <button type="button" onClick={() => setDark(!dark)} aria-label={dark ? 'Switch to white mode' : 'Switch to black mode'} title={dark ? 'White mode' : 'Black mode'}
+      className="inline-flex items-center justify-center w-9 h-9 border border-line-strong text-muted hover:text-text">
+      {dark ? (
+        // Sun: switch to white mode
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path strokeLinecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" />
+        </svg>
+      ) : (
+        // Crescent moon: switch to black mode
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+        </svg>
+      )}
     </button>
   );
 
@@ -178,7 +190,7 @@ export const App: React.FC = () => {
     <>
     {home && (
       <div className="min-h-screen bg-bg text-text px-4 sm:px-6 py-10">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="flex justify-end gap-2 mb-4">{modeButton}{themeButton}</div>
           <Landing onStart={() => start(false)} onTour={() => start(true)} />
         </div>
