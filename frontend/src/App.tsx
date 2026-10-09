@@ -8,8 +8,10 @@ import { getHealth } from './api/client';
 import { Landing } from './pages/Landing';
 import { Tour } from './components/tour/Tour';
 import { TOUR_DONE_KEY } from './components/tour/tourSteps';
+import { StressPage } from './pages/StressPage';
+import type { RunResult } from './api/types';
 
-type Tab = 'optimise' | 'method' | 'evidence' | 'glossary';
+type Tab = 'optimise' | 'stress' | 'method' | 'evidence' | 'glossary';
 
 interface NavItem {
   id: Tab;
@@ -25,6 +27,7 @@ export const App: React.FC = () => {
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const [home, setHome] = useState(true);
   const [tourOpen, setTourOpen] = useState(false);
+  const [lastResult, setLastResult] = useState<RunResult | null>(null); // latest run, for the Stress Test page
   // White theme by default; the choice is remembered in this browser.
   const [dark, setDark] = useState(() => { try { return localStorage.getItem('qp_theme') === 'dark'; } catch { return false; } });
   useEffect(() => {
@@ -102,6 +105,22 @@ export const App: React.FC = () => {
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+        </svg>
+      )
+    },
+    {
+      id: 'stress',
+      label: 'Stress Test',
+      sublabel: 'Market crash what-ifs',
+      icon: (active) => (
+        <svg
+          className={`w-4 h-4 shrink-0 transition-colors ${active ? 'text-accent-blue-hover' : 'text-muted'}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.306-4.307a11.95 11.95 0 015.814 5.519l2.74 1.22m0 0l-5.94 2.28m5.94-2.28l-2.28-5.941" />
         </svg>
       )
     },
@@ -336,6 +355,7 @@ export const App: React.FC = () => {
                 {activeTab === 'method' && 'Methodology & QUBO Specification'}
                 {activeTab === 'evidence' && 'Empirical Quantum Benchmarks'}
                 {activeTab === 'glossary' && 'Quantum & Quantitative Lexicon'}
+                {activeTab === 'stress' && 'Market Crash Stress Test'}
               </span>
             </div>
           </div>
@@ -366,9 +386,10 @@ export const App: React.FC = () => {
         <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Kept mounted so running jobs and results survive navigation */}
           <div hidden={activeTab !== 'optimise'}>
-            <Optimise />
+            <Optimise onResult={setLastResult} />
           </div>
           {activeTab === 'method' && <Method />}
+          {activeTab === 'stress' && <StressPage result={lastResult} onGo={() => handleTabChange('optimise')} />}
           {activeTab === 'evidence' && <Evidence />}
           {activeTab === 'glossary' && <GlossaryPage />}
         </main>

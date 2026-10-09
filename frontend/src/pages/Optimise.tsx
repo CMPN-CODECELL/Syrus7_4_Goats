@@ -86,7 +86,7 @@ const PRESETS: Preset[] = [
   }
 ];
 
-export const Optimise: React.FC = () => {
+export const Optimise: React.FC<{ onResult?: (r: RunResult) => void }> = ({ onResult }) => {
   // Stage Flow State: 'configure' = full setup screen, 'results' = full results workspace
   const [activeStage, setActiveStage] = useState<'configure' | 'results'>('configure');
   const [resultsTab, setResultsTab] = useState<'overview' | 'solvers' | 'quantum' | 'all'>('overview');
@@ -218,6 +218,7 @@ export const Optimise: React.FC = () => {
         setActiveJobStatus(status);
         if (status.state === 'done') {
           setRunResult(status.result);
+          if (status.result) onResult?.(status.result);
           setActiveStage('results');
         }
       } catch (err: any) {
