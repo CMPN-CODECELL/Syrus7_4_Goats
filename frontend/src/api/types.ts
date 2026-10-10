@@ -34,7 +34,7 @@ export interface RunRequest {
   qubit_cap: number;
   qaoa: QaoaSettings;
   /** Expected-return estimator: Bayes-Stein shrinkage (default) or the raw past average. */
-  mu_estimator?: 'bayes_stein' | 'raw';
+  mu_estimator?: 'capm' | 'bayes_stein' | 'raw';
 }
 
 export interface ScreenQubits {
@@ -241,7 +241,7 @@ export interface RunResult {
   /** Portfolio report: correlation and annualised covariance (daily log returns x252) of the recommended portfolio's stocks (estimation window). */
   correlation?: { tickers: string[]; matrix: number[][]; covariance: number[][] } | null;
   /** How expected returns were estimated: shrinkage weight (0..1) toward a target annual log return. */
-  estimator?: { method: 'bayes_stein' | 'raw'; shrinkage: number; target: number | null } | null;
+  estimator?: { method: 'capm' | 'bayes_stein' | 'raw'; shrinkage: number; target: number | null; market_return?: number; risk_free?: number } | null;
 }
 
 export interface AssetStat {
@@ -251,6 +251,8 @@ export interface AssetStat {
   exp_return: number;
   /** The raw past average before shrinkage (estimation window); absent on older runs. */
   past_return?: number;
+  /** The Bayes-Stein shrunk past average (estimation window); absent on older runs. */
+  shrunk_return?: number;
   volatility: number;
 }
 

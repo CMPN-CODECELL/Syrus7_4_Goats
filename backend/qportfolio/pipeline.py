@@ -27,6 +27,22 @@ def bayes_stein(mu: np.ndarray, sigma: np.ndarray, years: float) -> tuple[np.nda
     return (1 - weight) * mu + weight * target, weight, target
 
 
+# Long-run nominal market return assumed by the CAPM estimate (Indian equities). A stated assumption, not fitted to data.
+LONG_RUN_MARKET = 0.12
+
+
+def capm_returns(sigma: np.ndarray, risk_free: float, market: float = LONG_RUN_MARKET) -> np.ndarray:
+    """CAPM expected annual log returns: log(1 + rf + beta x (market - rf)), beta to the equal-weight market of `sigma`.
+
+    Uses only how each stock moves with the market (estimation-window covariance), not its past returns. On a validation
+    year inside the estimation data it was the most accurate estimate per stock (see docs/research/17-return-estimates.md).
+    """
+    w = np.full(len(sigma), 1.0 / len(sigma))
+    cov_with_market = sigma @ w
+    beta = cov_with_market / float(w @ cov_with_market)
+    return np.log1p(risk_free + beta * (market - risk_free))
+
+
 def market_betas(market) -> dict[str, float]:
     """Beta of each stock to the equal-weight market of `market`, from the estimation-window covariance only."""
     w = np.full(len(market.tickers), 1.0 / len(market.tickers))
@@ -55,14 +71,14 @@ def test_candles(market, solvers, capital: float) -> dict[str, list[dict]]:
     return out
 
 
-def asset_stats(market, past_mu: np.ndarray) -> list[dict]:
-    """Per stock of the requested universe (the same market the betas use), estimation window only: the expected annual log
-    return the optimiser used, the raw past average it came from, and volatility."""
+def asset_stats(market, past_mu: np.ndarray, shrunk_mu: np.ndarray) -> list[dict]:
+    """Per stock of the requested universe (the same market the betas use), estimation window only, annual log returns:
+    the estimate the optimiser used, the raw past average, and the Bayes-Stein shrunk past average; plus volatility."""
     names = {a.ticker: a.name for a in load_universe()}
     vol = np.sqrt(np.diag(market.sigma))
     return [{"ticker": t, "name": names.get(t, t), "sector": sec, "exp_return": round(float(m), 6),
-             "past_return": round(float(p), 6), "volatility": round(float(v), 6)}
-            for t, sec, m, p, v in zip(market.tickers, market.sectors, market.mu, past_mu, vol)]
+             "past_return": round(float(p), 6), "shrunk_return": round(float(b), 6), "volatility": round(float(v), 6)}
+            for t, sec, m, p, b, v in zip(market.tickers, market.sectors, market.mu, past_mu, shrunk_mu, vol)]
 
 
 def selection_correlation(market, selection: list[str]) -> dict:
@@ -92,6 +108,7 @@ from .contracts import (  # noqa: E402
     ScreenInfo,
 )
 from .data import (  # noqa: E402
+    RF,
     benchmark_oos,
     build_market,
     linear_costs,
@@ -122,13 +139,16 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
     step(0.0, "Starting")
     full = build_market(request.tickers)
     past_mu = full.mu
-    estimator = {"method": "raw", "shrinkage": 0.0, "target": None}
-    if request.mu_estimator == "bayes_stein":
-        win = full.windows
-        years = (pd.Timestamp(win.est_end) - pd.Timestamp(win.est_start)).days / 365.25
-        mu, weight, target = bayes_stein(full.mu, full.sigma, years)
-        full = replace(full, mu=mu)  # every later step (pre-screen, QUBO, solvers, report) uses the shrunk estimate
-        estimator = {"method": "bayes_stein", "shrinkage": round(weight, 4), "target": round(target, 6)}
+    win = full.windows
+    years = (pd.Timestamp(win.est_end) - pd.Timestamp(win.est_start)).days / 365.25
+    shrunk_mu, weight, target = bayes_stein(full.mu, full.sigma, years)
+    estimator = {"method": request.mu_estimator, "shrinkage": round(weight, 4), "target": round(target, 6),
+                 "market_return": LONG_RUN_MARKET, "risk_free": RF}
+    # Every later step (pre-screen, QUBO, solvers, frontier, report) uses the chosen estimate of expected return.
+    if request.mu_estimator == "capm":
+        full = replace(full, mu=capm_returns(full.sigma, RF))
+    elif request.mu_estimator == "bayes_stein":
+        full = replace(full, mu=shrunk_mu)
     step(0.05, "Market data loaded")
 
     # prescreen returns applied=False when the universe already fits; target_return adds 3 slack bits it cannot see.
@@ -142,7 +162,10 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
     prices = dict(zip(full.tickers, full.est_end_prices))
     weights = {t: n * float(prices[t]) / request.capital for t, n in request.holdings.items() if t in prices}
     notes = [SURVIVORSHIP_NOTE]
-    if estimator["method"] == "bayes_stein":
+    if estimator["method"] == "capm":
+        notes.append(f"Expected returns use CAPM: {RF:.2%} risk-free + beta x ({LONG_RUN_MARKET:.0%} assumed long-run market "
+                     "- risk-free). Past returns are not used, because they overstate recent winners.")
+    elif estimator["method"] == "bayes_stein":
         notes.append(f"Expected returns use Bayes-Stein shrinkage: each stock's past average is pulled "
                      f"{estimator['shrinkage']:.0%} toward a common target, because raw past averages overstate recent winners.")
     if len(weights) < len(request.holdings):
@@ -199,7 +222,7 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
         recommended=recommended,
         betas=market_betas(full),
         candles=test_candles(market, solvers, request.capital),
-        assets=asset_stats(full, past_mu),
+        assets=asset_stats(full, past_mu, shrunk_mu),
         estimator=estimator,
         correlation=selection_correlation(market, best.selection),
     )

@@ -46,12 +46,16 @@ export function holdings(r: RunResult, s: SolverResult): Holding[] {
   });
 }
 
-/** Raw past average annual log return of the picked stocks, before shrinkage; null on runs without it. */
-export function pastLogReturn(r: RunResult, s: SolverResult): number | null {
-  const stat = new Map((r.assets ?? []).map((a) => [a.ticker, a.past_return]));
+/** Equal-weight average of one per-stock annual log return over the picked stocks; null on runs without that field. */
+function selectionAverage(r: RunResult, s: SolverResult, key: 'past_return' | 'shrunk_return'): number | null {
+  const stat = new Map((r.assets ?? []).map((a) => [a.ticker, a[key]]));
   const p = (s.selection ?? []).map((t) => stat.get(t));
   return p.length && p.every(isNum) ? sum(p as number[]) / p.length : null;
 }
+/** Raw past average annual log return of the picked stocks (not a forecast). */
+export const pastLogReturn = (r: RunResult, s: SolverResult) => selectionAverage(r, s, 'past_return');
+/** Bayes-Stein shrunk past average annual log return of the picked stocks. */
+export const shrunkLogReturn = (r: RunResult, s: SolverResult) => selectionAverage(r, s, 'shrunk_return');
 
 /** Long-run nominal market return assumed by the CAPM view of Indian equities. A stated assumption, not an estimate. */
 export const LONG_RUN_MARKET = 0.12;
@@ -289,7 +293,7 @@ export function reportCsv(r: RunResult, capital = r.request.capital, scenarios =
   const logRet = portfolioLogReturn(s, h);
   const vol = s.volatility, oos = s.oos, nifty = r.benchmarks.nifty50;
   const noise = noiseSummary(r);
-  const past = pastLogReturn(r, s);
+  const past = pastLogReturn(r, s), shrunk = shrunkLogReturn(r, s);
   const noiseRows: Row[] = noise ? [
     [`Noise analysis (QAOA sampled on the simulated ${noise.backend} chip; angles optimised without noise)`], ['Metric', 'Ideal simulator', 'Noisy simulator'],
     ['Chance of sampling the best portfolio', f(noise.ideal.p_opt), f(noise.noisy.p_opt)], ['Random guess would get', f(noise.ideal.p_random), f(noise.noisy.p_random)],
@@ -311,6 +315,7 @@ export function reportCsv(r: RunResult, capital = r.request.capital, scenarios =
     ['Expected annual log return', f(logRet)], ['Expected annual return (exp(mu)-1)', f(logRet === null ? null : simpleAnnual(logRet))], ['Estimated volatility', f(vol)],
     ['Return estimator', r.estimator ? `${r.estimator.method}${r.estimator.method === 'bayes_stein' ? ` (shrinkage ${f(r.estimator.shrinkage)})` : ''}` : 'raw'],
     ['Past performance, estimation window (raw average, not a forecast)', f(past === null ? null : simpleAnnual(past))],
+    ['Recent-history estimate (Bayes-Stein shrunk past average)', f(shrunk === null ? null : simpleAnnual(shrunk))],
     [`CAPM view (risk-free 5.57%, ${LONG_RUN_MARKET * 100}% long-run market)`, f(capmReturn(h))],
     ['Sharpe (RF 5.57%)', f(logRet !== null && isNum(vol) ? sharpe(logRet, vol) : null)], ['Modelled transaction cost (fraction of capital)', f(s.txn_cost)],
     ['Test-year return', f(oos?.ann_return)], ['Test-year volatility', f(oos?.ann_vol)], ['Test-year Sharpe', f(oos?.sharpe)], ['Test-year max drawdown', f(oos?.max_drawdown)],

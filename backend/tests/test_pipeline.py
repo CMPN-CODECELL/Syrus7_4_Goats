@@ -105,3 +105,17 @@ def test_bayes_stein_pulls_extremes_toward_the_target():
     np.testing.assert_allclose(shrunk, (1 - weight) * mu + weight * target)
     assert np.ptp(shrunk) <= np.ptp(mu) + 1e-12
     assert list(np.argsort(shrunk)) == list(np.argsort(mu))
+
+
+def test_capm_returns_follow_beta_and_average_the_market():
+    """CAPM estimates rise with beta, and the equal-weight market itself earns the assumed market return."""
+    import numpy as np
+    from qportfolio.pipeline import LONG_RUN_MARKET, capm_returns
+    rng = np.random.default_rng(7)
+    a = rng.normal(size=(6, 6)) * 0.1
+    sigma = a @ a.T + np.eye(6) * 0.04
+    mu = capm_returns(sigma, risk_free=0.0557)
+    w = np.full(6, 1 / 6)
+    beta = (sigma @ w) / (w @ sigma @ w)
+    assert list(np.argsort(mu)) == list(np.argsort(beta))
+    assert np.isclose(w @ np.expm1(mu), LONG_RUN_MARKET)  # beta averages to 1 over the equal-weight market
