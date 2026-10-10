@@ -4,10 +4,27 @@ from __future__ import annotations
 import threading
 import uuid
 from collections.abc import Callable
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 import numpy as np
 import pandas as pd
+
+
+def bayes_stein(mu: np.ndarray, sigma: np.ndarray, years: float) -> tuple[np.ndarray, float, float]:
+    """Jorion (1986) Bayes-Stein shrinkage of expected returns toward the minimum-variance portfolio's mean.
+
+    Plain sample means overstate the stocks that just ran up, and an optimiser then picks exactly those (selection bias).
+    Shrinking every mean toward a common target, by an amount the data sets, removes most of that bias. Annualised inputs;
+    `years` of daily observations (~252 a year). Estimation window only, so it adds no look-ahead.
+    Returns (shrunk mu, shrinkage weight in [0, 1], target).
+    """
+    n = len(mu)
+    inv = np.linalg.pinv(sigma)
+    ones = np.ones(n)
+    target = float((inv @ ones) @ mu / (ones @ inv @ ones))
+    d = mu - target
+    weight = min(max((n + 2) / ((n + 2) + years * float(d @ inv @ d)), 0.0), 1.0)
+    return (1 - weight) * mu + weight * target, weight, target
 
 
 def market_betas(market) -> dict[str, float]:
@@ -38,12 +55,14 @@ def test_candles(market, solvers, capital: float) -> dict[str, list[dict]]:
     return out
 
 
-def asset_stats(market) -> list[dict]:
-    """Per stock of the requested universe (the same market the betas use): annualised expected log return and volatility, estimation window only."""
+def asset_stats(market, past_mu: np.ndarray) -> list[dict]:
+    """Per stock of the requested universe (the same market the betas use), estimation window only: the expected annual log
+    return the optimiser used, the raw past average it came from, and volatility."""
     names = {a.ticker: a.name for a in load_universe()}
     vol = np.sqrt(np.diag(market.sigma))
-    return [{"ticker": t, "name": names.get(t, t), "sector": sec, "exp_return": round(float(m), 6), "volatility": round(float(v), 6)}
-            for t, sec, m, v in zip(market.tickers, market.sectors, market.mu, vol)]
+    return [{"ticker": t, "name": names.get(t, t), "sector": sec, "exp_return": round(float(m), 6),
+             "past_return": round(float(p), 6), "volatility": round(float(v), 6)}
+            for t, sec, m, p, v in zip(market.tickers, market.sectors, market.mu, past_mu, vol)]
 
 
 def selection_correlation(market, selection: list[str]) -> dict:
@@ -102,6 +121,14 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
 
     step(0.0, "Starting")
     full = build_market(request.tickers)
+    past_mu = full.mu
+    estimator = {"method": "raw", "shrinkage": 0.0, "target": None}
+    if request.mu_estimator == "bayes_stein":
+        win = full.windows
+        years = (pd.Timestamp(win.est_end) - pd.Timestamp(win.est_start)).days / 365.25
+        mu, weight, target = bayes_stein(full.mu, full.sigma, years)
+        full = replace(full, mu=mu)  # every later step (pre-screen, QUBO, solvers, report) uses the shrunk estimate
+        estimator = {"method": "bayes_stein", "shrinkage": round(weight, 4), "target": round(target, 6)}
     step(0.05, "Market data loaded")
 
     # prescreen returns applied=False when the universe already fits; target_return adds 3 slack bits it cannot see.
@@ -115,6 +142,9 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
     prices = dict(zip(full.tickers, full.est_end_prices))
     weights = {t: n * float(prices[t]) / request.capital for t, n in request.holdings.items() if t in prices}
     notes = [SURVIVORSHIP_NOTE]
+    if estimator["method"] == "bayes_stein":
+        notes.append(f"Expected returns use Bayes-Stein shrinkage: each stock's past average is pulled "
+                     f"{estimator['shrinkage']:.0%} toward a common target, because raw past averages overstate recent winners.")
     if len(weights) < len(request.holdings):
         unpriced = ", ".join(sorted(set(request.holdings) - set(weights)))
         notes.append(f"Holdings without a price in the market were ignored in transaction costs: {unpriced}.")
@@ -169,7 +199,8 @@ def run(request: RunRequest, on_progress: Callable[[float, str, dict | None], No
         recommended=recommended,
         betas=market_betas(full),
         candles=test_candles(market, solvers, request.capital),
-        assets=asset_stats(full),
+        assets=asset_stats(full, past_mu),
+        estimator=estimator,
         correlation=selection_correlation(market, best.selection),
     )
     step(1.0, "Done")

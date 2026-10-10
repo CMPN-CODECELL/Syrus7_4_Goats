@@ -90,3 +90,18 @@ def test_cancel_before_start_raises():
     cancel.set()
     with pytest.raises(Cancelled):
         run(small_request(), cancel=cancel)
+
+
+def test_bayes_stein_pulls_extremes_toward_the_target():
+    """Shrinkage keeps the order of the means, narrows their spread, and stays a weighted average of mu and the target."""
+    import numpy as np
+    from qportfolio.pipeline import bayes_stein
+    rng = np.random.default_rng(7)
+    a = rng.normal(size=(6, 6)) * 0.1
+    sigma = a @ a.T + np.eye(6) * 0.04
+    mu = np.array([0.6, 0.4, 0.2, 0.1, 0.05, -0.1])
+    shrunk, weight, target = bayes_stein(mu, sigma, years=2.0)
+    assert 0.0 <= weight <= 1.0
+    np.testing.assert_allclose(shrunk, (1 - weight) * mu + weight * target)
+    assert np.ptp(shrunk) <= np.ptp(mu) + 1e-12
+    assert list(np.argsort(shrunk)) == list(np.argsort(mu))

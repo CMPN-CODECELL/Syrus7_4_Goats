@@ -50,6 +50,8 @@ class RunRequest(BaseModel):
     holdings: dict[str, int] = {}  # ticker -> share count
     qubit_cap: int = 12  # 16 allowed (FakeGuadalupeV2 size) but ~3 min per live run; 12 keeps it under a minute
     qaoa: QaoaSettings = QaoaSettings()
+    # How expected returns are estimated: Bayes-Stein shrinkage (default) or the raw past average.
+    mu_estimator: Literal["bayes_stein", "raw"] = "bayes_stein"
 
 
 # --- 2.3 Sample, 2.4 ScreenInfo --------------------------------------------
@@ -244,8 +246,9 @@ class RunResult(BaseModel):
     candles: dict[str, list[dict]] | None = None  # weekly OHLC of each portfolio's rupee value over the test window, plus nifty50
     # Portfolio report, estimation window only. assets: every stock of the requested universe (a superset of the solved one), as
     # {ticker, name, sector, exp_return, volatility}. correlation: {tickers, matrix, covariance} for the recommended portfolio.
-    assets: list[dict] | None = None
+    assets: list[dict] | None = None  # each also carries past_return: the raw past average before shrinkage
     correlation: dict[str, Any] | None = None
+    estimator: dict[str, Any] | None = None  # {method, shrinkage (0..1), target (annual log return)}
 
 
 # --- 2.5 JobStatus ----------------------------------------------------------

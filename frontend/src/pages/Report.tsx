@@ -96,6 +96,8 @@ function ReportBody({ result, onNavigateToOptimise }: { result: RunResult; onNav
   const buyCost = isNum(s.txn_cost) ? s.txn_cost : null;
   const estWin = `${data.est_window[0]} to ${data.est_window[1]}`, testWin = `${data.test_window[0]} to ${data.test_window[1]}`;
   const conc = R.concentration(h);
+  const past = R.pastLogReturn(result, s), capm = R.capmReturn(h), est = result.estimator;
+  const beta = h.every((x) => x.beta !== null) ? h.reduce((t, x) => t + x.weight * (x.beta as number), 0) : null;
 
   // Backtest series, re-based to the capital typed above (the candles are in rupees of request.capital).
   const pCandles = result.candles?.[s.solver], nCandles = result.candles?.nifty50;
@@ -172,7 +174,9 @@ function ReportBody({ result, onNavigateToOptimise }: { result: RunResult; onNav
           {request.target_return !== null ? `, at least ${formatPct(request.target_return)} net return` : ''}; risk aversion {request.risk_aversion}). Equal weights; whole-share rounding is ignored here.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <Stat label="Expected annual return" value={annual === null ? '—' : <Delta x={annual} />} hint="What past prices imply the stocks earn in a year if that pattern repeats. An estimate." />
+          <Stat label="Expected annual return" value={annual === null ? '—' : <Delta x={annual} />} hint={est?.method === 'bayes_stein' ? `Past returns pulled ${formatPct(est.shrinkage, { digits: 0 })} toward a common average (Bayes-Stein), because raw past averages overstate recent winners. An estimate, not a promise.` : 'What past prices imply the stocks earn in a year if that pattern repeats. An estimate.'} />
+          {past !== null && <Stat label="Past performance (not a forecast)" value={<Delta x={R.simpleAnnual(past)} />} hint={`What these stocks actually did per year in ${estWin}. The optimiser picked them partly because of this, so it overstates the future.`} />}
+          {capm !== null && <Stat label="Market-model view (CAPM)" value={<Delta x={capm} />} hint={`5.57% risk-free + beta ${beta?.toFixed(2)} × (${R.LONG_RUN_MARKET * 100}% assumed long-run market − 5.57%). Uses market sensitivity only, not past returns: the most conservative view.`} />}
           <Stat label="Estimated 12-month profit/loss" value={logRet === null ? '—' : <Money x={R.projectedPL(capital, logRet, 12)} />} hint="The expected annual return applied to your capital." />
           <Stat label="Volatility (estimated)" value={formatPct(vol)} hint="How much the value typically swings over a year (one standard deviation)." />
           <Stat label="Sharpe ratio (estimated)" value={fix2(sharpe)} hint="Return above the 5.57% risk-free rate for each unit of volatility. Higher is better." />
@@ -183,6 +187,7 @@ function ReportBody({ result, onNavigateToOptimise }: { result: RunResult; onNav
         </div>
         <Calc>
           <p>Expected annual return: the average of each stock's estimated annual <em>log</em> return (the mean of daily log returns × 252 over the estimation window, {estWin}), weighted equally, converted with exp(μ) − 1. Log returns add up over time, which is why they are used to compound. The Optimise page shows μ itself (the log return); this page converts it to a plain percentage, which is larger when the return is positive.</p>
+          {est?.method === 'bayes_stein' && <p>Bayes-Stein shrinkage (Jorion, 1986): μ = (1 − w) × past average + w × target, where the target is the return of the minimum-variance portfolio and the data sets w ({formatPct(est.shrinkage, { digits: 0 })} for this run). A plain past average rewards whatever just ran up, and an optimiser then picks exactly those stocks; shrinking removes most of that bias. It uses the estimation window only.</p>}
           <p>Estimated profit/loss = capital × (exp(μ × months/12) − 1). Volatility = √(wᵀΣw) with Σ the annualised covariance of daily log returns. Sharpe = (exp(μ) − 1 − 5.57%) ÷ volatility.</p>
           <p>Test-year figures come from the real prices in {testWin}: equal-weight buy-and-hold, no trading after the first day. Max drawdown is the largest peak-to-trough fall of the daily value.</p>
         </Calc>
